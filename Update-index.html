@@ -34,9 +34,6 @@
   .navlinks{display:flex;gap:22px;flex-wrap:wrap;font-size:14px;font-weight:500;align-items:center;}
   .navlinks a,.navlinks button.navbtn{text-decoration:none;color:var(--muted);padding:4px 0;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;}
   .navlinks a:hover,.navlinks button.navbtn:hover{color:var(--accent);border-color:var(--accent);}
-  .mode-badge{font-size:12px;font-weight:700;padding:5px 11px;border:1px solid var(--border);white-space:nowrap;}
-  .mode-badge.can-edit{color:#2E7D32;border-color:#8FC98F;}
-  .mode-badge.read-only{color:var(--muted);}
 
   .dropdown{position:relative;}
   .dropdown-panel{position:absolute;top:calc(100% + 14px);left:-14px;background:var(--card);border:1px solid var(--border);min-width:240px;box-shadow:0 10px 26px rgba(0,0,0,0.14);display:none;z-index:70;}
@@ -55,10 +52,6 @@
   .hero-tags{display:flex;gap:10px;flex-wrap:wrap;}
   .tag{font-size:12.5px;font-weight:600;padding:5px 12px;border:1px solid rgba(255,255,255,0.28);color:#EAF0F8;background:rgba(255,255,255,0.06);}
 
-  .edit-hint{max-width:1040px;margin:18px auto 0;padding:0 24px;}
-  .edit-hint .box{display:flex;gap:10px;align-items:flex-start;background:#EAF3EC;border:1px solid #BFE0C4;color:#245F2D;padding:10px 14px;font-size:13px;}
-  @media (prefers-color-scheme:dark){ .edit-hint .box{background:#16281B;border-color:#2E4E33;color:#8FD79A;} }
-  :root[data-theme="dark"] .edit-hint .box{background:#16281B;border-color:#2E4E33;color:#8FD79A;}
 
   main{padding:28px 0 80px;}
   section{margin-bottom:28px;}
@@ -215,7 +208,6 @@
       <button class="navbtn" onclick="switchView('view-home','ky-nang')">Kỹ năng</button>
       <button class="navbtn" onclick="switchView('view-home','lien-he')">Liên hệ</button>
     </div>
-    <span id="modeBadge" class="mode-badge read-only">Đang kiểm tra quyền…</span>
   </div>
 </nav>
 
@@ -236,10 +228,6 @@
     </div>
   </div>
 </header>
-
-<div class="edit-hint" id="editHint" artifact-local>
-  <div class="box">✏️ <span>Bấm trực tiếp vào bất kỳ đoạn chữ nào để sửa. Dùng nút <strong>+ Thêm dòng / + Thêm thẻ</strong> để thêm nội dung, hoặc <strong>×</strong> để xoá.</span></div>
-</div>
 
 <main class="wrap">
 
@@ -809,7 +797,7 @@
         <h4>Bước 4: Chia sẻ thư mục Drive với quyền xem (Viewer)</h4>
         <p>Thư mục lưu trữ đã được phân quyền công khai <em>"Bất kỳ ai có đường liên kết đều có thể xem"</em> để phục vụ giảng viên chấm điểm:</p>
         <div style="margin-top:10px;">
-          <a href="https://drive.google.com/" target="_blank" class="wlink" style="display:inline-flex;">📂 Mở thư mục Google Drive minh chứng bài làm →</a>
+          <a href="https://drive.google.com/drive/folders/1x7CdIxvw2UyD_8qjP3XWKWXj7rY1WWtF?usp=drive_link" target="_blank" rel="noopener" class="wlink" style="display:inline-flex;">📂 Mở thư mục Google Drive minh chứng bài làm →</a>
         </div>
       </div>
 
@@ -910,21 +898,14 @@
   });
 
   (async ()=>{
-    const badge = document.getElementById('modeBadge');
     try{
       const user = await claude.use('user');
       const editable = user ? (user.canEdit ? user.canEdit() : true) : true;
-      if(editable){
-        badge.textContent = '✏️ Bạn có thể chỉnh sửa'; badge.className = 'mode-badge can-edit';
-      } else {
-        badge.textContent = '👁 Chỉ xem'; badge.className = 'mode-badge read-only';
-        const hint = document.getElementById('editHint'); if(hint) hint.style.display = 'none';
+      if(!editable){
         document.querySelectorAll('[contenteditable="true"]').forEach(el=>el.removeAttribute('contenteditable'));
         document.querySelectorAll('.add-row-btn,.row-del,.wcard-del,.add-card-btn,.add-skill-btn,.li-del').forEach(el=>el.style.display='none');
       }
-    }catch(e){
-      badge.textContent = '✏️ Có thể chỉnh sửa'; badge.className = 'mode-badge can-edit';
-    }
+    }catch(e){}
   })();
 </script>
 
