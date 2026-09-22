@@ -1,1 +1,847 @@
 
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nguyễn Chí Nguyên — E-Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#132238; --navy-2:#1D3557; --accent:#D9642C; --accent-2:#F0965A;
+    --steel:#3E6491; --bg:#F4F5F7; --card:#FFFFFF; --text:#1C2430;
+    --muted:#5C6774; --border:#E1E4EA;
+    font-family:'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){ --bg:#0E1520; --card:#161F2E; --text:#E7EAEF; --muted:#98A2B3; --border:#26303F; }
+  }
+  :root[data-theme="dark"]{ --bg:#0E1520; --card:#161F2E; --text:#E7EAEF; --muted:#98A2B3; --border:#26303F; }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth; scroll-padding-top: calc(64px + env(safe-area-inset-top,0px));}
+  html,body{height:100%;}
+  body{margin:0;background:var(--bg);color:var(--text);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);line-height:1.55;}
+  a{color:inherit;} img{max-width:100%;display:block;}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 24px;}
+  .hidden{display:none;}
+
+  nav.top{position:sticky;top:0;top:env(safe-area-inset-top,0px);z-index:60;background:var(--card);border-bottom:1px solid var(--border);}
+  nav.top .inner{max-width:1040px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+  .brand{font-weight:700;font-size:15px;color:var(--navy);cursor:pointer;}
+  @media (prefers-color-scheme:dark){ .brand{color:var(--accent-2);} } :root[data-theme="dark"] .brand{color:var(--accent-2);}
+  .brand span{color:var(--accent);}
+  .navlinks{display:flex;gap:22px;flex-wrap:wrap;font-size:14px;font-weight:500;align-items:center;}
+  .navlinks a,.navlinks button.navbtn{text-decoration:none;color:var(--muted);padding:4px 0;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;}
+  .navlinks a:hover,.navlinks button.navbtn:hover{color:var(--accent);border-color:var(--accent);}
+  .mode-badge{font-size:12px;font-weight:700;padding:5px 11px;border:1px solid var(--border);white-space:nowrap;}
+  .mode-badge.can-edit{color:#2E7D32;border-color:#8FC98F;}
+  .mode-badge.read-only{color:var(--muted);}
+
+  .dropdown{position:relative;}
+  .dropdown-panel{position:absolute;top:calc(100% + 14px);left:-14px;background:var(--card);border:1px solid var(--border);min-width:240px;box-shadow:0 10px 26px rgba(0,0,0,0.14);display:none;z-index:70;}
+  .dropdown.open .dropdown-panel{display:block;}
+  .dropdown-panel a{display:flex;align-items:center;gap:9px;padding:10px 14px;font-size:13.5px;color:var(--text);text-decoration:none;border-bottom:1px solid var(--border);}
+  .dropdown-panel a:last-child{border-bottom:none;}
+  .dropdown-panel a:hover{background:var(--bg);color:var(--accent);}
+  .dcaret{font-size:10px;margin-left:2px;}
+
+  header.hero{background:linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);color:#EEF2F8;padding:52px 24px 46px;position:relative;overflow:hidden;}
+  header.hero::after{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(115deg, rgba(255,255,255,0.035) 0 2px, transparent 2px 38px);pointer-events:none;}
+  .hero-inner{max-width:1040px;margin:0 auto;position:relative;display:flex;gap:34px;align-items:center;flex-wrap:wrap;}
+  .avatar{width:106px;height:106px;flex:none;border-radius:50%;background:radial-gradient(circle at 32% 28%, var(--accent-2), var(--accent) 65%, #b8501c 100%);display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:800;color:#fff;border:3px solid rgba(255,255,255,0.35);}
+  .hero-text h1{margin:0 0 6px;font-size:clamp(26px,4vw,36px);font-weight:800;}
+  .hero-text p.role{margin:0 0 14px;font-size:15.5px;color:#C7D3E3;font-weight:400;}
+  .hero-tags{display:flex;gap:10px;flex-wrap:wrap;}
+  .tag{font-size:12.5px;font-weight:600;padding:5px 12px;border:1px solid rgba(255,255,255,0.28);color:#EAF0F8;background:rgba(255,255,255,0.06);}
+
+  .edit-hint{max-width:1040px;margin:18px auto 0;padding:0 24px;}
+  .edit-hint .box{display:flex;gap:10px;align-items:flex-start;background:#EAF3EC;border:1px solid #BFE0C4;color:#245F2D;padding:10px 14px;font-size:13px;}
+  @media (prefers-color-scheme:dark){ .edit-hint .box{background:#16281B;border-color:#2E4E33;color:#8FD79A;} }
+  :root[data-theme="dark"] .edit-hint .box{background:#16281B;border-color:#2E4E33;color:#8FD79A;}
+
+  main{padding:28px 0 80px;}
+  section{margin-bottom:28px;}
+  .card{background:var(--card);border:1px solid var(--border);border-left:4px solid var(--accent);padding:30px 30px 32px;}
+  h2.section-title{display:flex;align-items:baseline;gap:10px;font-size:21px;font-weight:800;color:var(--navy);margin:0 0 20px;}
+  @media (prefers-color-scheme:dark){ h2.section-title{color:#F1F5FB;} } :root[data-theme="dark"] h2.section-title{color:#F1F5FB;}
+  h2.section-title .num{color:var(--accent);}
+
+  [contenteditable="true"]{border-radius:2px;transition:background .12s;}
+  [contenteditable="true"]:hover{background:rgba(217,100,44,0.08);outline:1px dashed var(--accent);}
+  [contenteditable="true"]:focus{outline:2px solid var(--accent);background:rgba(217,100,44,0.12);}
+
+  .intro-grid{display:grid;grid-template-columns:220px 1fr;gap:32px;}
+  @media (max-width:640px){.intro-grid{grid-template-columns:1fr;}}
+  .intro-photo{width:100%;aspect-ratio:1/1;background:linear-gradient(160deg,var(--navy-2),var(--navy));display:flex;align-items:center;justify-content:center;color:#fff;font-size:52px;font-weight:800;}
+  dl.facts{margin:0 0 18px;display:grid;grid-template-columns:150px 1fr;row-gap:9px;column-gap:12px;font-size:14.5px;}
+  dl.facts dt{color:var(--muted);font-weight:600;}
+  dl.facts dd{margin:0;font-weight:500;}
+  .bio{font-size:14.5px;}
+
+  .gpa-banner{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:#FCEEE4;border:1px solid #F0C6A2;color:#7A3B12;padding:11px 16px;font-size:14px;font-weight:600;margin-bottom:20px;}
+  @media (prefers-color-scheme:dark){ .gpa-banner{background:#2B1F14;border-color:#5C3A1C;color:#F0B27A;} } :root[data-theme="dark"] .gpa-banner{background:#2B1F14;border-color:#5C3A1C;color:#F0B27A;}
+  .gpa-banner .star{color:var(--accent);}
+
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+  .tab-btn{border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:inherit;font-size:13.5px;font-weight:600;padding:8px 16px;cursor:pointer;}
+  .tab-btn:hover{border-color:var(--accent);}
+  .tab-btn.active{background:var(--navy);border-color:var(--navy);color:#fff;}
+  @media (prefers-color-scheme:dark){ .tab-btn.active{background:var(--accent);border-color:var(--accent);} } :root[data-theme="dark"] .tab-btn.active{background:var(--accent);border-color:var(--accent);}
+
+  .table-scroll{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px;}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--border);}
+  th{color:var(--muted);font-size:12.5px;text-transform:uppercase;letter-spacing:.04em;font-weight:700;}
+  td.grade{font-weight:700;color:var(--navy);}
+  @media (prefers-color-scheme:dark){ td.grade{color:var(--accent-2);} } :root[data-theme="dark"] td.grade{color:var(--accent-2);}
+  td.num-col{width:34px;color:var(--muted);}
+  th.del-col,td.del-col{width:30px;text-align:center;}
+  .row-del{border:none;background:none;color:var(--muted);cursor:pointer;font-size:15px;line-height:1;padding:4px;}
+  .row-del:hover{color:#C0392B;}
+  .table-foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:13.5px;font-weight:600;color:var(--muted);margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+  .add-row-btn{margin-top:14px;border:1px dashed var(--border);background:none;color:var(--muted);font-family:inherit;font-size:13px;font-weight:600;padding:8px 14px;cursor:pointer;width:100%;}
+  .add-row-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+  .lede{font-size:14px;color:var(--muted);margin:-8px 0 22px;max-width:70ch;}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  @media (max-width:640px){.grid-2{grid-template-columns:1fr;}}
+  .wcard{border:1px solid var(--border);background:var(--bg);overflow:hidden;position:relative;}
+  .wcard .thumb{height:130px;background:linear-gradient(135deg,var(--navy),var(--steel));display:flex;align-items:center;justify-content:center;color:#fff;font-size:12.5px;font-weight:600;letter-spacing:.03em;text-align:center;padding:0 16px;}
+  .wcard .body{padding:18px 20px 20px;}
+  .wcard h3{margin:0 0 8px;font-size:15.5px;font-weight:700;color:var(--navy);}
+  @media (prefers-color-scheme:dark){ .wcard h3{color:#F1F5FB;} } :root[data-theme="dark"] .wcard h3{color:#F1F5FB;}
+  .wcard p{margin:0 0 16px;font-size:13.5px;color:var(--muted);}
+  .wlink{display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:#fff;font-size:13px;font-weight:600;padding:8px 14px;text-decoration:none;border:none;cursor:pointer;font-family:inherit;}
+  .wlink:hover{background:var(--accent);}
+  .wcard-del{position:absolute;top:8px;right:8px;border:none;background:rgba(0,0,0,0.45);color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:14px;line-height:1;}
+  .wcard-del:hover{background:#C0392B;}
+  .add-card-btn{border:1px dashed var(--border);background:none;color:var(--muted);font-family:inherit;font-size:13px;font-weight:600;padding:14px;cursor:pointer;min-height:100%;width:100%;}
+  .add-card-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+  .skills-cols{display:grid;grid-template-columns:1fr 1fr;gap:36px;}
+  @media (max-width:640px){.skills-cols{grid-template-columns:1fr;}}
+  h4.sub{margin:0 0 12px;font-size:14.5px;font-weight:700;color:var(--navy);}
+  @media (prefers-color-scheme:dark){ h4.sub{color:#F1F5FB;} } :root[data-theme="dark"] h4.sub{color:#F1F5FB;}
+  ul.skill-list{list-style:none;margin:0;padding:0;}
+  ul.skill-list li{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13.5px;align-items:flex-start;}
+  ul.skill-list li:last-child{border-bottom:none;}
+  ul.skill-list li::before{content:"✓";color:var(--accent);font-weight:800;flex:none;}
+  ul.skill-list li span.txt{flex:1;}
+  .li-del{border:none;background:none;color:var(--muted);cursor:pointer;font-size:14px;}
+  .li-del:hover{color:#C0392B;}
+  .add-skill-btn{margin-top:8px;border:1px dashed var(--border);background:none;color:var(--muted);font-family:inherit;font-size:12.5px;font-weight:600;padding:6px 12px;cursor:pointer;}
+  .add-skill-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:640px){.contact-grid{grid-template-columns:1fr;}}
+  .contact-item{border:1px solid var(--border);padding:14px 16px;font-size:13.5px;}
+  .contact-item dt{color:var(--muted);font-weight:600;margin-bottom:3px;font-size:12px;text-transform:uppercase;letter-spacing:.04em;}
+  .contact-item dd{margin:0;font-weight:600;}
+
+  footer{text-align:center;font-size:12.5px;color:var(--muted);padding:26px 24px 40px;}
+
+  /* Detail report views */
+  .crumbs{font-size:13px;color:#B8C3D6;margin-bottom:10px;}
+  .crumbs button{background:none;border:none;color:#EAF0F8;text-decoration:underline;cursor:pointer;font-family:inherit;font-size:13px;padding:0;}
+  .crumbs span{margin:0 6px;}
+  .detail-hero p{margin:0;color:#C7D3E3;font-size:14.5px;max-width:70ch;}
+  .info-box{background:var(--bg);border:1px solid var(--border);padding:18px 20px;display:grid;grid-template-columns:1fr 1fr;gap:12px 28px;font-size:14px;margin-bottom:26px;}
+  @media (max-width:640px){.info-box{grid-template-columns:1fr;}}
+  .info-box .f b{display:block;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px;font-weight:700;}
+  .info-box .f span{font-weight:600;}
+  .equip-list{margin:0 0 22px;padding-left:20px;font-size:14px;}
+  .equip-list li{margin-bottom:6px;}
+  .media-row{display:grid;grid-template-columns:230px 1fr;gap:20px;margin-bottom:26px;align-items:start;}
+  @media (max-width:640px){.media-row{grid-template-columns:1fr;}}
+  .media-thumb{width:100%;aspect-ratio:4/3;background:linear-gradient(135deg,var(--steel),var(--navy));display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;text-align:center;padding:10px;}
+  .media-row h4{margin:0 0 6px;font-size:14.5px;font-weight:700;color:var(--navy);}
+  @media (prefers-color-scheme:dark){ .media-row h4{color:#F1F5FB;} } :root[data-theme="dark"] .media-row h4{color:#F1F5FB;}
+  .media-row p{margin:0;font-size:13.5px;color:var(--muted);}
+  .step{border-left:3px solid var(--accent);padding:2px 0 2px 16px;margin-bottom:20px;}
+  .step h4{margin:0 0 6px;font-size:15px;font-weight:700;color:var(--navy);}
+  @media (prefers-color-scheme:dark){ .step h4{color:#F1F5FB;} } :root[data-theme="dark"] .step h4{color:#F1F5FB;}
+  .step p{margin:0 0 8px;font-size:14px;}
+  .step .result{color:#2E7D32;font-weight:600;font-size:13.5px;}
+  .mini-table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:10px;}
+  .mini-table th,.mini-table td{border-bottom:1px solid var(--border);padding:8px 10px;text-align:left;}
+  .mini-table th{color:var(--muted);font-size:11px;text-transform:uppercase;font-weight:700;}
+  .mini-table td.pass{color:#2E7D32;font-weight:600;}
+  .lessons-box{background:#FCEEE4;border:1px solid #F0C6A2;padding:16px 18px;font-size:14px;color:#5B3312;margin-bottom:10px;}
+  @media (prefers-color-scheme:dark){ .lessons-box{background:#2B1F14;border-color:#5C3A1C;color:#F0B27A;} }
+  :root[data-theme="dark"] .lessons-box{background:#2B1F14;border-color:#5C3A1C;color:#F0B27A;}
+  .detail-nav{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:4px;}
+  .btn-back,.btn-next,.btn-home{border:1px solid var(--border);background:var(--card);color:var(--text);font-weight:600;font-size:13.5px;padding:10px 18px;cursor:pointer;font-family:inherit;}
+  .btn-next{border:none;background:var(--accent);color:#fff;}
+  .btn-next:hover{background:#c1541f;} .btn-back:hover,.btn-home:hover{border-color:var(--accent);color:var(--accent);}
+</style>
+</head>
+<body>
+
+<nav class="top" artifact-local>
+  <div class="inner">
+    <div class="brand" onclick="switchView('view-home')">E-PORTFOLIO · <span>NGUYỄN CHÍ NGUYÊN</span></div>
+    <div class="navlinks">
+      <button class="navbtn" onclick="switchView('view-home','gioi-thieu')">Giới thiệu</button>
+      <button class="navbtn" onclick="switchView('view-home','hoc-tap')">Kết quả học tập</button>
+      <div class="dropdown" id="wsDropdown">
+        <button class="navbtn" onclick="toggleDropdown(event)">Thực hành xưởng <span class="dcaret">▾</span></button>
+        <div class="dropdown-panel">
+          <a href="#" onclick="switchView('view-home','xuong');closeDropdown();return false;">📌 Tổng quan 4 bài thực hành</a>
+          <a href="#" onclick="switchView('view-ws1');closeDropdown();return false;">🚗 1. Động cơ đốt trong</a>
+          <a href="#" onclick="switchView('view-ws2');closeDropdown();return false;">⚡ 2. Điện – Điện tử ô tô</a>
+          <a href="#" onclick="switchView('view-ws3');closeDropdown();return false;">🔧 3. Khung gầm &amp; Phanh</a>
+          <a href="#" onclick="switchView('view-ws4');closeDropdown();return false;">🩺 4. Bảo dưỡng &amp; OBD-II</a>
+        </div>
+      </div>
+      <button class="navbtn" onclick="switchView('view-home','ky-nang')">Kỹ năng</button>
+      <button class="navbtn" onclick="switchView('view-home','lien-he')">Liên hệ</button>
+    </div>
+    <span id="modeBadge" class="mode-badge read-only">Đang kiểm tra quyền…</span>
+  </div>
+</nav>
+
+<!-- ========================= VIEW: HOME ========================= -->
+<div class="view" id="view-home">
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="avatar">NCN</div>
+    <div class="hero-text">
+      <h1 contenteditable="true">NGUYỄN CHÍ NGUYÊN</h1>
+      <p class="role" contenteditable="true">Sinh viên ngành Công nghệ Kỹ thuật Ô tô — Trường Cao đẳng Công nghiệp Huế</p>
+      <div class="hero-tags">
+        <span class="tag" contenteditable="true">Lớp 26CDOT09</span>
+        <span class="tag" contenteditable="true">Khóa 2026 – 2029</span>
+        <span class="tag" contenteditable="true">Khoa Cơ khí – Động lực</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="edit-hint" id="editHint" artifact-local>
+  <div class="box">✏️ <span>Bấm trực tiếp vào bất kỳ đoạn chữ nào để sửa. Dùng nút <strong>+ Thêm dòng / + Thêm thẻ</strong> để thêm nội dung, hoặc <strong>×</strong> để xoá. Thay đổi tự lưu và mọi người xem trang sẽ thấy bản mới nhất.</span></div>
+</div>
+
+<main class="wrap">
+
+  <section id="gioi-thieu">
+    <div class="card">
+      <h2 class="section-title"><span class="num">1.</span> Giới thiệu bản thân</h2>
+      <div class="intro-grid">
+        <div class="intro-photo">NCN</div>
+        <div>
+          <dl class="facts">
+            <dt>Họ và tên:</dt><dd contenteditable="true">Nguyễn Chí Nguyên</dd>
+            <dt>Giới tính:</dt><dd contenteditable="true">Nam</dd>
+            <dt>Mã sinh viên:</dt><dd contenteditable="true">2660935</dd>
+            <dt>Lớp:</dt><dd contenteditable="true">Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09)</dd>
+            <dt>Khoa:</dt><dd contenteditable="true">Cơ khí – Động lực</dd>
+            <dt>Trường:</dt><dd contenteditable="true">Cao đẳng Công nghiệp Huế (HueIC)</dd>
+            <dt>Niên khóa:</dt><dd contenteditable="true">2026 – 2029</dd>
+          </dl>
+          <p class="bio" contenteditable="true">Em là sinh viên ngành Công nghệ Kỹ thuật Ô tô tại Trường Cao đẳng Công nghiệp Huế. Em yêu thích công việc bảo dưỡng ô tô, sửa chữa động cơ và kiểm tra hệ thống điện – điện tử xe. Mục tiêu của em sau khi tốt nghiệp là trở thành một kỹ thuật viên sửa chữa ô tô lành nghề, làm việc chuyên nghiệp tại các garage và đại lý ô tô chính hãng.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="hoc-tap">
+    <div class="card">
+      <h2 class="section-title"><span class="num">2.</span> Kết quả học tập</h2>
+      <div class="gpa-banner">
+        <span class="star">★</span> ĐIỂM TÍCH LŨY TOÀN KHÓA (GPA): <span contenteditable="true">8.7</span> / 10 · XẾP LOẠI DỰ KIẾN: <span contenteditable="true">GIỎI</span> (<span contenteditable="true">92</span> TÍN CHỈ)
+      </div>
+
+      <div class="tabs" role="tablist" artifact-local>
+        <button class="tab-btn active" data-tab="hk1">Học kỳ 1</button>
+        <button class="tab-btn" data-tab="hk2">Học kỳ 2</button>
+        <button class="tab-btn" data-tab="hk3">Học kỳ 3</button>
+        <button class="tab-btn" data-tab="hk4">Học kỳ 4</button>
+        <button class="tab-btn" data-tab="hk5">Học kỳ 5</button>
+      </div>
+
+      <div class="tab-panel" id="hk1" artifact-local>
+        <div class="table-scroll" artifact-sync>
+        <table data-sem="hk1">
+          <thead><tr><th class="num-col">STT</th><th>Tên môn học / Mô-đun</th><th>Số tín chỉ</th><th>Điểm số</th><th>Xếp loại</th><th class="del-col"></th></tr></thead>
+          <tbody id="hk1-body">
+            <tr id="hk1-r1"><td class="num-col">1</td><td contenteditable="true">Vẽ kỹ thuật cơ khí &amp; AutoCAD 2D</td><td contenteditable="true">3</td><td class="grade" contenteditable="true">8.6</td><td contenteditable="true">Giỏi</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk1-r2"><td class="num-col">2</td><td contenteditable="true">Vật liệu cơ khí &amp; Công nghệ kim loại</td><td contenteditable="true">3</td><td class="grade" contenteditable="true">8.4</td><td contenteditable="true">Khá Giỏi</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk1-r3"><td class="num-col">3</td><td contenteditable="true">Cơ học cơ sở &amp; Sức bền vật liệu</td><td contenteditable="true">3</td><td class="grade" contenteditable="true">8.2</td><td contenteditable="true">Khá</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk1-r4"><td class="num-col">4</td><td contenteditable="true">Tin học văn phòng &amp; Kỹ thuật</td><td contenteditable="true">2</td><td class="grade" contenteditable="true">8.5</td><td contenteditable="true">Giỏi</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk1-r5"><td class="num-col">5</td><td contenteditable="true">Tiếng Anh cơ bản 1</td><td contenteditable="true">3</td><td class="grade" contenteditable="true">8.0</td><td contenteditable="true">Khá</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk1-r6"><td class="num-col">6</td><td contenteditable="true">Pháp luật đại cương &amp; Chính trị</td><td contenteditable="true">2</td><td class="grade" contenteditable="true">8.2</td><td contenteditable="true">Khá</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk1-r7"><td class="num-col">7</td><td contenteditable="true">An toàn lao động &amp; Tiêu chuẩn 5S</td><td contenteditable="true">2</td><td class="grade" contenteditable="true">9.2</td><td contenteditable="true">Xuất sắc</td><td class="del-col"><button class="row-del">×</button></td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="table-foot"><span>Tổng số tín chỉ: <span contenteditable="true">18</span> tín chỉ</span><span>Điểm trung bình học kỳ 1: <span contenteditable="true">8.45</span> / 10 (Xếp loại: <span contenteditable="true">Giỏi</span>)</span></div>
+        <button class="add-row-btn" data-target="hk1-body">+ Thêm môn học</button>
+      </div>
+
+      <div class="tab-panel hidden" id="hk2" artifact-local>
+        <div class="table-scroll" artifact-sync>
+        <table data-sem="hk2">
+          <thead><tr><th class="num-col">STT</th><th>Tên môn học / Mô-đun</th><th>Số tín chỉ</th><th>Điểm số</th><th>Xếp loại</th><th class="del-col"></th></tr></thead>
+          <tbody id="hk2-body">
+            <tr id="hk2-r1"><td class="num-col">1</td><td contenteditable="true">Nhập môn Kỹ thuật Ô tô &amp; Đạo đức nghề</td><td contenteditable="true">2</td><td class="grade" contenteditable="true">9.0</td><td contenteditable="true">Xuất sắc</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk2-r2"><td class="num-col">2</td><td contenteditable="true">Lý thuyết ô tô &amp; Kết cấu tổng thành</td><td contenteditable="true">3</td><td class="grade" contenteditable="true">8.6</td><td contenteditable="true">Giỏi</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk2-r3"><td class="num-col">3</td><td contenteditable="true">Dung sai lắp ghép &amp; Kỹ thuật đo lường</td><td contenteditable="true">3</td><td class="grade" contenteditable="true">8.5</td><td contenteditable="true">Giỏi</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk2-r4"><td class="num-col">4</td><td contenteditable="true">Kỹ thuật nhiệt &amp; Khí động lực học</td><td contenteditable="true">3</td><td class="grade" contenteditable="true">8.2</td><td contenteditable="true">Khá</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk2-r5"><td class="num-col">5</td><td contenteditable="true">Kỹ thuật điện &amp; Điện tử cơ bản</td><td contenteditable="true">3</td><td class="grade" contenteditable="true">8.7</td><td contenteditable="true">Giỏi</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk2-r6"><td class="num-col">6</td><td contenteditable="true">Thực hành Nguội, Hàn &amp; Gia công cơ bản</td><td contenteditable="true">4</td><td class="grade" contenteditable="true">8.8</td><td contenteditable="true">Giỏi</td><td class="del-col"><button class="row-del">×</button></td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="table-foot"><span>Tổng số tín chỉ: <span contenteditable="true">18</span> tín chỉ</span><span>Điểm trung bình học kỳ 2: <span contenteditable="true">8.60</span> / 10 (Xếp loại: <span contenteditable="true">Giỏi</span>)</span></div>
+        <button class="add-row-btn" data-target="hk2-body">+ Thêm môn học</button>
+      </div>
+
+      <div class="tab-panel hidden" id="hk3" artifact-local>
+        <div class="table-scroll" artifact-sync>
+        <table data-sem="hk3">
+          <thead><tr><th class="num-col">STT</th><th>Tên môn học / Mô-đun</th><th>Số tín chỉ</th><th>Điểm số</th><th>Xếp loại</th><th class="del-col"></th></tr></thead>
+          <tbody id="hk3-body">
+            <tr id="hk3-r1"><td class="num-col">1</td><td contenteditable="true">Lý thuyết Động cơ đốt trong</td><td contenteditable="true">3</td><td class="grade" contenteditable="true">8.5</td><td contenteditable="true">Giỏi</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk3-r2"><td class="num-col">2</td><td contenteditable="true">Thực hành Tháo lắp &amp; Sửa chữa Động cơ xăng</td><td contenteditable="true">4</td><td class="grade" contenteditable="true">8.8</td><td contenteditable="true">Giỏi</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk3-r3"><td class="num-col">3</td><td contenteditable="true">Thực hành Tháo lắp &amp; Sửa chữa Động cơ Diesel</td><td contenteditable="true">3</td><td class="grade" contenteditable="true">8.4</td><td contenteditable="true">Khá Giỏi</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk3-r4"><td class="num-col">4</td><td contenteditable="true">Hệ thống truyền lực ô tô (Hộp số, ly hợp)</td><td contenteditable="true">3</td><td class="grade" contenteditable="true">8.5</td><td contenteditable="true">Giỏi</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk3-r5"><td class="num-col">5</td><td contenteditable="true">Thực hành Hệ thống phanh, lái &amp; treo</td><td contenteditable="true">4</td><td class="grade" contenteditable="true">8.7</td><td contenteditable="true">Giỏi</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk3-r6"><td class="num-col">6</td><td contenteditable="true">Tiếng Anh chuyên ngành ô tô 1</td><td contenteditable="true">2</td><td class="grade" contenteditable="true">8.0</td><td contenteditable="true">Khá</td><td class="del-col"><button class="row-del">×</button></td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="table-foot"><span>Tổng số tín chỉ: <span contenteditable="true">19</span> tín chỉ</span><span>Điểm trung bình học kỳ 3: <span contenteditable="true">8.55</span> / 10 (Xếp loại: <span contenteditable="true">Giỏi</span>)</span></div>
+        <button class="add-row-btn" data-target="hk3-body">+ Thêm môn học</button>
+      </div>
+
+      <div class="tab-panel hidden" id="hk4" artifact-local>
+        <div class="table-scroll" artifact-sync>
+        <table data-sem="hk4">
+          <thead><tr><th class="num-col">STT</th><th>Tên môn học / Mô-đun</th><th>Số tín chỉ</th><th>Điểm số</th><th>Xếp loại</th><th class="del-col"></th></tr></thead>
+          <tbody id="hk4-body">
+            <tr id="hk4-r1"><td class="num-col">1</td><td contenteditable="true">Hệ thống Điện – Điện tử ô tô</td><td contenteditable="true">3</td><td class="grade" contenteditable="true">9.0</td><td contenteditable="true">Xuất sắc</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk4-r2"><td class="num-col">2</td><td contenteditable="true">Thực hành Mạch điện thân xe &amp; Chiếu sáng</td><td contenteditable="true">4</td><td class="grade" contenteditable="true">9.2</td><td contenteditable="true">Xuất sắc</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk4-r3"><td class="num-col">3</td><td contenteditable="true">Hệ thống phun xăng điện tử (EFI) &amp; CRDi</td><td contenteditable="true">3</td><td class="grade" contenteditable="true">8.8</td><td contenteditable="true">Giỏi</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk4-r4"><td class="num-col">4</td><td contenteditable="true">Thực hành Hệ thống điều hòa không khí ô tô</td><td contenteditable="true">3</td><td class="grade" contenteditable="true">8.7</td><td contenteditable="true">Giỏi</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk4-r5"><td class="num-col">5</td><td contenteditable="true">Chẩn đoán kỹ thuật ô tô &amp; Máy quét OBD-II</td><td contenteditable="true">3</td><td class="grade" contenteditable="true">8.9</td><td contenteditable="true">Giỏi</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk4-r6"><td class="num-col">6</td><td contenteditable="true">Công nghệ Xe điện (EV) &amp; Hybrid cơ bản</td><td contenteditable="true">2</td><td class="grade" contenteditable="true">8.6</td><td contenteditable="true">Giỏi</td><td class="del-col"><button class="row-del">×</button></td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="table-foot"><span>Tổng số tín chỉ: <span contenteditable="true">18</span> tín chỉ</span><span>Điểm trung bình học kỳ 4: <span contenteditable="true">8.90</span> / 10 (Xếp loại: <span contenteditable="true">Giỏi</span>)</span></div>
+        <button class="add-row-btn" data-target="hk4-body">+ Thêm môn học</button>
+      </div>
+
+      <div class="tab-panel hidden" id="hk5" artifact-local>
+        <div class="table-scroll" artifact-sync>
+        <table data-sem="hk5">
+          <thead><tr><th class="num-col">STT</th><th>Tên môn học / Mô-đun</th><th>Số tín chỉ</th><th>Điểm số</th><th>Xếp loại</th><th class="del-col"></th></tr></thead>
+          <tbody id="hk5-body">
+            <tr id="hk5-r1"><td class="num-col">1</td><td contenteditable="true">Thực hành Quy trình Bảo dưỡng định kỳ ô tô</td><td contenteditable="true">4</td><td class="grade" contenteditable="true">9.0</td><td contenteditable="true">Xuất sắc</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk5-r2"><td class="num-col">2</td><td contenteditable="true">Thực tập tốt nghiệp tại Garage Toyota / Hyundai</td><td contenteditable="true">6</td><td class="grade" contenteditable="true">9.2</td><td contenteditable="true">Xuất sắc</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk5-r3"><td class="num-col">3</td><td contenteditable="true">Đồ án chuyên ngành Công nghệ Kỹ thuật Ô tô</td><td contenteditable="true">3</td><td class="grade" contenteditable="true">8.8</td><td contenteditable="true">Giỏi</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk5-r4"><td class="num-col">4</td><td contenteditable="true">Quản trị xưởng dịch vụ &amp; Cố vấn dịch vụ</td><td contenteditable="true">2</td><td class="grade" contenteditable="true">8.6</td><td contenteditable="true">Giỏi</td><td class="del-col"><button class="row-del">×</button></td></tr>
+            <tr id="hk5-r5"><td class="num-col">5</td><td contenteditable="true">Khóa luận / Thi tốt nghiệp chuyên môn</td><td contenteditable="true">4</td><td class="grade" contenteditable="true">9.0</td><td contenteditable="true">Xuất sắc</td><td class="del-col"><button class="row-del">×</button></td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="table-foot"><span>Tổng số tín chỉ: <span contenteditable="true">19</span> tín chỉ</span><span>Điểm trung bình học kỳ 5: <span contenteditable="true">9.00</span> / 10 (Xếp loại: <span contenteditable="true">Xuất sắc</span>)</span></div>
+        <button class="add-row-btn" data-target="hk5-body">+ Thêm môn học</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="xuong">
+    <div class="card">
+      <h2 class="section-title"><span class="num">3.</span> Nhật ký thực hành tại xưởng</h2>
+      <p class="lede" contenteditable="true">Bấm vào từng bài thực hành bên dưới để xem báo cáo trang con chi tiết: quy trình tháo lắp, số liệu đo kiểm thực tế và dụng cụ sử dụng.</p>
+      <div class="grid-2" id="workshopGrid" artifact-sync>
+        <div class="wcard" id="wc1">
+          <button class="wcard-del" title="Xoá thẻ">×</button>
+          <div class="thumb" contenteditable="true">THỰC HÀNH ĐỘNG CƠ ĐỐT TRONG</div>
+          <div class="body">
+            <h3 contenteditable="true">1. Thực hành động cơ đốt trong</h3>
+            <p contenteditable="true">Tháo rã cụm động cơ xăng, kiểm tra độ phẳng nắp máy, đo khe hở nhiệt xupap, cân cam và siết nắp quy-lát theo góc.</p>
+            <button class="wlink" onclick="switchView('view-ws1')">👉 Xem báo cáo chi tiết trang con →</button>
+          </div>
+        </div>
+        <div class="wcard" id="wc2">
+          <button class="wcard-del" title="Xoá thẻ">×</button>
+          <div class="thumb" contenteditable="true">ĐIỆN – ĐIỆN TỬ &amp; XE ĐIỆN</div>
+          <div class="body">
+            <h3 contenteditable="true">2. Thực hành điện – điện tử &amp; xe điện</h3>
+            <p contenteditable="true">Đấu nối mạch điện thân xe, kiểm tra chổi than &amp; dàn diode máy phát điện xoay chiều, đo cảm biến EFI bằng VOM và an toàn khối pin xe điện.</p>
+            <button class="wlink" onclick="switchView('view-ws2')">👉 Xem báo cáo chi tiết trang con →</button>
+          </div>
+        </div>
+        <div class="wcard" id="wc3">
+          <button class="wcard-del" title="Xoá thẻ">×</button>
+          <div class="thumb" contenteditable="true">KHUNG GẦM &amp; PHANH</div>
+          <div class="body">
+            <h3 contenteditable="true">3. Thực hành khung gầm &amp; phanh</h3>
+            <p contenteditable="true">Bảo dưỡng cụm phanh đĩa thủy lực, đo độ dày &amp; độ đảo mặt đĩa phanh bằng đồng hồ so, xả gió dầu phanh và kiểm tra các khớp rotuyn lái.</p>
+            <button class="wlink" onclick="switchView('view-ws3')">👉 Xem báo cáo chi tiết trang con →</button>
+          </div>
+        </div>
+        <div class="wcard" id="wc4">
+          <button class="wcard-del" title="Xoá thẻ">×</button>
+          <div class="thumb" contenteditable="true">BẢO DƯỠNG NHANH &amp; OBD-II</div>
+          <div class="body">
+            <h3 contenteditable="true">4. Bảo dưỡng nhanh &amp; chẩn đoán OBD-II</h3>
+            <p contenteditable="true">Quy trình bảo dưỡng định kỳ Quick Service 10.000km và phân tích xử lý thực tế các mã lỗi động cơ bằng máy quét.</p>
+            <button class="wlink" onclick="switchView('view-ws4')">👉 Xem báo cáo chi tiết trang con →</button>
+          </div>
+        </div>
+      </div>
+      <button class="add-card-btn" id="addWorkshopCard" style="margin-top:16px;">+ Thêm thẻ thực hành</button>
+    </div>
+  </section>
+
+  <section id="ky-nang">
+    <div class="card">
+      <h2 class="section-title"><span class="num">4.</span> Kỹ năng &amp; chứng chỉ</h2>
+      <div class="skills-cols">
+        <div>
+          <h4 class="sub">Kỹ năng chuyên môn</h4>
+          <ul class="skill-list" id="skillPro" artifact-sync>
+            <li><span class="txt" contenteditable="true">Thực hiện đúng quy trình bảo dưỡng định kỳ xe ô tô (thay dầu nhớt, lọc gió, kiểm tra gầm).</span><button class="li-del">×</button></li>
+            <li><span class="txt" contenteditable="true">Sử dụng thành thạo các thiết bị đo kiểm: đồng hồ vạn năng VOM, cờ lê cân lực, thước kẹp cơ khí.</span><button class="li-del">×</button></li>
+            <li><span class="txt" contenteditable="true">Biết sử dụng máy quét lỗi OBD-II để đọc và xóa mã lỗi động cơ cơ bản.</span><button class="li-del">×</button></li>
+            <li><span class="txt" contenteditable="true">Đọc hiểu sơ đồ mạch điện thân xe cơ bản và tài liệu kỹ thuật tiếng Anh.</span><button class="li-del">×</button></li>
+          </ul>
+          <button class="add-skill-btn" data-target="skillPro">+ Thêm kỹ năng</button>
+        </div>
+        <div>
+          <h4 class="sub">Bằng cấp &amp; chứng chỉ</h4>
+          <ul class="skill-list" id="skillCert" artifact-sync>
+            <li><span class="txt" contenteditable="true">Giấy phép lái xe ô tô hạng B2 (đã có bằng, tự tin vận hành xe).</span><button class="li-del">×</button></li>
+            <li><span class="txt" contenteditable="true">Chứng nhận An toàn vệ sinh lao động &amp; 5S tại xưởng thực hành HueIC.</span><button class="li-del">×</button></li>
+            <li><span class="txt" contenteditable="true">Tin học văn phòng &amp; AutoCAD 2D (đạt chuẩn đầu ra HueIC).</span><button class="li-del">×</button></li>
+            <li><span class="txt" contenteditable="true">Kinh nghiệm thực tập: Thực tập kỹ thuật viên bảo dưỡng tại Garage Toyota / Hyundai Huế.</span><button class="li-del">×</button></li>
+          </ul>
+          <button class="add-skill-btn" data-target="skillCert">+ Thêm mục</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="lien-he">
+    <div class="card">
+      <h2 class="section-title"><span class="num">5.</span> Liên hệ</h2>
+      <div class="contact-grid">
+        <dl class="contact-item"><dt>Họ và tên</dt><dd contenteditable="true">Nguyễn Chí Nguyên</dd></dl>
+        <dl class="contact-item"><dt>Mã sinh viên</dt><dd contenteditable="true">2660935</dd></dl>
+        <dl class="contact-item"><dt>Điện thoại</dt><dd contenteditable="true">— điền số của bạn —</dd></dl>
+        <dl class="contact-item"><dt>Email</dt><dd contenteditable="true">— điền email của bạn —</dd></dl>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer contenteditable="true">E-Portfolio cá nhân · Nguyễn Chí Nguyên · Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) · Trường Cao đẳng Công nghiệp Huế (HueIC) · Cập nhật lần cuối: 2026</footer>
+
+</div>
+<!-- ======================= END VIEW: HOME ======================= -->
+
+
+<!-- ========================= VIEW: WS1 – ĐỘNG CƠ ĐỐT TRONG ========================= -->
+<div class="view hidden" id="view-ws1">
+  <header class="hero" style="padding:34px 24px 30px;">
+    <div class="hero-inner wrap" style="display:block;">
+      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span><button onclick="switchView('view-home','xuong')">Nhật ký thực hành xưởng</button><span>/</span>Thực hành Động cơ</div>
+      <h1 contenteditable="true" style="margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);">NHẬT KÝ THỰC HÀNH: ĐỘNG CƠ ĐỐT TRONG</h1>
+      <p contenteditable="true">Mô-đun thực hành tháo rã, đo kiểm chi tiết cơ khí và lắp ráp cân chỉnh động cơ xăng 4 xy-lanh tại xưởng HueIC</p>
+    </div>
+  </header>
+  <main class="wrap" style="padding-top:28px;">
+    <div class="card">
+      <h2 class="section-title"><span class="num">1.</span> Thông tin mô-đun thực hành</h2>
+      <div class="info-box">
+        <div class="f"><b>Môn học</b><span contenteditable="true">Thực hành Động cơ đốt trong (4 Tín chỉ)</span></div>
+        <div class="f"><b>Địa điểm</b><span contenteditable="true">Xưởng Động lực — Trường CĐ Công nghiệp Huế</span></div>
+        <div class="f"><b>Đối tượng thực hành</b><span contenteditable="true">Động cơ xăng Toyota 1NZ-FE (1.5L)</span></div>
+        <div class="f"><b>Thời lượng</b><span contenteditable="true">60 tiết thực hành xưởng</span></div>
+        <div class="f"><b>Điểm đánh giá</b><span contenteditable="true">8.8 / 10 (Xếp loại: Giỏi)</span></div>
+        <div class="f"><b>Tiêu chuẩn an toàn</b><span contenteditable="true">100% tuân thủ bảo hộ lao động &amp; 5S</span></div>
+      </div>
+
+      <h2 class="section-title"><span class="num">2.</span> Trang thiết bị &amp; dụng cụ sử dụng</h2>
+      <p contenteditable="true" style="font-size:14px;margin-top:-10px;">Trong suốt quá trình thực hành, em đã trực tiếp sử dụng thành thạo các thiết bị chuyên dụng:</p>
+      <ul class="equip-list">
+        <li contenteditable="true">Bộ khẩu tuýp KingTony 1/2 inch và cần xiết tự động.</li>
+        <li contenteditable="true"><strong>Cần xiết cân lực (Torque Wrench):</strong> dùng để siết nắp quy-lát và nắp ổ đỡ trục khuỷu theo đúng lực hãng.</li>
+        <li contenteditable="true"><strong>Dụng cụ đo cơ khí chính xác:</strong> thước lá (Feeler Gauge) đo khe hở nhiệt xupap, panme đo ngoài (Micrometer), thước cặp cơ khí.</li>
+      </ul>
+
+      <div class="media-row">
+        <div class="media-thumb">Khu vực thực hành động cơ — xưởng HueIC</div>
+        <div>
+          <h4 contenteditable="true">Khu vực thực hành động cơ xưởng HueIC</h4>
+          <p contenteditable="true">Hình ảnh em cùng các bạn trong nhóm tiến hành đo khe hở xupap và kiểm tra độ phẳng mặt nắp máy bằng thước thẳng và thước lá.</p>
+        </div>
+      </div>
+
+      <h2 class="section-title"><span class="num">3.</span> Nhật ký các bước thực hiện &amp; số liệu thực tế</h2>
+
+      <div class="step">
+        <h4 contenteditable="true">Bước 1: Tháo rã nắp máy &amp; Kiểm tra độ cong vênh</h4>
+        <p contenteditable="true">Tháo nắp giàn cò, tháo cụm trục cam nạp và xả theo đúng thứ tự từ ngoài vào trong để tránh nứt gãy trục cam. Sử dụng thước thẳng kim loại đặt theo các đường chéo và đường thẳng trên mặt máy, dùng thước lá 0.05mm kiểm tra.</p>
+        <p class="result" contenteditable="true">➜ Kết quả: Mặt nắp máy phẳng, độ vênh &lt; 0.03mm (Chuẩn cho phép &lt; 0.05mm).</p>
+      </div>
+
+      <div class="step">
+        <h4 contenteditable="true">Bước 2: Đo khe hở nhiệt xupap nạp và xả</h4>
+        <p contenteditable="true">Quay trục khuỷu đưa máy 1 về điểm chết trên (TDC) kỳ nén; tiến hành dùng thước lá đo khe hở giữa vấu cam và con đội:</p>
+        <table class="mini-table">
+          <thead><tr><th>Vị trí xupap</th><th>Tiêu chuẩn hãng Toyota</th><th>Số đo thực tế</th><th>Đánh giá</th></tr></thead>
+          <tbody>
+            <tr><td contenteditable="true">Xupap Nạp (Xylanh 1, 2)</td><td contenteditable="true">0.15 – 0.25 mm</td><td contenteditable="true">0.20 mm</td><td class="pass" contenteditable="true">Đạt tiêu chuẩn</td></tr>
+            <tr><td contenteditable="true">Xupap Xả (Xylanh 1, 3)</td><td contenteditable="true">0.25 – 0.35 mm</td><td contenteditable="true">0.30 mm</td><td class="pass" contenteditable="true">Đạt tiêu chuẩn</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="step">
+        <h4 contenteditable="true">Bước 3: Lắp ráp, cân cam &amp; Siết nắp quy-lát theo góc</h4>
+        <p contenteditable="true">Làm sạch bề mặt thân máy, lắp gioăng quy-lát mới. Đặt đúng dấu xích cam trùng với dấu khắc trên bánh răng cam và bánh răng trục khuỷu. Siết 10 bulong nắp máy theo hình xoắn ốc từ trong ra ngoài: Giai đoạn 1: siết lực 29 N·m → Giai đoạn 2: siết thêm góc 90° → Giai đoạn 3: siết thêm góc 90°.</p>
+      </div>
+
+      <h2 class="section-title"><span class="num">4.</span> Bài học kinh nghiệm &amp; đánh giá</h2>
+      <div class="lessons-box" contenteditable="true">Qua mô-đun này, em đã nắm vững quy trình tháo lắp chuẩn công nghiệp, rèn luyện được tính cẩn thận khi dùng thước đo chính xác và hiểu sâu sắc tầm quan trọng của việc siết lực theo đúng thông số của nhà sản xuất để chống rò rỉ khí nén và nước làm mát.</div>
+
+      <div class="detail-nav">
+        <button class="btn-back" onclick="switchView('view-home','xuong')">← Quay lại Trang chủ E-Portfolio</button>
+        <button class="btn-next" onclick="switchView('view-ws2')">Xem tiếp: Thực hành Điện – Điện tử Ô tô →</button>
+      </div>
+    </div>
+  </main>
+  <footer contenteditable="true">© 2026 E-Portfolio Cá nhân — Nguyễn Chí Nguyên | Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) — Trường Cao đẳng Công nghiệp Huế</footer>
+</div>
+
+<!-- ========================= VIEW: WS2 – ĐIỆN ô tô ========================= -->
+<div class="view hidden" id="view-ws2">
+  <header class="hero" style="padding:34px 24px 30px;">
+    <div class="hero-inner wrap" style="display:block;">
+      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span><button onclick="switchView('view-home','xuong')">Nhật ký thực hành xưởng</button><span>/</span>Thực hành Điện ô tô</div>
+      <h1 contenteditable="true" style="margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);">NHẬT KÝ THỰC HÀNH: ĐIỆN – ĐIỆN TỬ Ô TÔ</h1>
+      <p contenteditable="true">Mô-đun thực hành đấu nối mạch điện thân xe, kiểm tra hệ thống nạp và đo kiểm cảm biến EFI tại xưởng Điện ô tô HueIC</p>
+    </div>
+  </header>
+  <main class="wrap" style="padding-top:28px;">
+    <div class="card">
+      <h2 class="section-title"><span class="num">1.</span> Thông tin mô-đun thực hành</h2>
+      <div class="info-box">
+        <div class="f"><b>Môn học</b><span contenteditable="true">Thực hành Hệ thống Điện – Điện tử Ô tô (4 Tín chỉ)</span></div>
+        <div class="f"><b>Địa điểm</b><span contenteditable="true">Phòng thực hành Điện ô tô — Khoa Cơ khí HueIC</span></div>
+        <div class="f"><b>Đối tượng thực hành</b><span contenteditable="true">Sa bàn điện thân xe Toyota Vios &amp; Mô hình xe điện</span></div>
+        <div class="f"><b>Thời lượng</b><span contenteditable="true">60 tiết thực hành xưởng</span></div>
+        <div class="f"><b>Điểm đánh giá</b><span contenteditable="true">9.0 / 10 (Xếp loại: Xuất sắc)</span></div>
+        <div class="f"><b>Kỹ năng đạt được</b><span contenteditable="true">Đọc sơ đồ mạch, đo VOM, kiểm tra nạp xả</span></div>
+      </div>
+
+      <h2 class="section-title"><span class="num">2.</span> Thiết bị đo kiểm chuyên dụng</h2>
+      <ul class="equip-list">
+        <li contenteditable="true"><strong>Đồng hồ vạn năng số (Digital Multimeter - VOM):</strong> đo điện áp 12V, kiểm tra thông mạch và điện trở cuộn dây rơ-le.</li>
+        <li contenteditable="true"><strong>Bình ắc-quy GS 12V-45Ah &amp; Máy sạc ắc-quy chuyên dụng:</strong> kiểm tra điện áp không tải và sụt áp khi đề.</li>
+        <li contenteditable="true">Bút thử điện ô tô 12V-24V và bộ giắc cắm bấm cốt chống nước.</li>
+        <li contenteditable="true">Đồ bảo hộ cách điện cấp độ CAT III 1000V dành cho khu vực tìm hiểu xe điện (EV).</li>
+      </ul>
+
+      <div class="media-row">
+        <div class="media-thumb">Khối pin cao áp xe điện</div>
+        <div>
+          <h4 contenteditable="true">Hệ thống điện tử và công nghệ xe điện</h4>
+          <p contenteditable="true">Bên cạnh hệ thống điện 12V truyền thống, em được tìm hiểu nguyên lý khối pin cao áp, hệ thống quản lý pin BMS và quy tắc ngắt cầu chì khẩn cấp (Service Plug) trước khi sửa chữa xe điện.</p>
+        </div>
+      </div>
+
+      <h2 class="section-title"><span class="num">3.</span> Các nội dung thực hành tiêu biểu</h2>
+
+      <div class="step">
+        <h4 contenteditable="true">Nội dung 1: Đấu nối mạch đèn chiếu sáng &amp; Đèn xinhan</h4>
+        <p contenteditable="true">Dựa vào sơ đồ mạch điện nguyên lý hãng Toyota, tiến hành bố trí cầu chì tổng, rơ-le 4 chân / 5 chân, công tắc điều khiển tích hợp trên vô lăng và đấu nối bóng đèn halogen / LED. Kiểm tra sụt áp trên dây dẫn đảm bảo &lt; 0.5V khi bật tải đầy đủ.</p>
+      </div>
+
+      <div class="step">
+        <h4 contenteditable="true">Nội dung 2: Kiểm tra máy phát điện xoay chiều (Alternator)</h4>
+        <p contenteditable="true">Tháo rã cụm máy phát, kiểm tra độ mòn chổi than (đạt 11.5mm, tiêu chuẩn &gt; 5mm), đo kiểm thông mạch cuộn Rotor và cuộn Stator, dùng thang đo Diode trên VOM kiểm tra dàn chỉnh lưu 6 diode.</p>
+        <table class="mini-table">
+          <thead><tr><th>Hạng mục đo kiểm</th><th>Tiêu chuẩn kỹ thuật</th><th>Số đo thực tế</th><th>Đánh giá</th></tr></thead>
+          <tbody>
+            <tr><td contenteditable="true">Điện thế phát khi động cơ nổ</td><td contenteditable="true">13.8V – 14.5V</td><td contenteditable="true">14.2V</td><td class="pass" contenteditable="true">Hoạt động tốt</td></tr>
+            <tr><td contenteditable="true">Điện trở cuộn kích từ Rotor</td><td contenteditable="true">2.1 – 2.9 Ohm</td><td contenteditable="true">2.4 Ohm</td><td class="pass" contenteditable="true">Cuộn dây không chập</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="step">
+        <h4 contenteditable="true">Nội dung 3: Đo kiểm các cảm biến hệ thống phun xăng EFI</h4>
+        <p contenteditable="true">Dùng đồng hồ VOM đo điện trở cảm biến nhiệt độ nước làm mát (ECT Sensor) khi nhúng vào cốc nước ấm: điện trở giảm dần từ 2.4 kOhm (ở 20°C) xuống còn 320 Ohm (ở 80°C), xác nhận cảm biến nhiệt điện trở âm (NTC) hoạt động hoàn hảo.</p>
+      </div>
+
+      <h2 class="section-title"><span class="num">4.</span> Bài học &amp; kỹ năng đúc kết</h2>
+      <div class="lessons-box" contenteditable="true">Mô-đun Điện ô tô rèn luyện cho em tư duy logic khi đọc sơ đồ nguyên lý (Wiring Diagram) và kỹ năng chẩn đoán chập chờn, đứt dây ngầm nhanh chóng bằng phương pháp đo thông mạch và sụt áp.</div>
+
+      <div class="detail-nav">
+        <button class="btn-back" onclick="switchView('view-ws1')">← Bài trước: Thực hành Động cơ</button>
+        <button class="btn-next" onclick="switchView('view-ws3')">Xem tiếp: Thực hành Khung gầm &amp; Phanh →</button>
+      </div>
+    </div>
+  </main>
+  <footer contenteditable="true">© 2026 E-Portfolio Cá nhân — Nguyễn Chí Nguyên | Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) — Trường Cao đẳng Công nghiệp Huế</footer>
+</div>
+
+<!-- ========================= VIEW: WS3 – KHUNG GẦM & PHANH ========================= -->
+<div class="view hidden" id="view-ws3">
+  <header class="hero" style="padding:34px 24px 30px;">
+    <div class="hero-inner wrap" style="display:block;">
+      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span><button onclick="switchView('view-home','xuong')">Nhật ký thực hành xưởng</button><span>/</span>Thực hành Khung gầm &amp; Phanh</div>
+      <h1 contenteditable="true" style="margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);">NHẬT KÝ THỰC HÀNH: KHUNG GẦM &amp; HỆ THỐNG PHANH</h1>
+      <p contenteditable="true">Mô-đun bảo dưỡng phanh đĩa thủy lực, kiểm tra hệ thống treo và các khớp rô-tuyn lái tại xưởng Gầm ô tô HueIC</p>
+    </div>
+  </header>
+  <main class="wrap" style="padding-top:28px;">
+    <div class="card">
+      <h2 class="section-title"><span class="num">1.</span> Thông tin mô-đun thực hành</h2>
+      <div class="info-box">
+        <div class="f"><b>Môn học</b><span contenteditable="true">Thực hành Khung gầm &amp; Hệ thống Phanh (4 Tín chỉ)</span></div>
+        <div class="f"><b>Địa điểm</b><span contenteditable="true">Xưởng Gầm ô tô — Trường CĐ Công nghiệp Huế</span></div>
+        <div class="f"><b>Thiết bị</b><span contenteditable="true">Cầu nâng 2 trụ, Máy xả gió phanh &amp; Thước đo góc lái</span></div>
+        <div class="f"><b>Thời lượng</b><span contenteditable="true">60 tiết thực hành</span></div>
+        <div class="f"><b>Điểm đánh giá</b><span contenteditable="true">8.7 / 10 (Xếp loại: Giỏi)</span></div>
+        <div class="f"><b>Trọng tâm</b><span contenteditable="true">Bảo dưỡng phanh an toàn, thay thế rô-tuyn</span></div>
+      </div>
+
+      <h2 class="section-title"><span class="num">2.</span> Thiết bị xưởng &amp; dụng cụ chuyên dụng</h2>
+      <ul class="equip-list">
+        <li contenteditable="true">Cầu nâng 2 trụ thủy lực có chốt khóa an toàn cơ khí.</li>
+        <li contenteditable="true"><strong>Đồng hồ so kèm đế từ:</strong> đo độ đảo mặt đĩa phanh (Brake rotor runout).</li>
+        <li contenteditable="true"><strong>Thước cặp đo độ dày:</strong> đo độ dày đĩa phanh và độ mòn má phanh (Brake pads).</li>
+        <li contenteditable="true">Dụng cụ ép piston phanh đĩa (Brake caliper tool) và bình thu hồi dầu phanh thải.</li>
+        <li contenteditable="true">Bộ cảo rô-tuyn lái và cảo vòng bi moay-ơ bánh xe.</li>
+      </ul>
+
+      <div class="media-row">
+        <div class="media-thumb">Kiểm tra gầm &amp; dẫn động</div>
+        <div>
+          <h4 contenteditable="true">Kiểm tra gầm &amp; Dẫn động thực tế</h4>
+          <p contenteditable="true">Em thực hành kiểm tra độ rơ của bạc đạn moay-ơ, kiểm tra rách chụp bụi láp dẫn động và tham gia hoàn thiện hệ thống lái cho mô hình xe sinh viên.</p>
+        </div>
+      </div>
+
+      <h2 class="section-title"><span class="num">3.</span> Nhật ký các bước thực hiện &amp; số liệu thực tế</h2>
+
+      <div class="step">
+        <h4 contenteditable="true">Bước 1: Nâng xe an toàn &amp; Tháo cụm phanh Caliper</h4>
+        <p contenteditable="true">Kê cầu nâng vào đúng 4 vị trí chịu lực dưới bệ gầm xe theo hướng dẫn hãng. Tháo bánh xe, tháo chốt trượt cụm phanh (Slide pins), treo cụm phanh bằng dây móc để tránh làm căng đứt ống dầu mềm.</p>
+      </div>
+
+      <div class="step">
+        <h4 contenteditable="true">Bước 2: Đo độ mòn đĩa phanh &amp; Độ đảo mặt đĩa</h4>
+        <p contenteditable="true">Làm sạch gỉ sét bề mặt, gắn đế từ đồng hồ so lên càng chữ A, xoay đĩa phanh chậm 1 vòng để ghi nhận độ đảo:</p>
+        <table class="mini-table">
+          <thead><tr><th>Hạng mục kiểm tra</th><th>Tiêu chuẩn giới hạn</th><th>Số liệu đo thực tế</th><th>Đánh giá</th></tr></thead>
+          <tbody>
+            <tr><td contenteditable="true">Độ dày đĩa phanh trước</td><td contenteditable="true">Tối thiểu &gt; 22.0 mm</td><td contenteditable="true">24.3 mm</td><td class="pass" contenteditable="true">Còn tốt</td></tr>
+            <tr><td contenteditable="true">Độ đảo mặt đĩa phanh</td><td contenteditable="true">Cho phép &lt; 0.05 mm</td><td contenteditable="true">0.03 mm</td><td class="pass" contenteditable="true">Không cong vênh</td></tr>
+            <tr><td contenteditable="true">Độ dày má phanh còn lại</td><td contenteditable="true">Tối thiểu &gt; 2.0 mm</td><td contenteditable="true">7.5 mm</td><td class="pass" contenteditable="true">Chưa cần thay</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="step">
+        <h4 contenteditable="true">Bước 3: Vệ sinh, tra mỡ chốt trượt &amp; Xả gió dầu phanh (Bleeding)</h4>
+        <p contenteditable="true">Vệ sinh sạch mạt kim loại trên phe gài má phanh bằng chai xịt Brake Cleaner. Tra mỡ chuyên dụng chịu nhiệt cho chốt trượt để cụm phanh ép nhả tự do. Tiến hành xả gió dầu phanh theo thứ tự từ bánh xa tổng phanh nhất đến bánh gần nhất (Sau Phải → Sau Trái → Trước Phải → Trước Trái).</p>
+      </div>
+
+      <h2 class="section-title"><span class="num">4.</span> Bài học kinh nghiệm</h2>
+      <div class="lessons-box" contenteditable="true">Hệ thống phanh và gầm liên quan trực tiếp đến tính mạng của người sử dụng xe. Em học được thái độ làm việc tuyệt đối không được chủ quan, luôn kiểm tra lại lực siết bulong bánh xe bằng cần xiết cân lực trước khi hạ cầu nâng giao xe.</div>
+
+      <div class="detail-nav">
+        <button class="btn-back" onclick="switchView('view-ws2')">← Bài trước: Thực hành Điện ô tô</button>
+        <button class="btn-next" onclick="switchView('view-ws4')">Xem tiếp: Bảo dưỡng &amp; Chẩn đoán OBD-II →</button>
+      </div>
+    </div>
+  </main>
+  <footer contenteditable="true">Giảng viên hướng dẫn: — điền tên — · © 2026 E-Portfolio Cá nhân — Nguyễn Chí Nguyên | Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) — Trường Cao đẳng Công nghiệp Huế</footer>
+</div>
+
+<!-- ========================= VIEW: WS4 – BẢO DƯỠNG & OBD-II ========================= -->
+<div class="view hidden" id="view-ws4">
+  <header class="hero" style="padding:34px 24px 30px;">
+    <div class="hero-inner wrap" style="display:block;">
+      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span><button onclick="switchView('view-home','xuong')">Nhật ký thực hành xưởng</button><span>/</span>Bảo dưỡng &amp; Chẩn đoán OBD-II</div>
+      <h1 contenteditable="true" style="margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);">CHUYÊN ĐỀ: BẢO DƯỠNG NHANH &amp; CHẨN ĐOÁN OBD-II</h1>
+      <p contenteditable="true">Quy trình bảo dưỡng định kỳ Quick Service và phân tích thực tế các mã lỗi động cơ tại xưởng chẩn đoán HueIC &amp; Garage Toyota Huế</p>
+    </div>
+  </header>
+  <main class="wrap" style="padding-top:28px;">
+    <div class="card">
+      <h2 class="section-title"><span class="num">1.</span> Thông tin chuyên đề thực hành</h2>
+      <div class="info-box">
+        <div class="f"><b>Môn học</b><span contenteditable="true">Chẩn đoán kỹ thuật ô tô &amp; Bảo dưỡng định kỳ</span></div>
+        <div class="f"><b>Địa điểm</b><span contenteditable="true">Xưởng chẩn đoán ô tô HueIC &amp; Garage Toyota Huế</span></div>
+        <div class="f"><b>Thiết bị</b><span contenteditable="true">Máy đọc lỗi Launch X431, G-scan 2, VOM số</span></div>
+        <div class="f"><b>Thời lượng</b><span contenteditable="true">45 tiết thực hành chuyên sâu</span></div>
+        <div class="f"><b>Điểm đánh giá</b><span contenteditable="true">8.9 / 10 (Xếp loại: Giỏi)</span></div>
+        <div class="f"><b>Kỹ năng cốt lõi</b><span contenteditable="true">Đọc Live Data, khoanh vùng mã lỗi DTC</span></div>
+      </div>
+
+      <h2 class="section-title"><span class="num">2.</span> Quy trình bảo dưỡng nhanh (Quick Service 10.000 km)</h2>
+      <p contenteditable="true" style="font-size:14px;margin-top:-10px;">Em đã thuần thục các bước bảo dưỡng cấp tiêu chuẩn trong thời gian 45 phút cho 1 xe:</p>
+      <ul class="equip-list">
+        <li contenteditable="true">Kiểm tra hệ thống đèn chiếu sáng, gạt mưa, còi và nâng hạ kính.</li>
+        <li contenteditable="true">Xả dầu nhớt động cơ, thay cốc lọc dầu mới (bôi trơn gioăng cao su, siết lực 3/4 vòng sau khi tiếp xúc).</li>
+        <li contenteditable="true">Vệ sinh hoặc thay thế lọc gió động cơ, lọc gió điều hòa cabin.</li>
+        <li contenteditable="true">Kiểm tra mức nước làm mát, dầu trợ lực lái, dầu phanh và châm nước rửa kính.</li>
+        <li contenteditable="true">Kiểm tra áp suất lốp (2.2 – 2.4 bar) và đảo lốp nếu cần thiết.</li>
+      </ul>
+
+      <div class="media-row">
+        <div class="media-thumb">Chẩn đoán OBD-II</div>
+        <div>
+          <h4 contenteditable="true">Bắt bệnh bằng máy chẩn đoán kết nối OBD-II</h4>
+          <p contenteditable="true">Cắm giắc OBD-II 16 chân dưới vô lăng, bật khóa điện ON, quét toàn bộ hệ thống ECU xe (Động cơ, Phanh ABS, Túi khí SRS, Hộp số AT).</p>
+        </div>
+      </div>
+
+      <h2 class="section-title"><span class="num">3.</span> Nhật ký các ca xử lý mã lỗi DTC thực tế</h2>
+
+      <div class="step">
+        <h4 contenteditable="true">Ca 1: Mã lỗi P0171 — Hỗn hợp nhiên liệu quá nghèo (Bank 1)</h4>
+        <p contenteditable="true"><strong>Hiện tượng:</strong> Xe có hiện tượng hụt ga khi đạp thốc ga, đèn Check Engine sáng vàng.</p>
+        <p contenteditable="true"><strong>Dữ liệu Live Data:</strong> Short Term Fuel Trim (STFT) = +19.5% và Long Term (LTFT) = +14% (chứng tỏ ECU đang phải phun bù xăng vì lọt gió ngoài).</p>
+        <p class="result" contenteditable="true"><strong>Quy trình xử lý:</strong> Kiểm tra đường ống nạp khí sau bướm ga, phát hiện rách gioăng cao su cổ hút. Thay mới gioăng, vệ sinh cảm biến MAF bằng dung dịch chuyên dụng. Xóa mã lỗi, chạy thử STFT quay về dao động quanh 0% ± 2%.</p>
+      </div>
+
+      <div class="step">
+        <h4 contenteditable="true">Ca 2: Mã lỗi P0300 / P0301 — Bỏ lửa xy-lanh số 1 (Cylinder 1 Misfire)</h4>
+        <p contenteditable="true"><strong>Hiện tượng:</strong> Động cơ nổ rung giật ở chế độ không tải, ống xả có mùi xăng sống nồng.</p>
+        <p class="result" contenteditable="true"><strong>Quy trình xử lý:</strong> Hoán đổi bô-bin đánh lửa của máy 1 sang máy 2, xóa mã lỗi và nổ máy lại: mã lỗi đổi thành P0302 → kết luận chính xác bô-bin máy 1 bị chập cuộn dây thứ cấp. Thay mới 1 cây bô-bin và căn chỉnh lại khe hở 4 bugi ở mức 1.1mm.</p>
+      </div>
+
+      <h2 class="section-title"><span class="num">4.</span> Đúc kết kinh nghiệm làm nghề</h2>
+      <div class="lessons-box" contenteditable="true">Việc sử dụng máy đọc lỗi giúp tiết kiệm rất nhiều thời gian, nhưng kỹ thuật viên không được "thay đồ mù quáng theo mã lỗi". Cần phải kết hợp đọc dữ liệu thời gian thực (Live Data) và đo kiểm thủ công bằng đồng hồ VOM trước khi quyết định thay thế phụ tùng cho khách hàng.</div>
+
+      <div class="detail-nav">
+        <button class="btn-back" onclick="switchView('view-ws3')">← Bài trước: Thực hành Khung gầm</button>
+        <button class="btn-home" onclick="switchView('view-home','xuong')">🏠 Về Mục lục Nhật ký thực hành xưởng</button>
+      </div>
+    </div>
+  </main>
+  <footer contenteditable="true">© 2026 E-Portfolio Cá nhân — Nguyễn Chí Nguyên | Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) — Trường Cao đẳng Công nghiệp Huế</footer>
+</div>
+
+<script>
+  function switchView(viewId, scrollToId){
+    document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));
+    const v = document.getElementById(viewId);
+    if(v) v.classList.remove('hidden');
+    window.scrollTo({top:0, behavior:'instant' in window ? 'instant' : 'auto'});
+    if(scrollToId){
+      setTimeout(()=>{
+        const el = document.getElementById(scrollToId);
+        if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+      }, 30);
+    }
+  }
+  function toggleDropdown(e){
+    e.stopPropagation();
+    document.getElementById('wsDropdown').classList.toggle('open');
+  }
+  function closeDropdown(){ document.getElementById('wsDropdown').classList.remove('open'); }
+  document.addEventListener('click', ()=>{ closeDropdown(); });
+
+  // Tab switching within Kết quả học tập (local per-viewer UI only)
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p=>p.classList.add('hidden'));
+      btn.classList.add('active');
+      const panel = document.getElementById(btn.dataset.tab);
+      if(panel) panel.classList.remove('hidden');
+    });
+  });
+
+  function renumber(tbody){
+    [...tbody.children].forEach((tr,i)=>{ const c = tr.querySelector('.num-col'); if(c) c.textContent = i+1; });
+  }
+  document.querySelectorAll('.row-del').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const tr = btn.closest('tr'); const tbody = tr.parentElement;
+      tr.remove(); renumber(tbody);
+    });
+  });
+  document.querySelectorAll('.add-row-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const tbody = document.getElementById(btn.dataset.target);
+      const tr = document.createElement('tr');
+      tr.id = btn.dataset.target + '-new-' + Date.now();
+      tr.innerHTML = '<td class="num-col"></td>'+
+        '<td contenteditable="true">Tên môn học mới</td>'+
+        '<td contenteditable="true">3</td>'+
+        '<td class="grade" contenteditable="true">0.0</td>'+
+        '<td contenteditable="true">—</td>'+
+        '<td class="del-col"><button class="row-del">×</button></td>';
+      tbody.appendChild(tr); renumber(tbody);
+      tr.querySelector('.row-del').addEventListener('click', ()=>{ tr.remove(); renumber(tbody); });
+      tr.querySelectorAll('[contenteditable]')[0].focus();
+    });
+  });
+
+  document.getElementById('workshopGrid').addEventListener('click', (e)=>{
+    if(e.target.classList.contains('wcard-del')){ e.target.closest('.wcard').remove(); }
+  });
+  document.getElementById('addWorkshopCard').addEventListener('click', ()=>{
+    const grid = document.getElementById('workshopGrid');
+    const card = document.createElement('div');
+    card.className = 'wcard'; card.id = 'wc-new-' + Date.now();
+    card.innerHTML = '<button class="wcard-del" title="Xoá thẻ">×</button>'+
+      '<div class="thumb" contenteditable="true">TÊN BÀI THỰC HÀNH</div>'+
+      '<div class="body">'+
+      '<h3 contenteditable="true">Bài thực hành mới</h3>'+
+      '<p contenteditable="true">Mô tả ngắn về quy trình, dụng cụ và kết quả đo kiểm.</p>'+
+      '<button class="wlink">👉 Xem báo cáo chi tiết trang con →</button>'+
+      '</div>';
+    grid.appendChild(card); card.querySelector('h3').focus();
+  });
+
+  document.querySelectorAll('.skill-list').forEach(list=>{
+    list.addEventListener('click', (e)=>{
+      if(e.target.classList.contains('li-del')){ e.target.closest('li').remove(); }
+    });
+  });
+  document.querySelectorAll('.add-skill-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const list = document.getElementById(btn.dataset.target);
+      const li = document.createElement('li');
+      li.innerHTML = '<span class="txt" contenteditable="true">Nội dung mới…</span><button class="li-del">×</button>';
+      list.appendChild(li); li.querySelector('.txt').focus();
+    });
+  });
+
+  (async ()=>{
+    const badge = document.getElementById('modeBadge');
+    try{
+      const user = await claude.use('user');
+      const editable = user ? (user.canEdit ? user.canEdit() : true) : true;
+      if(editable){
+        badge.textContent = '✏️ Bạn có thể chỉnh sửa'; badge.className = 'mode-badge can-edit';
+      } else {
+        badge.textContent = '👁 Chỉ xem'; badge.className = 'mode-badge read-only';
+        const hint = document.getElementById('editHint'); if(hint) hint.style.display = 'none';
+        document.querySelectorAll('[contenteditable="true"]').forEach(el=>el.removeAttribute('contenteditable'));
+        document.querySelectorAll('.add-row-btn,.row-del,.wcard-del,.add-card-btn,.add-skill-btn,.li-del').forEach(el=>el.style.display='none');
+      }
+    }catch(e){
+      badge.textContent = '✏️ Có thể chỉnh sửa'; badge.className = 'mode-badge can-edit';
+    }
+  })();
+</script>
+
+</body>
+</html>
