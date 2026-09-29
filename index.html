@@ -222,6 +222,22 @@
   .photo-ui button.ico{padding:7px 10px;min-width:34px;}
   .photo-size{flex-basis:100%;align-items:center;justify-content:flex-end;gap:8px;background:var(--card);color:var(--text);border:1px solid var(--border);padding:6px 10px;font-size:12.5px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.28);cursor:default;}
   .photo-size input[type=range]{width:120px;accent-color:var(--accent);cursor:pointer;}
+  body.edit-mode .intro-photo,body.edit-mode .ws-photo,body.edit-mode figure.evidence-shot img{cursor:pointer;}
+  body.edit-mode .photo-ui.photo-ov{display:block;}
+  .photo-ov{position:absolute;pointer-events:none;outline:2px solid var(--accent);z-index:8;}
+  .ph{position:absolute;width:12px;height:12px;background:#fff;border:2px solid var(--accent);border-radius:2px;transform:translate(-50%,-50%);pointer-events:auto;touch-action:none;}
+  @media (pointer:coarse){.ph{width:20px;height:20px;}}
+  .ph-nw{left:0;top:0;cursor:nwse-resize;} .ph-n{left:50%;top:0;cursor:ns-resize;} .ph-ne{left:100%;top:0;cursor:nesw-resize;}
+  .ph-e{left:100%;top:50%;cursor:ew-resize;} .ph-se{left:100%;top:100%;cursor:nwse-resize;} .ph-s{left:50%;top:100%;cursor:ns-resize;}
+  .ph-sw{left:0;top:100%;cursor:nesw-resize;} .ph-w{left:0;top:50%;cursor:ew-resize;}
+  .ph-rot{position:absolute;left:50%;top:-30px;width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid var(--accent);transform:translate(-50%,-50%);cursor:grab;pointer-events:auto;touch-action:none;}
+  .ph-rot::after{content:"";position:absolute;left:50%;top:100%;width:2px;height:14px;margin-left:-1px;background:var(--accent);}
+  #photoBar{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:190;max-width:calc(100vw - 24px);flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);box-shadow:0 8px 24px rgba(0,0,0,.22);padding:8px 10px;}
+  #photoBar.show{display:flex;}
+  #photoBar button{font-family:inherit;font-size:13px;font-weight:700;padding:7px 11px;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;}
+  #photoBar button:hover{border-color:var(--accent);color:var(--accent);}
+  #photoBar button.danger:hover{border-color:#C0392B;color:#C0392B;}
+  #photoBar .pinfo{font-size:12.5px;color:var(--muted);font-weight:600;padding:0 6px;}
 </style>
 </head>
 <body>
@@ -1138,23 +1154,9 @@ else{
       const oi=host.querySelector('img'); if(oi&&oi.alt) img.alt=oi.alt;
     }
     if(target.style.width){ img.style.width=target.style.width; img.style.marginInline='auto'; }
+    if(target.style.transform) img.style.transform=target.style.transform;
     host.insertAdjacentElement('afterend',fig);
-  }
-  function mkSize(target){
-    const wrap=document.createElement('label'); wrap.className='photo-ui photo-size';
-    const cur=Math.min(100,Math.max(20,parseInt(target.style.width)||100));
-    const txt=document.createElement('span'); txt.textContent='Kích thước '+cur+'%';
-    const r=document.createElement('input'); r.type='range'; r.min=20; r.max=100; r.step=5; r.value=cur;
-    r.addEventListener('input',()=>{
-      const v=+r.value;
-      if(v>=100){ target.style.width=''; target.style.marginInline=''; }
-      else{ target.style.width=v+'%'; target.style.marginInline='auto'; }
-      txt.textContent='Kích thước '+v+'%';
-      msg.textContent='Đang sửa — nhớ bấm Lưu';
-    });
-    wrap.addEventListener('click',e=>e.stopPropagation());
-    wrap.append(txt,r);
-    return wrap;
+    return fig;
   }
   const photoInput=document.createElement('input');
   photoInput.type='file'; photoInput.accept='image/*'; photoInput.hidden=true; document.body.appendChild(photoInput);
@@ -1184,45 +1186,111 @@ else{
     fig.append(img,cap); setPhoto(img,url);
     return fig;
   }
-  function detachPhotoUI(){ document.querySelectorAll('.photo-ui').forEach(e=>e.remove()); }
-  function attachPhotoUI(){
-    detachPhotoUI();
-    document.querySelectorAll('.intro-photo, .ws-photo, figure.evidence-shot').forEach(host=>{
-      const isFig=host.tagName==='FIGURE';
-      const target=isFig?host.querySelector('img'):host;
-      if(!target) return;
-      const ctl=document.createElement('div'); ctl.className='photo-ui photo-ctl';
-      ctl.append(mkBtn('📷 Đổi ảnh',async()=>{
-        const [f]=await pickFiles(false); if(!f) return;
-        await busy(async()=>{ setPhoto(target,await compressImage(f)); });
-      }));
-      [['⟲','rotL','Xoay trái 90°'],['⟳','rotR','Xoay phải 90°'],['↔','flipH','Lật ngang'],['↕','flipV','Lật dọc']].forEach(([lb,op,tt])=>{
-        ctl.append(mkBtn(lb,()=>busy(async()=>{ await transformPhoto(target,op); }),'ico',tt));
-      });
-      if(!host.classList.contains('intro-photo')) ctl.append(mkBtn('⧉ Sao chép',async()=>{
-        await busy(async()=>{ await duplicatePhoto(host,target); });
-        attachPhotoUI();
-      },'',"Nhân bản ảnh này xuống bên dưới"));
-      if(isFig) ctl.append(mkBtn('🗑 Xoá ảnh',()=>{
-        if(!confirm('Xoá ảnh này (kèm chú thích)?')) return;
-        const pid=target.dataset.pid; if(pid){ pendingPhotos.delete(pid); removedPhotos.add(pid); }
-        host.remove(); attachPhotoUI();
-      },'danger'));
-      ctl.append(mkSize(target));
-      host.appendChild(ctl);
-      if(host.classList.contains('intro-photo')) return;      // ảnh chân dung: chỉ đổi, không thêm bên dưới
-      const bar=document.createElement('div'); bar.className='photo-ui photo-add';
-      bar.append(mkBtn('＋ Thêm ảnh bên dưới',async()=>{
-        const files=await pickFiles(true); if(!files.length) return;
-        await busy(async()=>{
-          let anchor=host;
-          for(const f of files){ const fig=makeFigure(await compressImage(f)); anchor.insertAdjacentElement('afterend',fig); anchor=fig; }
-        });
-        attachPhotoUI();
-      }));
-      host.insertAdjacentElement('afterend',bar);
+  /* ===== Chọn ảnh → khung kéo giãn (8 điểm) + tay xoay + thanh công cụ nổi ===== */
+  let sel=null;   // {host,target,ov}
+  const pbar=document.createElement('div'); pbar.id='photoBar'; document.body.appendChild(pbar);
+  const rotOf=el=>{ const m=(el.style.transform||'').match(/rotate\((-?[\d.]+)deg\)/); return m?parseFloat(m[1]):0; };
+  const pctOf=el=>parseFloat(el.style.width)||100;
+  function setRot(el,deg){ deg=((deg+180)%360+360)%360-180; deg=Math.round(deg*10)/10; el.style.transform=deg?('rotate('+deg+'deg)'):''; }
+  function placeOverlay(){
+    if(!sel) return; const {host,target,ov}=sel;
+    if(target===host) Object.assign(ov.style,{left:'0',top:'0',width:'100%',height:'100%',transform:'none'});
+    else Object.assign(ov.style,{left:target.offsetLeft+'px',top:target.offsetTop+'px',width:target.offsetWidth+'px',height:target.offsetHeight+'px',transform:target.style.transform||'none'});
+    const i=pbar.querySelector('.pinfo'); if(i) i.textContent=Math.round(pctOf(target))+'% · '+Math.round(rotOf(target))+'°';
+  }
+  function refresh(){ placeOverlay(); if(sel&&sel.target.tagName==='IMG') sel.target.addEventListener('load',placeOverlay,{once:true}); }
+  function drag(ev,onMove){
+    ev.preventDefault(); ev.stopPropagation();
+    const move=e=>{ e.preventDefault(); onMove(e); };
+    const up=()=>{ window.removeEventListener('pointermove',move); window.removeEventListener('pointerup',up); window.removeEventListener('pointercancel',up); msg.textContent='Đang sửa — nhớ bấm Lưu'; };
+    window.addEventListener('pointermove',move,{passive:false}); window.addEventListener('pointerup',up); window.addEventListener('pointercancel',up);
+  }
+  function startResize(ev,dir){
+    if(!sel) return; const {target}=sel;
+    const x0=ev.clientX, y0=ev.clientY, w0=target.offsetWidth, h0=target.offsetHeight||1, ratio=w0/h0;
+    const base=w0/(pctOf(target)/100);
+    const th=rotOf(target)*Math.PI/180, ux=Math.cos(th), uy=Math.sin(th), vx=-Math.sin(th), vy=Math.cos(th);
+    const sx=dir.includes('e')?1:dir.includes('w')?-1:0, sy=dir.includes('s')?1:dir.includes('n')?-1:0;
+    drag(ev,e=>{
+      const dx=e.clientX-x0, dy=e.clientY-y0, dl=dx*ux+dy*uy, dv=dx*vx+dy*vy;
+      const delta=sx?2*sx*dl:sy*dv*ratio;                         // ảnh căn giữa nên nở đều hai bên
+      const w=Math.min(base,Math.max(base*0.15,w0+delta)), pct=w/base*100;
+      if(pct>=99.5){ target.style.width=''; target.style.marginInline=''; }
+      else{ target.style.width=pct.toFixed(1)+'%'; target.style.marginInline='auto'; }
+      placeOverlay();
     });
   }
+  function startRotate(ev){
+    if(!sel) return; const {target}=sel;
+    drag(ev,e=>{
+      const b=target.getBoundingClientRect(), cx=b.left+b.width/2, cy=b.top+b.height/2;
+      let a=Math.atan2(e.clientY-cy,e.clientX-cx)*180/Math.PI+90;
+      a=((a+180)%360+360)%360-180;
+      const snap=Math.round(a/15)*15; if(e.shiftKey||Math.abs(a-snap)<3) a=snap;   // bám mốc 0°, 15°, 90°…
+      setRot(target,a); placeOverlay();
+    });
+  }
+  function deselect(){
+    if(sel&&sel.ov) sel.ov.remove();
+    sel=null; pbar.classList.remove('show'); pbar.innerHTML='';
+  }
+  function buildBar(){
+    const {host,target}=sel, isFig=host.tagName==='FIGURE', isIntro=host.classList.contains('intro-photo');
+    pbar.innerHTML='';
+    const info=document.createElement('span'); info.className='pinfo'; pbar.append(info);
+    pbar.append(mkBtn('📷 Đổi ảnh',async()=>{
+      const [f]=await pickFiles(false); if(!f) return;
+      await busy(async()=>{ setPhoto(target,await compressImage(f)); }); refresh();
+    }));
+    [['⟲','rotL','Xoay trái 90°'],['⟳','rotR','Xoay phải 90°'],['↔','flipH','Lật ngang'],['↕','flipV','Lật dọc']].forEach(([lb,op,tt])=>{
+      pbar.append(mkBtn(lb,async()=>{ await busy(async()=>{ await transformPhoto(target,op); }); refresh(); },'',tt));
+    });
+    pbar.append(mkBtn('↺ Đặt lại',()=>{
+      target.style.width=''; target.style.marginInline=''; target.style.transform='';
+      if(target.classList.contains('ws-photo')) target.style.aspectRatio='';
+      refresh();
+    },'','Về kích thước và góc xoay ban đầu'));
+    if(!isIntro){
+      pbar.append(mkBtn('⧉ Sao chép',async()=>{
+        let fig; await busy(async()=>{ fig=await duplicatePhoto(host,target); }); if(fig) select(fig);
+      },'','Nhân bản ảnh xuống bên dưới'));
+      pbar.append(mkBtn('＋ Thêm ảnh',async()=>{
+        const files=await pickFiles(true); if(!files.length) return;
+        let anchor=host;
+        await busy(async()=>{ for(const f of files){ const fig=makeFigure(await compressImage(f)); anchor.insertAdjacentElement('afterend',fig); anchor=fig; } });
+        select(anchor);
+      },'','Thêm ảnh mới bên dưới ảnh này'));
+    }
+    if(isFig) pbar.append(mkBtn('🗑 Xoá',()=>{
+      if(!confirm('Xoá ảnh này (kèm chú thích)?')) return;
+      const pid=target.dataset.pid; if(pid){ pendingPhotos.delete(pid); removedPhotos.add(pid); }
+      host.remove(); deselect();
+    },'danger'));
+    pbar.classList.add('show');
+  }
+  function select(host){
+    if(sel&&sel.host===host) return;
+    deselect();
+    const target=host.tagName==='FIGURE'?host.querySelector('img'):host; if(!target) return;
+    const ov=document.createElement('div'); ov.className='photo-ui photo-ov';
+    ['nw','n','ne','e','se','s','sw','w'].forEach(d=>{
+      const h=document.createElement('div'); h.className='ph ph-'+d; h.addEventListener('pointerdown',e=>startResize(e,d)); ov.append(h);
+    });
+    const r=document.createElement('div'); r.className='ph-rot'; r.title='Kéo để xoay (giữ Shift: bám mốc 15°)'; r.addEventListener('pointerdown',startRotate); ov.append(r);
+    host.appendChild(ov); sel={host,target,ov};
+    buildBar(); placeOverlay();
+  }
+  function attachPhotoUI(){ deselect(); }
+  function detachPhotoUI(){ deselect(); }
+  document.addEventListener('pointerdown',e=>{
+    if(!document.body.classList.contains('edit-mode')) return;
+    if(e.target.closest('#photoBar, .photo-ov')) return;
+    const img=e.target.closest('figure.evidence-shot img');
+    const host=img?img.closest('figure.evidence-shot'):e.target.closest('.intro-photo, .ws-photo');
+    if(host) select(host); else deselect();
+  });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') deselect(); });
+  window.addEventListener('resize',placeOverlay);
   bar.classList.add('show');
 
   // Nạp nội dung đã lưu (ai cũng xem được)
@@ -1264,7 +1332,7 @@ else{
     document.body.classList.toggle('edit-mode',on);
     document.querySelectorAll('[data-ce]').forEach(el=>{ if(on) el.setAttribute('contenteditable','true'); else el.removeAttribute('contenteditable'); });
     bEdit.style.display=on?'none':''; bSave.style.display=bCancel.style.display=on?'':'none'; bOut.style.display=on?'none':'';
-    msg.textContent=on?'Đang sửa — nhớ bấm Lưu':'';
+    msg.textContent=on?'Đang sửa — bấm vào ảnh để chỉnh, nhớ bấm Lưu':'';
     if(on) attachPhotoUI(); else detachPhotoUI();
   }
 
