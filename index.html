@@ -219,6 +219,9 @@
   .photo-ui button:hover{border-color:var(--accent);color:var(--accent);}
   .photo-ui button.danger:hover{border-color:#C0392B;color:#C0392B;}
   .photo-add button{border-style:dashed;background:var(--bg);box-shadow:none;}
+  .photo-ui button.ico{padding:7px 10px;min-width:34px;}
+  .photo-size{flex-basis:100%;align-items:center;justify-content:flex-end;gap:8px;background:var(--card);color:var(--text);border:1px solid var(--border);padding:6px 10px;font-size:12.5px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.28);cursor:default;}
+  .photo-size input[type=range]{width:120px;accent-color:var(--accent);cursor:pointer;}
 </style>
 </head>
 <body>
@@ -1085,24 +1088,73 @@ else{
     applyPhoto(el,url);
     pendingPhotos.set(pid,url);
   }
-  // Thu nhỏ + nén ảnh phía trình duyệt (tối đa 1600px, JPEG) để vừa giới hạn Firestore
+  // ===== Xử lý ảnh phía trình duyệt: nén (tối đa 1600px, JPEG) + xoay / lật =====
+  function loadImg(src){
+    return new Promise((ok,no)=>{ const i=new Image(); i.onload=()=>ok(i); i.onerror=()=>no(new Error('Không đọc được ảnh (hãy dùng JPG/PNG/WebP).')); i.src=src; });
+  }
+  // op: null | 'rotL' | 'rotR' | 'flipH' | 'flipV'
+  function encodeImage(img,op){
+    const W=img.naturalWidth, H=img.naturalHeight, swap=(op==='rotL'||op==='rotR');
+    let max=1600,q=0.85;
+    for(let n=0;n<10;n++){
+      const s=Math.min(1,max/Math.max(W,H));
+      const w=Math.max(1,Math.round(W*s)), h=Math.max(1,Math.round(H*s));
+      const cv=document.createElement('canvas'); cv.width=swap?h:w; cv.height=swap?w:h;
+      const cx=cv.getContext('2d'); cx.fillStyle='#fff'; cx.fillRect(0,0,cv.width,cv.height);
+      if(op==='rotR'){ cx.translate(cv.width,0); cx.rotate(Math.PI/2); }
+      else if(op==='rotL'){ cx.translate(0,cv.height); cx.rotate(-Math.PI/2); }
+      else if(op==='flipH'){ cx.translate(cv.width,0); cx.scale(-1,1); }
+      else if(op==='flipV'){ cx.translate(0,cv.height); cx.scale(1,-1); }
+      cx.drawImage(img,0,0,w,h);
+      const out=cv.toDataURL('image/jpeg',q);
+      if(out.length<=MAX_IMG_CHARS) return {url:out,w:cv.width,h:cv.height};
+      if(q>0.6) q-=0.1; else max=Math.round(max*0.8);
+    }
+    throw new Error('Ảnh quá lớn, không nén đủ nhỏ được.');
+  }
   async function compressImage(file){
     if(!file.type.startsWith('image/')) throw new Error('Tệp không phải ảnh.');
     const u=URL.createObjectURL(file);
-    try{
-      const img=await new Promise((ok,no)=>{ const i=new Image(); i.onload=()=>ok(i); i.onerror=()=>no(new Error('Không đọc được ảnh (hãy dùng JPG/PNG/WebP).')); i.src=u; });
-      let max=1600,q=0.85,out='';
-      for(let n=0;n<10;n++){
-        const s=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));
-        const w=Math.max(1,Math.round(img.naturalWidth*s)), h=Math.max(1,Math.round(img.naturalHeight*s));
-        const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
-        const cx=cv.getContext('2d'); cx.fillStyle='#fff'; cx.fillRect(0,0,w,h); cx.drawImage(img,0,0,w,h);
-        out=cv.toDataURL('image/jpeg',q);
-        if(out.length<=MAX_IMG_CHARS) return out;
-        if(q>0.6) q-=0.1; else max=Math.round(max*0.8);
-      }
-      throw new Error('Ảnh quá lớn, không nén đủ nhỏ được.');
-    }finally{ URL.revokeObjectURL(u); }
+    try{ return encodeImage(await loadImg(u),null).url; }
+    finally{ URL.revokeObjectURL(u); }
+  }
+  function getPhotoUrl(el){
+    if(el.tagName==='IMG') return el.currentSrc||el.src;
+    const m=getComputedStyle(el).backgroundImage.match(/url\(["']?([^"')]+)["']?\)/);
+    if(!m) throw new Error('Chưa có ảnh để chỉnh.');
+    return m[1];
+  }
+  async function transformPhoto(target,op){
+    const r=encodeImage(await loadImg(getPhotoUrl(target)),op);
+    setPhoto(target,r.url);
+    if(target.classList.contains('ws-photo')) target.style.aspectRatio=r.w+' / '+r.h;   // khung ảnh xưởng theo đúng tỉ lệ ảnh sau khi xoay
+  }
+  async function duplicatePhoto(host,target){
+    let url=getPhotoUrl(target);
+    if(url.length>MAX_IMG_CHARS) url=encodeImage(await loadImg(url),null).url;
+    const fig=makeFigure(url), img=fig.querySelector('img');
+    if(host.tagName==='FIGURE'){
+      const oc=host.querySelector('figcaption'); if(oc) fig.querySelector('figcaption').textContent=oc.textContent;
+      const oi=host.querySelector('img'); if(oi&&oi.alt) img.alt=oi.alt;
+    }
+    if(target.style.width){ img.style.width=target.style.width; img.style.marginInline='auto'; }
+    host.insertAdjacentElement('afterend',fig);
+  }
+  function mkSize(target){
+    const wrap=document.createElement('label'); wrap.className='photo-ui photo-size';
+    const cur=Math.min(100,Math.max(20,parseInt(target.style.width)||100));
+    const txt=document.createElement('span'); txt.textContent='Kích thước '+cur+'%';
+    const r=document.createElement('input'); r.type='range'; r.min=20; r.max=100; r.step=5; r.value=cur;
+    r.addEventListener('input',()=>{
+      const v=+r.value;
+      if(v>=100){ target.style.width=''; target.style.marginInline=''; }
+      else{ target.style.width=v+'%'; target.style.marginInline='auto'; }
+      txt.textContent='Kích thước '+v+'%';
+      msg.textContent='Đang sửa — nhớ bấm Lưu';
+    });
+    wrap.addEventListener('click',e=>e.stopPropagation());
+    wrap.append(txt,r);
+    return wrap;
   }
   const photoInput=document.createElement('input');
   photoInput.type='file'; photoInput.accept='image/*'; photoInput.hidden=true; document.body.appendChild(photoInput);
@@ -1119,8 +1171,8 @@ else{
     try{ await fn(); msg.textContent='Đang sửa — nhớ bấm Lưu'; }
     catch(e){ msg.textContent='Lỗi ảnh: '+(e.message||e); }
   }
-  function mkBtn(label,fn,cls){
-    const b=document.createElement('button'); b.type='button'; b.textContent=label; if(cls) b.className=cls;
+  function mkBtn(label,fn,cls,title){
+    const b=document.createElement('button'); b.type='button'; b.textContent=label; if(cls) b.className=cls; if(title) b.title=title;
     b.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation(); fn(); });
     return b;
   }
@@ -1144,11 +1196,19 @@ else{
         const [f]=await pickFiles(false); if(!f) return;
         await busy(async()=>{ setPhoto(target,await compressImage(f)); });
       }));
+      [['⟲','rotL','Xoay trái 90°'],['⟳','rotR','Xoay phải 90°'],['↔','flipH','Lật ngang'],['↕','flipV','Lật dọc']].forEach(([lb,op,tt])=>{
+        ctl.append(mkBtn(lb,()=>busy(async()=>{ await transformPhoto(target,op); }),'ico',tt));
+      });
+      if(!host.classList.contains('intro-photo')) ctl.append(mkBtn('⧉ Sao chép',async()=>{
+        await busy(async()=>{ await duplicatePhoto(host,target); });
+        attachPhotoUI();
+      },'',"Nhân bản ảnh này xuống bên dưới"));
       if(isFig) ctl.append(mkBtn('🗑 Xoá ảnh',()=>{
         if(!confirm('Xoá ảnh này (kèm chú thích)?')) return;
         const pid=target.dataset.pid; if(pid){ pendingPhotos.delete(pid); removedPhotos.add(pid); }
         host.remove(); attachPhotoUI();
       },'danger'));
+      ctl.append(mkSize(target));
       host.appendChild(ctl);
       if(host.classList.contains('intro-photo')) return;      // ảnh chân dung: chỉ đổi, không thêm bên dưới
       const bar=document.createElement('div'); bar.className='photo-ui photo-add';
