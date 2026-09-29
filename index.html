@@ -835,11 +835,13 @@
   <footer data-ce>© 2026 E-Portfolio Cá nhân — Nguyễn Chí Nguyên | Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) — Trường Cao đẳng Công nghiệp Huế</footer>
 </div>
 
-<div id="editBar" role="toolbar" aria-label="Chế độ sửa">
+<div id="editBar" role="toolbar" aria-label="Quản trị">
   <span class="msg" id="editMsg"></span>
-  <button type="button" id="btnEdit">✏️ Chế độ sửa</button>
+  <button type="button" id="btnLogin">🔐 Đăng nhập Google</button>
+  <button type="button" id="btnEdit" style="display:none">✏️ Chế độ sửa</button>
   <button type="button" id="btnCancel" style="display:none">Hủy</button>
-  <button type="button" id="btnSave" class="primary" style="display:none">💾 Lưu &amp; xuất bản</button>
+  <button type="button" id="btnSave" class="primary" style="display:none">💾 Lưu</button>
+  <button type="button" id="btnLogout" style="display:none">Đăng xuất</button>
 </div>
 
 <script>
@@ -862,31 +864,27 @@
   function closeDropdown(){ document.getElementById('wsDropdown').classList.remove('open'); }
   document.addEventListener('click', ()=>{ closeDropdown(); });
 
-  // Tab switching
-  document.querySelectorAll('.tab-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(p=>p.classList.add('hidden'));
-      btn.classList.add('active');
-      const panel = document.getElementById(btn.dataset.tab);
-      if(panel) panel.classList.remove('hidden');
-    });
-  });
-
   function renumber(tbody){
     [...tbody.children].forEach((tr,i)=>{ const c = tr.querySelector('.num-col'); if(c) c.textContent = i+1; });
   }
-  document.querySelectorAll('.row-del').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const tr = btn.closest('tr'); const tbody = tr.parentElement;
-      tr.remove(); renumber(tbody);
-    });
-  });
-  document.querySelectorAll('.add-row-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const tbody = document.getElementById(btn.dataset.target);
+  document.addEventListener('click', (e)=>{
+    const t = e.target;
+    const tab = t.closest('.tab-btn');
+    if(tab){
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p=>p.classList.add('hidden'));
+      tab.classList.add('active');
+      const panel = document.getElementById(tab.dataset.tab);
+      if(panel) panel.classList.remove('hidden');
+      return;
+    }
+    const rdel = t.closest('.row-del');
+    if(rdel){ const tr = rdel.closest('tr'); const tb = tr.parentElement; tr.remove(); renumber(tb); return; }
+    const addRow = t.closest('.add-row-btn');
+    if(addRow){
+      const tbody = document.getElementById(addRow.dataset.target);
       const tr = document.createElement('tr');
-      tr.id = btn.dataset.target + '-new-' + Date.now();
+      tr.id = addRow.dataset.target + '-new-' + Date.now();
       tr.innerHTML = '<td class="num-col"></td>'+
         '<td contenteditable="true" data-ce>Tên môn học mới</td>'+
         '<td contenteditable="true" data-ce>3</td>'+
@@ -894,103 +892,120 @@
         '<td contenteditable="true" data-ce>—</td>'+
         '<td class="del-col"><button class="row-del">×</button></td>';
       tbody.appendChild(tr); renumber(tbody);
-      tr.querySelector('.row-del').addEventListener('click', ()=>{ tr.remove(); renumber(tbody); });
-      tr.querySelectorAll('[contenteditable]')[0].focus();
-    });
-  });
-
-  document.getElementById('workshopGrid').addEventListener('click', (e)=>{
-    if(e.target.classList.contains('wcard-del')){ e.target.closest('.wcard').remove(); }
-  });
-  document.getElementById('addWorkshopCard').addEventListener('click', ()=>{
-    const grid = document.getElementById('workshopGrid');
-    const card = document.createElement('div');
-    card.className = 'wcard'; card.id = 'wc-new-' + Date.now();
-    card.innerHTML = '<button class="wcard-del" title="Xoá thẻ">×</button>'+
-      '<div class="thumb" contenteditable="true" data-ce>TÊN BÀI THỰC HÀNH</div>'+
-      '<div class="body">'+
-      '<h3 contenteditable="true" data-ce>Bài thực hành mới</h3>'+
-      '<p contenteditable="true" data-ce>Mô tả ngắn về quy trình, dụng cụ và kết quả đo kiểm.</p>'+
-      '<button class="wlink">👉 Xem báo cáo chi tiết trang con →</button>'+
-      '</div>';
-    grid.appendChild(card); card.querySelector('h3').focus();
-  });
-
-  document.querySelectorAll('.skill-list').forEach(list=>{
-    list.addEventListener('click', (e)=>{
-      if(e.target.classList.contains('li-del')){ e.target.closest('li').remove(); }
-    });
-  });
-  document.querySelectorAll('.add-skill-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const list = document.getElementById(btn.dataset.target);
+      tr.querySelector('[contenteditable]').focus();
+      return;
+    }
+    if(t.classList.contains('wcard-del')){ t.closest('.wcard').remove(); return; }
+    if(t.closest('#addWorkshopCard')){
+      const grid = document.getElementById('workshopGrid');
+      const card = document.createElement('div');
+      card.className = 'wcard'; card.id = 'wc-new-' + Date.now();
+      card.innerHTML = '<button class="wcard-del" title="Xoá thẻ">×</button>'+
+        '<div class="thumb" contenteditable="true" data-ce>TÊN BÀI THỰC HÀNH</div>'+
+        '<div class="body">'+
+        '<h3 contenteditable="true" data-ce>Bài thực hành mới</h3>'+
+        '<p contenteditable="true" data-ce>Mô tả ngắn về quy trình, dụng cụ và kết quả đo kiểm.</p>'+
+        '<button class="wlink">👉 Xem báo cáo chi tiết trang con →</button>'+
+        '</div>';
+      grid.appendChild(card); card.querySelector('h3').focus();
+      return;
+    }
+    if(t.classList.contains('li-del')){ t.closest('li').remove(); return; }
+    const addSkill = t.closest('.add-skill-btn');
+    if(addSkill){
+      const list = document.getElementById(addSkill.dataset.target);
       const li = document.createElement('li');
       li.innerHTML = '<span class="txt" contenteditable="true" data-ce>Nội dung mới…</span><button class="li-del">×</button>';
       list.appendChild(li); li.querySelector('.txt').focus();
-    });
-  });
-
-
-  // ===== Chế độ sửa: chỉ chủ trang mới thấy =====
-  const initClasses = [...document.querySelectorAll('.view,.tab-panel,.tab-btn')].map(e=>e.className);
-  const bar = document.getElementById('editBar');
-  const btnEdit = document.getElementById('btnEdit');
-  const btnSave = document.getElementById('btnSave');
-  const btnCancel = document.getElementById('btnCancel');
-  const msg = document.getElementById('editMsg');
-  let artifactApi = null;
-
-  function setEditing(on){
-    document.body.classList.toggle('edit-mode', on);
-    document.querySelectorAll('[data-ce]').forEach(el=>{
-      if(on) el.setAttribute('contenteditable','true'); else el.removeAttribute('contenteditable');
-    });
-    btnEdit.style.display = on ? 'none' : '';
-    btnSave.style.display = btnCancel.style.display = on ? '' : 'none';
-    msg.textContent = on ? 'Đang sửa — nhớ bấm Lưu' : '';
-  }
-
-  function buildCleanHtml(){
-    const clone = document.documentElement.cloneNode(true);
-    clone.querySelectorAll('[contenteditable]').forEach(el=>el.removeAttribute('contenteditable'));
-    clone.removeAttribute('data-theme');
-    const b = clone.querySelector('body'); if(b) b.classList.remove('edit-mode');
-    const eb = clone.querySelector('#editBar'); if(eb) eb.classList.remove('show');
-    const em = clone.querySelector('#editMsg'); if(em) em.textContent = '';
-    const be = clone.querySelector('#btnEdit'); if(be) be.style.display = '';
-    const bs = clone.querySelector('#btnSave'); if(bs){ bs.style.display='none'; bs.disabled=false; }
-    const bc = clone.querySelector('#btnCancel'); if(bc) bc.style.display='none';
-    clone.querySelectorAll('.dropdown.open').forEach(d=>d.classList.remove('open'));
-    [...clone.querySelectorAll('.view,.tab-panel,.tab-btn')].forEach((el,i)=>{ el.className = initClasses[i]; });
-    return '<!DOCTYPE html>\n' + clone.outerHTML;
-  }
-
-  btnEdit.addEventListener('click', ()=> setEditing(true));
-  btnCancel.addEventListener('click', ()=> location.reload());
-  btnSave.addEventListener('click', async ()=>{
-    if(!artifactApi) return;
-    btnSave.disabled = true; msg.textContent = 'Đang lưu…';
-    try{
-      await artifactApi.publish(buildCleanHtml());
-    }catch(err){
-      btnSave.disabled = false;
-      const c = err && err.code;
-      msg.textContent = (c==='not_writer'||c==='not_granted') ? 'Bạn không có quyền lưu trang này.'
-        : (c==='conflict') ? 'Trang vừa được cập nhật ở nơi khác, đang tải lại…'
-        : 'Lưu thất bại, thử lại sau.';
     }
   });
+</script>
 
-  (async ()=>{
+<script type="module">
+/* ============ CẤU HÌNH — điền 2 thứ này ============ */
+const ADMIN_EMAIL = "DAN_GMAIL_CUA_BAN@gmail.com";
+const FIREBASE_CONFIG = {
+  apiKey: "DAN_API_KEY", authDomain: "DAN_PROJECT.firebaseapp.com",
+  projectId: "DAN_PROJECT_ID", appId: "DAN_APP_ID"
+};
+/* =================================================== */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+if(FIREBASE_CONFIG.apiKey.startsWith("DAN_")){ console.warn("Chưa cấu hình Firebase/ADMIN_EMAIL — ẩn nút đăng nhập."); }
+else{
+  const app = initializeApp(FIREBASE_CONFIG), auth = getAuth(app), db = getFirestore(app);
+  const ref = doc(db,'site','content');
+  const $ = id=>document.getElementById(id);
+  const bar=$('editBar'), msg=$('editMsg'), bLogin=$('btnLogin'), bEdit=$('btnEdit'), bSave=$('btnSave'), bCancel=$('btnCancel'), bOut=$('btnLogout');
+  const VIEW_IDS=[...document.querySelectorAll('.view')].map(v=>v.id);
+  const origImgs={}; VIEW_IDS.forEach(id=>{ origImgs[id]=[...$(id).querySelectorAll('img[src^="data:"]')].map(i=>i.getAttribute('src')); });
+  bar.classList.add('show');
+
+  // Nạp nội dung đã lưu (ai cũng xem được)
+  getDoc(ref).then(snap=>{
+    if(!snap.exists()) return;
+    const data=JSON.parse(snap.data().json);
+    VIEW_IDS.forEach(id=>{
+      if(typeof data[id]!=='string') return;
+      const v=$(id); v.innerHTML=data[id];
+      v.querySelectorAll('img[data-img-idx]').forEach(im=>{ const src=origImgs[id][+im.dataset.imgIdx]; if(src) im.src=src; });
+    });
+  }).catch(e=>console.warn('Không nạp được nội dung đã lưu:',e));
+
+  function serialize(){
+    const out={};
+    VIEW_IDS.forEach(id=>{
+      const c=$(id).cloneNode(true);
+      c.querySelectorAll('[contenteditable]').forEach(e=>e.removeAttribute('contenteditable'));
+      c.querySelectorAll('.dropdown.open').forEach(d=>d.classList.remove('open'));
+      c.querySelectorAll('.tabs').forEach(g=>g.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===0)));
+      const seen=new Set();
+      c.querySelectorAll('.tab-panel').forEach(p=>{ const first=!seen.has(p.parentElement); seen.add(p.parentElement); p.classList.toggle('hidden',!first); });
+      c.querySelectorAll('img[src^="data:"]').forEach((im,i)=>{ im.setAttribute('data-img-idx',i); im.removeAttribute('src'); });
+      out[id]=c.innerHTML;
+    });
+    return JSON.stringify(out);
+  }
+
+  function setEditing(on){
+    document.body.classList.toggle('edit-mode',on);
+    document.querySelectorAll('[data-ce]').forEach(el=>{ if(on) el.setAttribute('contenteditable','true'); else el.removeAttribute('contenteditable'); });
+    bEdit.style.display=on?'none':''; bSave.style.display=bCancel.style.display=on?'':'none'; bOut.style.display=on?'none':'';
+    msg.textContent=on?'Đang sửa — nhớ bấm Lưu':'';
+  }
+
+  let denied='';
+  onAuthStateChanged(auth,user=>{
+    const ok=!!(user && user.emailVerified && user.email && user.email.toLowerCase()===ADMIN_EMAIL.toLowerCase());
+    if(user && !ok){ denied='Tài khoản '+user.email+' không có quyền sửa trang.'; signOut(auth); return; }
+    bLogin.style.display=ok?'none':''; bEdit.style.display=bOut.style.display=ok?'':'none';
+    bSave.style.display=bCancel.style.display='none';
+    document.body.classList.remove('edit-mode');
+    msg.textContent=ok?('Xin chào, '+user.email):denied; denied='';
+  });
+
+  bLogin.onclick=async()=>{
+    try{ const p=new GoogleAuthProvider(); p.setCustomParameters({prompt:'select_account'}); await signInWithPopup(auth,p); }
+    catch(e){ msg.textContent=(e.code==='auth/popup-closed-by-user')?'':'Đăng nhập thất bại: '+(e.code||e.message); }
+  };
+  bOut.onclick=()=>signOut(auth);
+  bEdit.onclick=()=>setEditing(true);
+  bCancel.onclick=()=>location.reload();
+  bSave.onclick=async()=>{
+    const json=serialize();
+    if(json.length>950000){ msg.textContent='Nội dung quá lớn (>1MB), không lưu được.'; return; }
+    bSave.disabled=true; msg.textContent='Đang lưu…';
     try{
-      if(!window.claude || !claude.use) return;
-      const user = await claude.use('user');
-      const isOwner = !!(user && user.isOwner && user.isOwner());
-      if(!isOwner) return;
-      artifactApi = await claude.use('artifact');
-      if(artifactApi) bar.classList.add('show');
-    }catch(e){}
-  })();
+      await setDoc(ref,{json,updatedBy:auth.currentUser.email,updatedAt:serverTimestamp()});
+      setEditing(false); msg.textContent='Đã lưu ✔';
+    }catch(e){
+      msg.textContent=e.code==='permission-denied'?'Không có quyền lưu (kiểm tra Firestore Rules).':'Lưu thất bại, thử lại sau.';
+    }
+    bSave.disabled=false;
+  };
+}
 </script>
 
 </body>
