@@ -882,7 +882,7 @@
     [...tbody.children].forEach((tr,i)=>{ const c = tr.querySelector('.num-col'); if(c) c.textContent = i+1; });
   }
   // ===== Duyệt Google Drive ngay trong trang (Drive API, thư mục phải để công khai) =====
-  const DRIVE_API_KEY = "AIzaSyA4LodV5sKg5D4IAqggBMietzi18tJchl0";
+  const DRIVE_API_KEY = "AIzaSyD7iDIJLbwbxhjs1EuLmPPvdea70WfRSC8";
   const driveState = new WeakMap();
   const dvEsc = t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   const DV_FOLDER = 'application/vnd.google-apps.folder';
