@@ -64,7 +64,7 @@
   [contenteditable="true"]:hover{background:rgba(217,100,44,0.08);outline:1px dashed var(--accent);}
   [contenteditable="true"]:focus{outline:2px solid var(--accent);background:rgba(217,100,44,0.12);}
 
-  .intro-grid{display:grid;grid-template-columns:220px 1fr;gap:32px;}
+  .intro-grid{display:grid;grid-template-columns:var(--intro-w,220px) 1fr;gap:32px;}
   @media (max-width:640px){.intro-grid{grid-template-columns:1fr;}}
   .intro-photo{width:100%;aspect-ratio:1/1;background:linear-gradient(160deg,var(--navy-2),var(--navy));display:flex;align-items:center;justify-content:center;color:#fff;font-size:52px;font-weight:800;}
   dl.facts{margin:0 0 18px;display:grid;grid-template-columns:150px 1fr;row-gap:9px;column-gap:12px;font-size:14.5px;}
@@ -1196,7 +1196,7 @@ else{
     if(!sel) return; const {host,target,ov}=sel;
     if(target===host) Object.assign(ov.style,{left:'0',top:'0',width:'100%',height:'100%',transform:'none'});
     else Object.assign(ov.style,{left:target.offsetLeft+'px',top:target.offsetTop+'px',width:target.offsetWidth+'px',height:target.offsetHeight+'px',transform:target.style.transform||'none'});
-    const i=pbar.querySelector('.pinfo'); if(i) i.textContent=Math.round(pctOf(target))+'% · '+Math.round(rotOf(target))+'°';
+    const i=pbar.querySelector('.pinfo'); if(i) i.textContent=(target.classList.contains('intro-photo')?Math.round(target.offsetWidth)+'px':Math.round(pctOf(target))+'%')+' · '+Math.round(rotOf(target))+'°';
   }
   function refresh(){ placeOverlay(); if(sel&&sel.target.tagName==='IMG') sel.target.addEventListener('load',placeOverlay,{once:true}); }
   function drag(ev,onMove){
@@ -1207,6 +1207,18 @@ else{
   }
   function startResize(ev,dir){
     if(!sel) return; const {target}=sel;
+    if(target.classList.contains('intro-photo')){          // ảnh chân dung: kéo to thì cột chứa ảnh nới theo, chữ dạt sang phải
+      const grid=target.parentElement, x0=ev.clientX, y0=ev.clientY, w0=target.offsetWidth;
+      const th=rotOf(target)*Math.PI/180, ux=Math.cos(th), uy=Math.sin(th), vx=-Math.sin(th), vy=Math.cos(th);
+      const sx=dir.includes('e')?1:dir.includes('w')?-1:0, sy=dir.includes('s')?1:dir.includes('n')?-1:0;
+      drag(ev,e=>{
+        const dx=e.clientX-x0, dy=e.clientY-y0, dl=dx*ux+dy*uy, dv=dx*vx+dy*vy;
+        const w=Math.min(Math.max(80,grid.clientWidth-220),Math.max(80,w0+(sx?sx*dl:sy*dv)));
+        grid.style.setProperty('--intro-w',Math.round(w)+'px');
+        placeOverlay();
+      });
+      return;
+    }
     const x0=ev.clientX, y0=ev.clientY, w0=target.offsetWidth, h0=target.offsetHeight||1, ratio=w0/h0;
     const base=w0/(pctOf(target)/100);
     const th=rotOf(target)*Math.PI/180, ux=Math.cos(th), uy=Math.sin(th), vx=-Math.sin(th), vy=Math.cos(th);
@@ -1248,6 +1260,7 @@ else{
     pbar.append(mkBtn('↺ Đặt lại',()=>{
       target.style.width=''; target.style.marginInline=''; target.style.transform='';
       if(target.classList.contains('ws-photo')) target.style.aspectRatio='';
+      if(target.classList.contains('intro-photo')) target.parentElement.style.removeProperty('--intro-w');
       refresh();
     },'','Về kích thước và góc xoay ban đầu'));
     if(!isIntro){
