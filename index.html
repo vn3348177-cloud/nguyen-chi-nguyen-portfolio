@@ -878,6 +878,24 @@
       if(panel) panel.classList.remove('hidden');
       return;
     }
+    const drv = t.closest('a[href*="drive.google.com/drive/folders/"]');
+    if(drv && !drv.closest('.drive-panel')){
+      e.preventDefault();
+      let panel = drv.nextElementSibling;
+      if(!panel || !panel.classList.contains('drive-panel')){
+        const id = (drv.href.match(/folders\/([\w-]+)/)||[])[1];
+        drv.dataset.orig = drv.textContent;
+        panel = document.createElement('div');
+        panel.className = 'drive-panel hidden';
+        panel.style.cssText = 'margin-top:14px;border:1px solid var(--border);background:var(--card);';
+        panel.innerHTML = '<iframe src="https://drive.google.com/embeddedfolderview?id='+id+'#list" style="width:100%;height:520px;border:0;display:block;" loading="lazy" title="Thư mục Google Drive minh chứng"></iframe>'+
+          '<div style="padding:8px 12px;font-size:12.5px;border-top:1px solid var(--border);"><a href="'+drv.href+'" target="_blank" rel="noopener">Mở trong Google Drive ↗</a></div>';
+        drv.insertAdjacentElement('afterend', panel);
+      }
+      const open = panel.classList.toggle('hidden') === false;
+      drv.textContent = open ? '✖ Đóng thư mục Google Drive' : drv.dataset.orig;
+      return;
+    }
     const rdel = t.closest('.row-del');
     if(rdel){ const tr = rdel.closest('tr'); const tb = tr.parentElement; tr.remove(); renumber(tb); return; }
     const addRow = t.closest('.add-row-btn');
@@ -964,6 +982,8 @@ else{
     VIEW_IDS.forEach(id=>{
       const c=$(id).cloneNode(true);
       c.querySelectorAll('[contenteditable]').forEach(e=>e.removeAttribute('contenteditable'));
+      c.querySelectorAll('.drive-panel').forEach(d=>d.remove());
+      c.querySelectorAll('a[data-orig]').forEach(a=>{ a.textContent=a.dataset.orig; a.removeAttribute('data-orig'); });
       c.querySelectorAll('.dropdown.open').forEach(d=>d.classList.remove('open'));
       c.querySelectorAll('.tabs').forEach(g=>g.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===0)));
       const seen=new Set();
