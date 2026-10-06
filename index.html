@@ -207,6 +207,15 @@
   .dv-prev button{font:inherit;font-weight:600;padding:6px 12px;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;}
   .dv-frame{width:100%;height:520px;border:0;display:block;}
   .dv-foot{padding:8px 12px;font-size:12.5px;border-top:1px solid var(--border);}
+  .dv-prev .dv-fullbtn{margin-left:auto;background:var(--navy);color:#fff;border-color:var(--navy);}
+  .dv-prev .dv-exit{display:none;margin-left:auto;background:var(--accent);color:#fff;border-color:var(--accent);}
+  .drive-panel.dv-full{position:fixed;inset:0;z-index:9999;margin:0;display:flex;flex-direction:column;border:0;}
+  .drive-panel.dv-full .dv-prev{position:sticky;top:0;background:var(--card);}
+  .drive-panel.dv-full .dv-prev .dv-fullbtn{display:none;}
+  .drive-panel.dv-full .dv-prev .dv-exit{display:inline-block;}
+  .drive-panel.dv-full .dv-body{flex:1;max-height:none;overflow:auto;}
+  .drive-panel.dv-full .dv-frame{height:100%;min-height:calc(100vh - 110px);}
+  body.dv-lock{overflow:hidden;}
   @media (max-width:640px){.dv-row{grid-template-columns:1fr 70px;}.dv-row span:nth-child(2){display:none;}}
 
   /* ===== Quản lý ảnh (chỉ hiện ở chế độ sửa) ===== */
@@ -967,15 +976,21 @@
       dvRender(panel,'<div class="dv-msg">Không tải được thư mục: '+dvEsc(err.message)+'<br>Hãy kiểm tra thư mục đã để chế độ "Bất kỳ ai có đường liên kết" và Drive API đã được bật.</div>');
     }
   }
+  function dvExitFull(panel){ panel.classList.remove('dv-full'); document.body.classList.remove('dv-lock'); }
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ const p=document.querySelector('.drive-panel.dv-full'); if(p) dvExitFull(p); } });
   function dvHandle(el){
     const panel=el.closest('.drive-panel'), st=driveState.get(panel), a=el.dataset.drive;
-    if(a==='crumb'){ if(+el.dataset.i===st.path.length-1) return dvList(panel); st.path=st.path.slice(0,+el.dataset.i+1); dvLoad(panel); }
-    else if(a==='back'){ dvList(panel); }
+    if(a==='crumb'){ dvExitFull(panel); if(+el.dataset.i===st.path.length-1) return dvList(panel); st.path=st.path.slice(0,+el.dataset.i+1); dvLoad(panel); }
+    else if(a==='full'){ panel.classList.add('dv-full'); document.body.classList.add('dv-lock'); }
+    else if(a==='exitfull'){ dvExitFull(panel); }
+    else if(a==='back'){ dvExitFull(panel); dvList(panel); }
     else if(a==='open'){
       const f=st.files[+el.dataset.i];
       if(f.mimeType===DV_FOLDER){ st.path.push({id:f.id,name:f.name}); return dvLoad(panel); }
       const u=dvPreview(f);
-      dvRender(panel,'<div class="dv-prev"><button type="button" data-drive="back">← Quay lại danh sách</button><strong>'+dvEsc(f.name)+'</strong></div>'+
+      dvRender(panel,'<div class="dv-prev"><button type="button" data-drive="back">← Quay lại danh sách</button><strong>'+dvEsc(f.name)+'</strong>'+
+        (u?'<button type="button" class="dv-fullbtn" data-drive="full">⛶ Xem toàn diện</button>':'')+
+        '<button type="button" class="dv-exit" data-drive="exitfull">✕ Thoát</button></div>'+
         (u?'<iframe class="dv-frame" src="'+u+'" allow="autoplay" title="'+dvEsc(f.name)+'"></iframe>'
           :'<div class="dv-msg">Loại tệp này không xem trước được trên trang.<br><a href="https://drive.google.com/uc?export=download&id='+f.id+'" target="_blank" rel="noopener">⬇ Tải xuống</a></div>'));
     }
