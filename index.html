@@ -238,6 +238,14 @@
   #photoBar button:hover{border-color:var(--accent);color:var(--accent);}
   #photoBar button.danger:hover{border-color:#C0392B;color:#C0392B;}
   #photoBar .pinfo{font-size:12.5px;color:var(--muted);font-weight:600;padding:0 6px;}
+
+  /* ===== ADMIN: sửa/xoá mọi thứ ===== */
+  .view[contenteditable="true"]:hover,.view[contenteditable="true"]:focus{outline:none;background:none;}
+  .view[contenteditable="true"]{cursor:text;}
+  #blkUI{display:none;position:fixed;z-index:180;pointer-events:none;outline:2px dashed #C0392B;outline-offset:1px;background:rgba(192,57,43,0.06);}
+  #blkUI .tb{position:absolute;top:0;right:0;display:flex;gap:4px;pointer-events:auto;}
+  #blkUI button{font-family:inherit;font-size:12px;font-weight:700;padding:5px 9px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+  #blkUI button.danger{background:#C0392B;border-color:#C0392B;color:#fff;}
 </style>
 </head>
 <body>
@@ -883,6 +891,7 @@
   <span class="msg" id="editMsg"></span>
   <button type="button" id="btnLogin">🔐 Đăng nhập Google</button>
   <button type="button" id="btnEdit" style="display:none">✏️ Chế độ sửa</button>
+  <button type="button" id="btnUndo" style="display:none">↩ Hoàn tác xoá</button>
   <button type="button" id="btnCancel" style="display:none">Hủy</button>
   <button type="button" id="btnSave" class="primary" style="display:none">💾 Lưu</button>
   <button type="button" id="btnLogout" style="display:none">Đăng xuất</button>
@@ -1341,12 +1350,63 @@ else{
     return JSON.stringify(out);
   }
 
+  /* ===== ADMIN: sửa/xoá bất kỳ thứ gì trong chế độ sửa ===== */
+  const bUndo=$('btnUndo'), trash=[];
+  const LOCK='button,.photo-ui,.drive-panel,input,select,textarea,iframe,img,.row-del,.wcard-del,.li-del';
+  const BLK='tr,table,h1,h2,h3,h4,li,p,pre,figure,.step,.lessons-box,.rule-box,.wcard,.card,section,.tag';
+  const lock=r=>{ if(r.matches&&r.matches(LOCK)) r.setAttribute('contenteditable','false'); r.querySelectorAll&&r.querySelectorAll(LOCK).forEach(e=>e.setAttribute('contenteditable','false')); };
+  const mo=new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{ if(n.nodeType===1) lock(n); })));
+  const ui=document.createElement('div'); ui.id='blkUI';
+  ui.innerHTML='<div class="tb"><button type="button" data-a="up" title="Chọn khối bao ngoài (vd: cả bảng)">⬆ Khối cha</button><button type="button" data-a="del" class="danger">🗑 Xoá khối</button></div>';
+  document.body.append(ui);
+  let cur=null;
+  function placeBlk(){
+    if(!cur||!cur.isConnected){ ui.style.display='none'; return; }
+    const r=cur.getBoundingClientRect(), top=Math.max(r.top,0), bot=Math.min(r.bottom,innerHeight);
+    if(bot<=top){ ui.style.display='none'; return; }
+    Object.assign(ui.style,{display:'block',left:r.left+'px',top:top+'px',width:r.width+'px',height:(bot-top)+'px'});
+  }
+  function setBlk(el){ cur=el; placeBlk(); }
+  function updateUndo(){ bUndo.textContent='↩ Hoàn tác xoá'+(trash.length?' ('+trash.length+')':''); bUndo.disabled=!trash.length; }
+  function adminMode(on){
+    document.querySelectorAll('.view').forEach(v=>{
+      v.querySelectorAll('[contenteditable="false"]').forEach(e=>e.removeAttribute('contenteditable'));
+      if(on) v.setAttribute('contenteditable','true'); else v.removeAttribute('contenteditable');
+    });
+    if(on){ lock(document.body); mo.observe(document.body,{childList:true,subtree:true}); }
+    else{ mo.disconnect(); setBlk(null); trash.length=0; }
+    bUndo.style.display=on?'':'none'; updateUndo();
+  }
+  document.addEventListener('mouseover',e=>{
+    if(!document.body.classList.contains('edit-mode')) return;
+    if(e.target.closest('#blkUI,#editBar,#photoBar,.photo-ov')) return;
+    const v=e.target.closest('.view'); if(!v) return setBlk(null);
+    const t=e.target.closest(BLK); if(t&&v.contains(t)) setBlk(t);
+  });
+  window.addEventListener('scroll',placeBlk,true); window.addEventListener('resize',placeBlk);
+  ui.addEventListener('mousedown',e=>e.preventDefault());
+  ui.addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b||!cur) return;
+    if(b.dataset.a==='up'){ const up=cur.parentElement&&cur.parentElement.closest(BLK); if(up&&up.closest('.view')) setBlk(up); return; }
+    const n=cur, parent=n.parentNode, next=n.nextSibling, tb=n.tagName==='TR'?parent:null;
+    trash.push({n,parent,next}); n.remove(); setBlk(null);
+    if(tb&&typeof renumber==='function') renumber(tb);
+    updateUndo();
+  });
+  bUndo.onclick=()=>{
+    const t=trash.pop(); if(!t) return;
+    (t.parent.isConnected?t.parent:document.body).insertBefore(t.n,t.next&&t.next.parentNode===t.parent?t.next:null);
+    if(t.n.tagName==='TR'&&typeof renumber==='function') renumber(t.parent);
+    updateUndo();
+  };
+
   function setEditing(on){
     document.body.classList.toggle('edit-mode',on);
     document.querySelectorAll('[data-ce]').forEach(el=>{ if(on) el.setAttribute('contenteditable','true'); else el.removeAttribute('contenteditable'); });
     bEdit.style.display=on?'none':''; bSave.style.display=bCancel.style.display=on?'':'none'; bOut.style.display=on?'none':'';
     msg.textContent=on?'Đang sửa — bấm vào ảnh để chỉnh, nhớ bấm Lưu':'';
     if(on) attachPhotoUI(); else detachPhotoUI();
+    adminMode(on);
   }
 
   let denied='';
