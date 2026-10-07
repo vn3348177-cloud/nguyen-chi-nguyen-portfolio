@@ -1050,20 +1050,53 @@
     ws4: 'https://docs.google.com/document/d/1vabPQgByiuv4ystuCqgA3IW2ozBDjNSpie-2dUGPhX8/edit?usp=sharing',  // Bảo dưỡng nhanh & OBD-II
     ws5: 'https://drive.google.com/drive/folders/1x7CdIxvw2UyD_8qjP3XWKWXj7rY1WWtF?usp=drive_link'  // Tin học (Buổi 3)
   };
-  document.querySelectorAll('.report-slot').forEach(slot=>{
-    const link = (REPORT_FOLDERS[slot.dataset.ws]||'').trim();
-    const body = slot.querySelector('.report-slot-body');
-    const docM = link.match(/docs\.google\.com\/document\/d\/([\w-]+)/);
-    if(docM){
-      body.innerHTML = '<iframe src="https://docs.google.com/document/d/'+docM[1]+'/preview" title="Báo cáo" style="width:100%;height:80vh;min-height:480px;border:1px solid var(--border);background:#fff;"></iframe>'+
-        '<p style="margin:10px 0 0;font-size:13.5px;"><a href="https://docs.google.com/document/d/'+docM[1]+'/edit" target="_blank" rel="noopener">Mở trong Google Docs ↗</a></p>';
-    } else if(/drive\.google\.com\/drive\/folders\//.test(link)){
-      body.innerHTML = '<p style="margin:0 0 12px;color:var(--muted);font-size:14px;">Bấm nút bên dưới để đọc báo cáo ngay trong trang. Nội dung được lấy trực tiếp từ Google Drive.</p>'+
-        '<a href="'+link+'" target="_blank" rel="noopener" class="wlink" style="display:inline-flex;">📂 Mở thư mục báo cáo (Google Drive) →</a>';
-    } else {
-      body.innerHTML = '<p style="margin:0;color:var(--muted);font-size:14px;">Báo cáo đang được cập nhật.</p>';
-    }
-  });
+  const WS_INFO = {
+    ws1:['Động cơ đốt trong','Tháo rã cụm động cơ xăng 4 xy-lanh, kiểm tra độ phẳng nắp máy, đo khe hở nhiệt xupap, cân cam và siết nắp quy-lát theo góc.','Tháo – lắp động cơ đúng quy trình · Dùng dụng cụ đo chính xác (thước, căn lá, đồng hồ so) · Siết bu-lông theo mô-men/góc quy định'],
+    ws2:['Điện – Điện tử ô tô','Đấu nối mạch điện thân xe, kiểm tra chổi than và dàn diode máy phát điện xoay chiều, đo cảm biến EFI bằng VOM.','Đọc sơ đồ và đấu nối mạch điện · Dùng đồng hồ VOM đo kiểm · Chẩn đoán máy phát và cảm biến EFI'],
+    ws3:['Khung gầm & Hệ thống phanh','Bảo dưỡng cụm phanh đĩa thủy lực, đo độ dày và độ đảo mặt đĩa phanh bằng đồng hồ so, xả gió dầu phanh, kiểm tra rô-tuyn.','Bảo dưỡng phanh đĩa · Đo độ dày, độ đảo bằng đồng hồ so · Xả gió hệ thống phanh, kiểm tra rô-tuyn'],
+    ws4:['Bảo dưỡng nhanh & Chẩn đoán OBD-II','Thực hiện quy trình bảo dưỡng định kỳ Quick Service 10.000 km và phân tích xử lý mã lỗi động cơ bằng máy quét Launch / G-scan.','Làm đúng quy trình bảo dưỡng định kỳ · Dùng máy quét OBD-II · Đọc và xử lý mã lỗi động cơ'],
+    ws5:['Tin học (Buổi 3)','','']
+  };
+  // Chạy lại sau khi nạp nội dung đã lưu (Firestore), để bố cục mới luôn được áp dụng
+  window.ensureReportSlots = function(){
+    Object.keys(WS_INFO).forEach(k=>{
+      const view = document.getElementById('view-'+k); if(!view) return;
+      const main = view.querySelector('main'); if(!main) return;
+      const [title,nd,kn] = WS_INFO[k];
+      if(k!=='ws5'){
+        view.querySelectorAll('.ws-photo').forEach(p=>p.remove());
+        if(!view.querySelector('.ws-summary')){
+          const sm=document.createElement('div'); sm.className='card ws-summary';
+          sm.innerHTML='<h2 class="section-title"><span class="num">📝</span> Tóm tắt</h2><dl class="facts"><dt>Nội dung thực hành</dt><dd data-ce></dd><dt>Kỹ năng rèn luyện</dt><dd data-ce></dd></dl>';
+          const dd=sm.querySelectorAll('dd'); dd[0].textContent=nd; dd[1].textContent=kn;
+          const first=main.querySelector('.card'); (first&&first.nextElementSibling)?first.nextElementSibling.before(sm):main.append(sm);
+        }
+      }
+      let slot = view.querySelector('.report-slot');
+      if(!slot){
+        slot=document.createElement('div'); slot.className='card report-slot'; slot.dataset.ws=k;
+        slot.innerHTML='<h2 class="section-title"><span class="num">📄</span> Báo cáo chi tiết: <span class="rs-title"></span></h2><div class="report-slot-body"></div>';
+        slot.querySelector('.rs-title').textContent=title;
+        main.append(slot);
+      }
+      const link = (REPORT_FOLDERS[k]||'').trim();
+      const body = slot.querySelector('.report-slot-body');
+      const docM = link.match(/docs\.google\.com\/document\/d\/([\w-]+)/);
+      if(docM){
+        body.innerHTML = '<iframe src="https://docs.google.com/document/d/'+docM[1]+'/preview" title="Báo cáo" style="width:100%;height:80vh;min-height:480px;border:1px solid var(--border);background:#fff;"></iframe>'+
+          '<p style="margin:10px 0 0;font-size:13.5px;"><a href="https://docs.google.com/document/d/'+docM[1]+'/edit" target="_blank" rel="noopener">Mở trong Google Docs ↗</a></p>';
+      } else if(/drive\.google\.com\/drive\/folders\//.test(link)){
+        body.innerHTML = '<p style="margin:0 0 12px;color:var(--muted);font-size:14px;">Bấm nút bên dưới để đọc báo cáo ngay trong trang. Nội dung được lấy trực tiếp từ Google Drive.</p>'+
+          '<a href="'+link+'" target="_blank" rel="noopener" class="wlink" style="display:inline-flex;">📂 Mở thư mục báo cáo (Google Drive) →</a>';
+      } else {
+        body.innerHTML = '<p style="margin:0;color:var(--muted);font-size:14px;">Báo cáo đang được cập nhật.</p>';
+      }
+    });
+    document.querySelectorAll('button.wlink').forEach(b=>{
+      if(b.textContent.includes('Xem báo cáo chi tiết trang con')) b.textContent='👉 Xem tóm tắt & báo cáo →';
+    });
+  };
+  window.ensureReportSlots();
 
   document.addEventListener('click', (e)=>{
     const t = e.target;
@@ -1408,6 +1441,7 @@ else{
       const v=$(id); v.innerHTML=data[id];
       v.querySelectorAll('img[data-img-idx]').forEach(im=>{ const src=origImgs[id][+im.dataset.imgIdx]; if(src) im.src=src; });
     });
+    if(window.ensureReportSlots) window.ensureReportSlots();
     loadPhotos();
   }).catch(e=>console.warn('Không nạp được nội dung đã lưu:',e));
 
