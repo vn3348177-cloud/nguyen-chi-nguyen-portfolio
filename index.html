@@ -1050,6 +1050,64 @@
     ws4: 'https://docs.google.com/document/d/1vabPQgByiuv4ystuCqgA3IW2ozBDjNSpie-2dUGPhX8/edit?usp=sharing',  // Bảo dưỡng nhanh & OBD-II
     ws5: 'https://drive.google.com/drive/folders/1x7CdIxvw2UyD_8qjP3XWKWXj7rY1WWtF?usp=drive_link'  // Tin học (Buổi 3)
   };
+  // Dán link Google Docs (tài liệu) hoặc thư mục Drive của từng bài Tin học (1–7). Bài 3 dùng mục ws5 ở trên.
+  const TINHOC_REPORTS = {
+    1: 'https://docs.google.com/document/d/1rEVTW1wJjjBlOQE0Qrd12iTVcL3uZO_P3cLGHPH3nlM/edit?usp=sharing',
+    2: 'https://drive.google.com/drive/folders/1U6t9eR6DbXV6JwE-yHUxQHhVt0y2R97C?usp=sharing',
+    3: '',  // (bài 3 hiển thị trang "Buổi 3" có sẵn, link ở ws5)
+    4: '',
+    5: '',
+    6: '',
+    7: ''
+  };
+  function renderReportInto(body, link){
+    link = (link||'').trim();
+    const docM = link.match(/docs\.google\.com\/document\/d\/([\w-]+)/);
+    if(docM){
+      body.innerHTML = '<iframe src="https://docs.google.com/document/d/'+docM[1]+'/preview" title="Báo cáo" style="width:100%;height:80vh;min-height:480px;border:1px solid var(--border);background:#fff;"></iframe>'+
+        '<p style="margin:10px 0 0;font-size:13.5px;"><a href="https://docs.google.com/document/d/'+docM[1]+'/edit" target="_blank" rel="noopener">Mở trong Google Docs ↗</a></p>';
+    } else if(/drive\.google\.com\/drive\/folders\//.test(link)){
+      body.innerHTML = '<p style="margin:0 0 12px;color:var(--muted);font-size:14px;">Bấm nút bên dưới để đọc báo cáo ngay trong trang. Nội dung được lấy trực tiếp từ Google Drive.</p>'+
+        '<a href="'+link+'" target="_blank" rel="noopener" class="wlink" style="display:inline-flex;">📂 Mở thư mục báo cáo (Google Drive) →</a>';
+    } else {
+      body.innerHTML = '<p style="margin:0;color:var(--muted);font-size:14px;">Báo cáo đang được cập nhật.</p>';
+    }
+  }
+  function ensureTinHoc(){
+    const grid = document.getElementById('itGrid');
+    const ws5 = document.getElementById('view-ws5');
+    if(!grid || !ws5) return;
+    // thẻ ở trang chủ: Bài 1–7
+    let html='';
+    for(let n=1;n<=7;n++){
+      const target = n===3 ? 'view-ws5' : 'view-th'+n;
+      const desc = n===3 ? 'Đập tan tin giả bằng toán tử tìm kiếm nâng cao &amp; bộ lọc CRAAP; thiết lập không gian lưu trữ Drive chuẩn và quy tắc đặt tên tệp.' : 'Báo cáo thực hành Tin học – Bài '+n+'.';
+      html+='<div class="wcard"><div class="thumb" style="background:linear-gradient(135deg,#D9642C,#132238);">TIN HỌC · BÀI '+n+'</div>'+
+        '<div class="body"><h3>Bài '+n+'</h3><p>'+desc+'</p>'+
+        '<button class="wlink" onclick="switchView(\''+target+'\')">👉 Xem báo cáo →</button></div></div>';
+    }
+    grid.innerHTML = html;
+    // trang con: bài 1,2,4,5,6,7
+    let last = ws5;
+    for(let n=1;n<=7;n++){
+      if(n===3) continue;
+      let v = document.getElementById('view-th'+n);
+      if(!v){
+        v = document.createElement('div'); v.className='view hidden'; v.id='view-th'+n;
+        v.innerHTML = '<header class="hero" style="padding:34px 24px 30px;"><div class="hero-inner wrap" style="display:block;">'+
+          '<div class="crumbs"><button onclick="switchView(\'view-home\')">Trang chủ E-Portfolio</button><span>/</span><button onclick="switchView(\'view-home\',\'tin-hoc\')">Tin học</button><span>/</span>Bài '+n+'</div>'+
+          '<h1 style="margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);">TIN HỌC: BÀI '+n+'</h1></div></header>'+
+          '<main class="wrap" style="padding-top:28px;">'+
+          '<div class="card"><div class="detail-nav"><button class="btn-back" onclick="switchView(\'view-home\',\'tin-hoc\')">← Quay lại Trang chủ E-Portfolio</button></div></div>'+
+          '<div class="card report-slot" data-ws="th'+n+'"><h2 class="section-title"><span class="num">📄</span> Báo cáo: Bài '+n+'</h2><div class="report-slot-body"></div></div>'+
+          '</main>';
+        last.after(v);
+      }
+      last = v;
+      const body = v.querySelector('.report-slot-body');
+      if(body) renderReportInto(body, TINHOC_REPORTS[n]);
+    }
+  }
   const WS_INFO = {
     ws1:['Động cơ đốt trong','Tháo rã cụm động cơ xăng 4 xy-lanh, kiểm tra độ phẳng nắp máy, đo khe hở nhiệt xupap, cân cam và siết nắp quy-lát theo góc.','Tháo – lắp động cơ đúng quy trình · Dùng dụng cụ đo chính xác (thước, căn lá, đồng hồ so) · Siết bu-lông theo mô-men/góc quy định'],
     ws2:['Điện – Điện tử ô tô','Đấu nối mạch điện thân xe, kiểm tra chổi than và dàn diode máy phát điện xoay chiều, đo cảm biến EFI bằng VOM.','Đọc sơ đồ và đấu nối mạch điện · Dùng đồng hồ VOM đo kiểm · Chẩn đoán máy phát và cảm biến EFI'],
@@ -1059,6 +1117,7 @@
   };
   // Chạy lại sau khi nạp nội dung đã lưu (Firestore), để bố cục mới luôn được áp dụng
   window.ensureReportSlots = function(){
+    ensureTinHoc();
     Object.keys(WS_INFO).forEach(k=>{
       const view = document.getElementById('view-'+k); if(!view) return;
       const main = view.querySelector('main'); if(!main) return;
@@ -1079,18 +1138,7 @@
         slot.querySelector('.rs-title').textContent=title;
         main.append(slot);
       }
-      const link = (REPORT_FOLDERS[k]||'').trim();
-      const body = slot.querySelector('.report-slot-body');
-      const docM = link.match(/docs\.google\.com\/document\/d\/([\w-]+)/);
-      if(docM){
-        body.innerHTML = '<iframe src="https://docs.google.com/document/d/'+docM[1]+'/preview" title="Báo cáo" style="width:100%;height:80vh;min-height:480px;border:1px solid var(--border);background:#fff;"></iframe>'+
-          '<p style="margin:10px 0 0;font-size:13.5px;"><a href="https://docs.google.com/document/d/'+docM[1]+'/edit" target="_blank" rel="noopener">Mở trong Google Docs ↗</a></p>';
-      } else if(/drive\.google\.com\/drive\/folders\//.test(link)){
-        body.innerHTML = '<p style="margin:0 0 12px;color:var(--muted);font-size:14px;">Bấm nút bên dưới để đọc báo cáo ngay trong trang. Nội dung được lấy trực tiếp từ Google Drive.</p>'+
-          '<a href="'+link+'" target="_blank" rel="noopener" class="wlink" style="display:inline-flex;">📂 Mở thư mục báo cáo (Google Drive) →</a>';
-      } else {
-        body.innerHTML = '<p style="margin:0;color:var(--muted);font-size:14px;">Báo cáo đang được cập nhật.</p>';
-      }
+      renderReportInto(slot.querySelector('.report-slot-body'), REPORT_FOLDERS[k]);
     });
     document.querySelectorAll('button.wlink').forEach(b=>{
       if(b.textContent.includes('Xem báo cáo chi tiết trang con')) b.textContent='👉 Xem tóm tắt & báo cáo →';
