@@ -441,7 +441,7 @@
           <div class="body">
             <h3 data-ce>1. Thực hành động cơ đốt trong</h3>
             <p data-ce>Tháo rã cụm động cơ xăng, kiểm tra độ phẳng nắp máy, đo khe hở nhiệt xupap, cân cam và siết nắp quy-lát theo góc.</p>
-            <button class="wlink" onclick="switchView('view-ws1')">👉 Xem báo cáo chi tiết trang con →</button>
+            <button class="wlink" onclick="switchView('view-ws1')">👉 Xem tóm tắt &amp; báo cáo →</button>
           </div>
         </div>
         <div class="wcard" id="wc2">
@@ -450,7 +450,7 @@
           <div class="body">
             <h3 data-ce>2. Thực hành điện – điện tử &amp; xe điện</h3>
             <p data-ce>Đấu nối mạch điện thân xe, kiểm tra chổi than &amp; dàn diode máy phát điện xoay chiều, đo cảm biến EFI bằng VOM.</p>
-            <button class="wlink" onclick="switchView('view-ws2')">👉 Xem báo cáo chi tiết trang con →</button>
+            <button class="wlink" onclick="switchView('view-ws2')">👉 Xem tóm tắt &amp; báo cáo →</button>
           </div>
         </div>
         <div class="wcard" id="wc3">
@@ -459,7 +459,7 @@
           <div class="body">
             <h3 data-ce>3. Thực hành khung gầm &amp; phanh</h3>
             <p data-ce>Bảo dưỡng cụm phanh đĩa thủy lực, đo độ dày &amp; độ đảo mặt đĩa phanh bằng đồng hồ so, xả gió dầu phanh và kiểm tra rô-tuyn.</p>
-            <button class="wlink" onclick="switchView('view-ws3')">👉 Xem báo cáo chi tiết trang con →</button>
+            <button class="wlink" onclick="switchView('view-ws3')">👉 Xem tóm tắt &amp; báo cáo →</button>
           </div>
         </div>
         <div class="wcard" id="wc4">
@@ -468,7 +468,7 @@
           <div class="body">
             <h3 data-ce>4. Bảo dưỡng nhanh &amp; chẩn đoán OBD-II</h3>
             <p data-ce>Quy trình bảo dưỡng định kỳ Quick Service 10.000km và phân tích xử lý thực tế các mã lỗi động cơ bằng máy quét Launch / G-scan.</p>
-            <button class="wlink" onclick="switchView('view-ws4')">👉 Xem báo cáo chi tiết trang con →</button>
+            <button class="wlink" onclick="switchView('view-ws4')">👉 Xem tóm tắt &amp; báo cáo →</button>
           </div>
         </div>
       </div>
@@ -486,7 +486,7 @@
           <div class="body">
             <h3 data-ce>Thực hành Tin học (Buổi 3)</h3>
             <p data-ce>Đập tan tin giả bằng toán tử tìm kiếm nâng cao &amp; bộ lọc CRAAP; thiết lập không gian lưu trữ Drive chuẩn và quy tắc đặt tên tệp.</p>
-            <button class="wlink" onclick="switchView('view-ws5')">👉 Xem báo cáo chi tiết trang con →</button>
+            <button class="wlink" onclick="switchView('view-ws5')">👉 Xem tóm tắt &amp; báo cáo →</button>
           </div>
         </div>
       </div>
@@ -552,8 +552,14 @@
   </header>
   <main class="wrap" style="padding-top:28px;">
     <div class="card ws-photo-card">
-      <div class="ws-photo" role="img" aria-label="Xưởng thực hành ô tô — hiện chưa có nội dung, đang chờ cập nhật"></div>
       <div class="detail-nav"><button class="btn-back" onclick="switchView('view-home','xuong')">← Quay lại Trang chủ E-Portfolio</button></div>
+    </div>
+    <div class="card ws-summary">
+      <h2 class="section-title"><span class="num">📝</span> Tóm tắt</h2>
+      <dl class="facts">
+        <dt>Nội dung thực hành</dt><dd data-ce>Tháo rã cụm động cơ xăng 4 xy-lanh, kiểm tra độ phẳng nắp máy, đo khe hở nhiệt xupap, cân cam và siết nắp quy-lát theo góc.</dd>
+        <dt>Kỹ năng rèn luyện</dt><dd data-ce>Tháo – lắp động cơ đúng quy trình · Dùng dụng cụ đo chính xác (thước, căn lá, đồng hồ so) · Siết bu-lông theo mô-men/góc quy định</dd>
+      </dl>
     </div>
     <div class="card hidden">
       <h2 class="section-title"><span class="num">1.</span> Thông tin mô-đun thực hành</h2>
@@ -606,6 +612,10 @@
         <button class="btn-next" onclick="switchView('view-ws2')">Xem tiếp: Thực hành Điện – Điện tử Ô tô →</button>
       </div>
     </div>
+    <div class="card report-slot" data-ws="ws1">
+      <h2 class="section-title"><span class="num">📄</span> Báo cáo chi tiết: Động cơ đốt trong</h2>
+      <div class="report-slot-body"></div>
+    </div>
   </main>
   <footer data-ce>© 2026 E-Portfolio Cá nhân — Nguyễn Chí Nguyên | Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) — Trường Cao đẳng Công nghiệp Huế</footer>
 </div>
@@ -621,8 +631,14 @@
   </header>
   <main class="wrap" style="padding-top:28px;">
     <div class="card ws-photo-card">
-      <div class="ws-photo" role="img" aria-label="Xưởng thực hành ô tô — hiện chưa có nội dung, đang chờ cập nhật"></div>
       <div class="detail-nav"><button class="btn-back" onclick="switchView('view-home','xuong')">← Quay lại Trang chủ E-Portfolio</button></div>
+    </div>
+    <div class="card ws-summary">
+      <h2 class="section-title"><span class="num">📝</span> Tóm tắt</h2>
+      <dl class="facts">
+        <dt>Nội dung thực hành</dt><dd data-ce>Đấu nối mạch điện thân xe, kiểm tra chổi than và dàn diode máy phát điện xoay chiều, đo cảm biến EFI bằng VOM.</dd>
+        <dt>Kỹ năng rèn luyện</dt><dd data-ce>Đọc sơ đồ và đấu nối mạch điện · Dùng đồng hồ VOM đo kiểm · Chẩn đoán máy phát và cảm biến EFI</dd>
+      </dl>
     </div>
     <div class="card hidden">
       <h2 class="section-title"><span class="num">1.</span> Thông tin mô-đun thực hành</h2>
@@ -660,6 +676,10 @@
         <button class="btn-next" onclick="switchView('view-ws3')">Xem tiếp: Thực hành Khung gầm &amp; Phanh →</button>
       </div>
     </div>
+    <div class="card report-slot" data-ws="ws2">
+      <h2 class="section-title"><span class="num">📄</span> Báo cáo chi tiết: Điện – Điện tử ô tô</h2>
+      <div class="report-slot-body"></div>
+    </div>
   </main>
   <footer data-ce>© 2026 E-Portfolio Cá nhân — Nguyễn Chí Nguyên | Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) — Trường Cao đẳng Công nghiệp Huế</footer>
 </div>
@@ -675,8 +695,14 @@
   </header>
   <main class="wrap" style="padding-top:28px;">
     <div class="card ws-photo-card">
-      <div class="ws-photo" role="img" aria-label="Xưởng thực hành ô tô — hiện chưa có nội dung, đang chờ cập nhật"></div>
       <div class="detail-nav"><button class="btn-back" onclick="switchView('view-home','xuong')">← Quay lại Trang chủ E-Portfolio</button></div>
+    </div>
+    <div class="card ws-summary">
+      <h2 class="section-title"><span class="num">📝</span> Tóm tắt</h2>
+      <dl class="facts">
+        <dt>Nội dung thực hành</dt><dd data-ce>Bảo dưỡng cụm phanh đĩa thủy lực, đo độ dày và độ đảo mặt đĩa phanh bằng đồng hồ so, xả gió dầu phanh, kiểm tra rô-tuyn.</dd>
+        <dt>Kỹ năng rèn luyện</dt><dd data-ce>Bảo dưỡng phanh đĩa · Đo độ dày, độ đảo bằng đồng hồ so · Xả gió hệ thống phanh, kiểm tra rô-tuyn</dd>
+      </dl>
     </div>
     <div class="card hidden">
       <h2 class="section-title"><span class="num">1.</span> Thông tin mô-đun thực hành</h2>
@@ -702,6 +728,10 @@
         <button class="btn-next" onclick="switchView('view-ws4')">Xem tiếp: Bảo dưỡng &amp; Chẩn đoán OBD-II →</button>
       </div>
     </div>
+    <div class="card report-slot" data-ws="ws3">
+      <h2 class="section-title"><span class="num">📄</span> Báo cáo chi tiết: Khung gầm &amp; Hệ thống phanh</h2>
+      <div class="report-slot-body"></div>
+    </div>
   </main>
   <footer data-ce>© 2026 E-Portfolio Cá nhân — Nguyễn Chí Nguyên | Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) — Trường Cao đẳng Công nghiệp Huế</footer>
 </div>
@@ -717,8 +747,14 @@
   </header>
   <main class="wrap" style="padding-top:28px;">
     <div class="card ws-photo-card">
-      <div class="ws-photo" role="img" aria-label="Xưởng thực hành ô tô — hiện chưa có nội dung, đang chờ cập nhật"></div>
       <div class="detail-nav"><button class="btn-back" onclick="switchView('view-home','xuong')">← Quay lại Trang chủ E-Portfolio</button></div>
+    </div>
+    <div class="card ws-summary">
+      <h2 class="section-title"><span class="num">📝</span> Tóm tắt</h2>
+      <dl class="facts">
+        <dt>Nội dung thực hành</dt><dd data-ce>Thực hiện quy trình bảo dưỡng định kỳ Quick Service 10.000 km và phân tích xử lý mã lỗi động cơ bằng máy quét Launch / G-scan.</dd>
+        <dt>Kỹ năng rèn luyện</dt><dd data-ce>Làm đúng quy trình bảo dưỡng định kỳ · Dùng máy quét OBD-II · Đọc và xử lý mã lỗi động cơ</dd>
+      </dl>
     </div>
     <div class="card hidden">
       <h2 class="section-title"><span class="num">1.</span> Thông tin chuyên đề thực hành</h2>
@@ -739,6 +775,10 @@
         <button class="btn-back" onclick="switchView('view-ws3')">← Bài trước: Thực hành Khung gầm</button>
         <button class="btn-home" onclick="switchView('view-home','xuong')">🏠 Về Trang chủ E-Portfolio</button>
       </div>
+    </div>
+    <div class="card report-slot" data-ws="ws4">
+      <h2 class="section-title"><span class="num">📄</span> Báo cáo chi tiết: Bảo dưỡng nhanh &amp; Chẩn đoán OBD-II</h2>
+      <div class="report-slot-body"></div>
     </div>
   </main>
   <footer data-ce>© 2026 E-Portfolio Cá nhân — Nguyễn Chí Nguyên | Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) — Trường Cao đẳng Công nghiệp Huế</footer>
@@ -892,6 +932,10 @@
         <button class="btn-home" onclick="switchView('view-home','tin-hoc')">🏠 Về Trang chủ E-Portfolio</button>
       </div>
     </div>
+    <div class="card report-slot" data-ws="ws5">
+      <h2 class="section-title"><span class="num">📄</span> Báo cáo chi tiết: Tin học (Buổi 3)</h2>
+      <div class="report-slot-body"></div>
+    </div>
   </main>
   <footer data-ce>© 2026 E-Portfolio Cá nhân — Nguyễn Chí Nguyên | Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) — Trường Cao đẳng Công nghiệp Huế</footer>
 </div>
@@ -996,6 +1040,31 @@
     }
   }
 
+  // ===== BÁO CÁO TRÊN GOOGLE DRIVE =====
+  // Dán link Google Docs (tài liệu) hoặc thư mục Google Drive của từng bài vào giữa hai dấu nháy. Để trống '' nếu chưa có.
+  // Sau đó chỉ cần sửa/thêm file trong thư mục Drive, không cần sửa trang web.
+  const REPORT_FOLDERS = {
+    ws1: 'https://docs.google.com/document/d/1hUBq7AOyCRUgiTR-T83-NOIUMjl50yo4oioCsX-O8kI/edit?usp=sharing',  // Động cơ đốt trong
+    ws2: 'https://docs.google.com/document/d/1RxVWO19w1oN1qNX_-owPhOFC63bv7_w5Mhctsd277VI/edit?usp=sharing',  // Điện – Điện tử ô tô
+    ws3: 'https://docs.google.com/document/d/1lJzPHckHk9PAM0Rz4o2ljmOD0jZG9Z1UeL88WXG565I/edit?usp=sharing',  // Khung gầm & Hệ thống phanh
+    ws4: 'https://docs.google.com/document/d/1vabPQgByiuv4ystuCqgA3IW2ozBDjNSpie-2dUGPhX8/edit?usp=sharing',  // Bảo dưỡng nhanh & OBD-II
+    ws5: 'https://drive.google.com/drive/folders/1x7CdIxvw2UyD_8qjP3XWKWXj7rY1WWtF?usp=drive_link'  // Tin học (Buổi 3)
+  };
+  document.querySelectorAll('.report-slot').forEach(slot=>{
+    const link = (REPORT_FOLDERS[slot.dataset.ws]||'').trim();
+    const body = slot.querySelector('.report-slot-body');
+    const docM = link.match(/docs\.google\.com\/document\/d\/([\w-]+)/);
+    if(docM){
+      body.innerHTML = '<iframe src="https://docs.google.com/document/d/'+docM[1]+'/preview" title="Báo cáo" style="width:100%;height:80vh;min-height:480px;border:1px solid var(--border);background:#fff;"></iframe>'+
+        '<p style="margin:10px 0 0;font-size:13.5px;"><a href="https://docs.google.com/document/d/'+docM[1]+'/edit" target="_blank" rel="noopener">Mở trong Google Docs ↗</a></p>';
+    } else if(/drive\.google\.com\/drive\/folders\//.test(link)){
+      body.innerHTML = '<p style="margin:0 0 12px;color:var(--muted);font-size:14px;">Bấm nút bên dưới để đọc báo cáo ngay trong trang. Nội dung được lấy trực tiếp từ Google Drive.</p>'+
+        '<a href="'+link+'" target="_blank" rel="noopener" class="wlink" style="display:inline-flex;">📂 Mở thư mục báo cáo (Google Drive) →</a>';
+    } else {
+      body.innerHTML = '<p style="margin:0;color:var(--muted);font-size:14px;">Báo cáo đang được cập nhật.</p>';
+    }
+  });
+
   document.addEventListener('click', (e)=>{
     const t = e.target;
     const tab = t.closest('.tab-btn');
@@ -1054,7 +1123,7 @@
         '<div class="body">'+
         '<h3 contenteditable="true" data-ce>Bài thực hành mới</h3>'+
         '<p contenteditable="true" data-ce>Mô tả ngắn về quy trình, dụng cụ và kết quả đo kiểm.</p>'+
-        '<button class="wlink">👉 Xem báo cáo chi tiết trang con →</button>'+
+        '<button class="wlink">👉 Xem tóm tắt &amp; báo cáo →</button>'+
         '</div>';
       grid.appendChild(card); card.querySelector('h3').focus();
       return;
