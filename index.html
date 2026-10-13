@@ -1114,8 +1114,14 @@
       body.innerHTML = '<iframe src="https://docs.google.com/document/d/'+docM[1]+'/preview" title="Báo cáo" style="width:100%;height:80vh;min-height:480px;border:1px solid var(--border);background:#fff;"></iframe>'+
         '<p style="margin:10px 0 0;font-size:13.5px;"><a href="https://docs.google.com/document/d/'+docM[1]+'/edit" target="_blank" rel="noopener">Mở trong Google Docs ↗</a></p>';
     } else if(/drive\.google\.com\/drive\/folders\//.test(link)){
-      body.innerHTML = '<p style="margin:0 0 12px;color:var(--muted);font-size:14px;">Bấm nút bên dưới để đọc báo cáo ngay trong trang. Nội dung được lấy trực tiếp từ Google Drive.</p>'+
-        '<a href="'+link+'" target="_blank" rel="noopener" class="wlink" style="display:inline-flex;">📂 Mở thư mục báo cáo (Google Drive) →</a>';
+      // Hiển thị luôn danh sách tệp trong thư mục Drive (không cần bấm nút)
+      const fid = (link.match(/folders\/([\w-]+)/)||[])[1];
+      body.innerHTML = '';
+      const panel = document.createElement('div');
+      panel.className = 'drive-panel'; panel.style.marginTop = '0'; panel.dataset.href = link;
+      driveState.set(panel,{path:[{id:fid,name:'Thư mục báo cáo'}],files:[]});
+      body.appendChild(panel);
+      dvLoad(panel);
     } else {
       body.innerHTML = '<p style="margin:0;color:var(--muted);font-size:14px;">Báo cáo đang được cập nhật.</p>';
     }
@@ -1151,6 +1157,7 @@
         last.after(v);
       }
       last = v;
+      v.querySelectorAll('.btn-back').forEach(b=>{ b.textContent='← Quay lại danh sách'; });
       const body = v.querySelector('.report-slot-body');
       if(body) renderReportInto(body, TINHOC_REPORTS[n]);
     }
@@ -1163,8 +1170,34 @@
     ws5:['Tin học (Buổi 3)','','']
   };
   // Chạy lại sau khi nạp nội dung đã lưu (Firestore), để bố cục mới luôn được áp dụng
+  // Bài 1 Tin học: thêm phần "Minh chứng" (cây thư mục, quy tắc đặt tên, ảnh chụp Drive) dưới báo cáo
+  function ensureTh1Proof(){
+    const v = document.getElementById('view-th1'); if(!v) return;
+    let card = v.querySelector('#th1-proof');
+    if(!card){
+      card = document.createElement('div'); card.className='card'; card.id='th1-proof';
+      card.innerHTML =
+        '<h2 class="section-title"><span class="num">✅</span> Minh chứng: Cấu trúc thư mục &amp; quy tắc đặt tên tệp</h2>'+
+        '<div class="step"><h4>Cấu trúc thư mục trên Google Drive</h4>'+
+        '<p data-ce>Cấu trúc lưu trữ trên Google Drive cá nhân tuân thủ quy chuẩn:</p>'+
+        '<pre style="background:var(--bg);padding:14px;border:1px solid var(--border);border-radius:4px;font-size:13.5px;line-height:1.6;font-family:Consolas, monospace;overflow-x:auto;" data-ce>📁 2660935_NguyenChiNguyen_DigitalLiteracy/\n   ├── 📁 01_TaiLieuHocTap/\n   ├── 📁 02_BaiTapThucHanh/\n   │      └── 📄 20261015_2660935_NLS_BTTH01_v1.0.docx\n   └── 📁 03_MinhChung_ePortfolio/</pre>'+
+        '<div class="rule-box"><strong>Quy tắc đặt tên tệp</strong>'+
+        '<code class="inline-code">YYYYMMDD_[MaSV]_[TenMon]_BTTH01_v1.0</code><br>'+
+        'Ví dụ: <code class="inline-code">20261015_2660935_NLS_BTTH01_v1.0.docx</code></div></div>'+
+        '<div class="step"><h4>Ảnh chụp minh chứng trên Google Drive</h4>'+
+        '<p data-ce>Ảnh chụp màn hình cấu trúc thư mục và tệp bài làm được đặt tên chuẩn theo quy tắc trên:</p>'+
+        '<figure class="evidence-shot"><img alt="Ảnh chụp màn hình cây thư mục Google Drive 2660935_NguyenChiNguyen_DigitalLiteracy">'+
+        '<figcaption data-ce>Cấu trúc thư mục 2660935_NguyenChiNguyen_DigitalLiteracy trên Google Drive cá nhân.</figcaption></figure></div>';
+      const slot = v.querySelector('.report-slot');
+      if(slot) slot.after(card); else (v.querySelector('main')||v).append(card);
+    }
+    const img = card.querySelector('img');
+    const srcImg = document.querySelector('#view-ws5 img[alt*="cây thư mục Google Drive"]');
+    if(img && srcImg && srcImg.src && (!img.getAttribute('src'))) img.src = srcImg.src;
+  }
   window.ensureReportSlots = function(){
     ensureTinHoc();
+    ensureTh1Proof();
     Object.keys(WS_INFO).forEach(k=>{
       const view = document.getElementById('view-'+k); if(!view) return;
       const main = view.querySelector('main'); if(!main) return;
