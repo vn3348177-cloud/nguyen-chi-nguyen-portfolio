@@ -263,21 +263,17 @@
   <div class="inner">
     <div class="brand" onclick="switchView('view-home')">E-PORTFOLIO · <span>NGUYỄN CHÍ NGUYÊN</span></div>
     <div class="navlinks">
-      <button class="navbtn" onclick="switchView('view-home','gioi-thieu')">Giới thiệu</button>
-      <button class="navbtn" onclick="switchView('view-home','hoc-tap')">Kết quả học tập</button>
+      <button class="navbtn" onclick="switchView('view-home')">Giới thiệu</button>
+      <button class="navbtn" onclick="switchView('view-results')">Kết quả học tập</button>
       <div class="dropdown" id="wsDropdown">
-        <button class="navbtn" onclick="toggleDropdown(event)">Thực hành xưởng <span class="dcaret">▾</span></button>
+        <button class="navbtn" onclick="toggleDropdown(event)">Thực hành <span class="dcaret">▾</span></button>
         <div class="dropdown-panel">
-          <a href="#" onclick="switchView('view-home','xuong');closeDropdown();return false;">📌 Tổng quan 4 bài thực hành</a>
-          <a href="#" onclick="switchView('view-ws1');closeDropdown();return false;">🚗 1. Động cơ đốt trong</a>
-          <a href="#" onclick="switchView('view-ws2');closeDropdown();return false;">⚡ 2. Điện – Điện tử ô tô</a>
-          <a href="#" onclick="switchView('view-ws3');closeDropdown();return false;">🔧 3. Khung gầm &amp; Phanh</a>
-          <a href="#" onclick="switchView('view-ws4');closeDropdown();return false;">🩺 4. Bảo dưỡng &amp; OBD-II</a>
+          <a href="#" onclick="switchView('view-practice');closeDropdown();return false;">🚗 Thực hành ô tô</a>
+          <a href="#" onclick="switchView('view-tinhoc');closeDropdown();return false;">💻 Tin học</a>
+          <a href="#" onclick="switchView('view-skills');closeDropdown();return false;">🛠️ Kỹ năng</a>
         </div>
       </div>
-      <button class="navbtn" onclick="switchView('view-home','tin-hoc')">💻 Tin học</button>
-      <button class="navbtn" onclick="switchView('view-home','ky-nang')">Kỹ năng</button>
-      <button class="navbtn" onclick="switchView('view-home','lien-he')">Liên hệ</button>
+      <button class="navbtn" onclick="switchView('view-contact')">Liên hệ</button>
     </div>
   </div>
 </nav>
@@ -323,6 +319,22 @@
     </div>
   </section>
 
+</main>
+
+<footer data-ce>E-Portfolio cá nhân · Nguyễn Chí Nguyên · Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) · Trường Cao đẳng Công nghiệp Huế (HueIC) · Cập nhật lần cuối: 2026</footer>
+
+</div>
+<!-- ======================= END VIEW: HOME ======================= -->
+
+<!-- ========================= VIEW: VIEW-RESULTS ========================= -->
+<div class="view hidden" id="view-results">
+  <header class="hero" style="padding:34px 24px 30px;">
+    <div class="hero-inner wrap" style="display:block;">
+      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span>Kết quả học tập</div>
+      <h1 data-ce style="margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);">KẾT QUẢ HỌC TẬP</h1>
+    </div>
+  </header>
+  <main class="wrap" style="padding-top:28px;">
   <section id="hoc-tap">
     <div class="card">
       <h2 class="section-title"><span class="num">2.</span> Kết quả học tập</h2>
@@ -429,10 +441,22 @@
       </div>
     </div>
   </section>
+  </main>
+  <footer data-ce>E-Portfolio cá nhân · Nguyễn Chí Nguyên · Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) · Trường Cao đẳng Công nghiệp Huế (HueIC) · Cập nhật lần cuối: 2026</footer>
+</div>
 
+<!-- ========================= VIEW: VIEW-PRACTICE ========================= -->
+<div class="view hidden" id="view-practice">
+  <header class="hero" style="padding:34px 24px 30px;">
+    <div class="hero-inner wrap" style="display:block;">
+      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span>Thực hành ô tô</div>
+      <h1 data-ce style="margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);">THỰC HÀNH Ô TÔ</h1>
+    </div>
+  </header>
+  <main class="wrap" style="padding-top:28px;">
   <section id="xuong">
     <div class="card">
-      <h2 class="section-title"><span class="num">3.</span> Nhật ký thực hành tại xưởng</h2>
+      <h2 class="section-title"><span class="num">3.</span> Thực hành ô tô</h2>
       <p class="lede" data-ce>Bấm vào từng bài thực hành bên dưới để xem báo cáo trang con chi tiết: quy trình kỹ thuật, số liệu thực tế và minh chứng học tập.</p>
       <div class="grid-2" id="workshopGrid" artifact-sync>
         <div class="wcard" id="wc1">
@@ -475,10 +499,22 @@
       <button class="add-card-btn" id="addWorkshopCard" style="margin-top:16px;">+ Thêm thẻ thực hành</button>
     </div>
   </section>
+  </main>
+  <footer data-ce>E-Portfolio cá nhân · Nguyễn Chí Nguyên · Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) · Trường Cao đẳng Công nghiệp Huế (HueIC) · Cập nhật lần cuối: 2026</footer>
+</div>
 
+<!-- ========================= VIEW: VIEW-TINHOC ========================= -->
+<div class="view hidden" id="view-tinhoc">
+  <header class="hero" style="padding:34px 24px 30px;">
+    <div class="hero-inner wrap" style="display:block;">
+      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span>Tin học</div>
+      <h1 data-ce style="margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);">THỰC HÀNH TIN HỌC</h1>
+    </div>
+  </header>
+  <main class="wrap" style="padding-top:28px;">
   <section id="tin-hoc">
     <div class="card" style="border-left-color:#D9642C;">
-      <h2 class="section-title"><span class="num">4.</span> Tin học</h2>
+      <h2 class="section-title"><span class="num">4.</span> Thực hành Tin học</h2>
       <p class="lede" data-ce>Mục riêng dành cho học phần Năng lực số &amp; Khai thác thông tin — tách biệt với nhật ký thực hành xưởng ô tô.</p>
       <div class="grid-2" id="itGrid">
         <div class="wcard" id="wc5">
@@ -492,7 +528,19 @@
       </div>
     </div>
   </section>
+  </main>
+  <footer data-ce>E-Portfolio cá nhân · Nguyễn Chí Nguyên · Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) · Trường Cao đẳng Công nghiệp Huế (HueIC) · Cập nhật lần cuối: 2026</footer>
+</div>
 
+<!-- ========================= VIEW: VIEW-SKILLS ========================= -->
+<div class="view hidden" id="view-skills">
+  <header class="hero" style="padding:34px 24px 30px;">
+    <div class="hero-inner wrap" style="display:block;">
+      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span>Kỹ năng</div>
+      <h1 data-ce style="margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);">KỸ NĂNG &amp; CHỨNG CHỈ</h1>
+    </div>
+  </header>
+  <main class="wrap" style="padding-top:28px;">
   <section id="ky-nang">
     <div class="card">
       <h2 class="section-title"><span class="num">5.</span> Kỹ năng &amp; chứng chỉ sẽ có khi tốt nghiệp</h2>
@@ -520,7 +568,19 @@
       </div>
     </div>
   </section>
+  </main>
+  <footer data-ce>E-Portfolio cá nhân · Nguyễn Chí Nguyên · Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) · Trường Cao đẳng Công nghiệp Huế (HueIC) · Cập nhật lần cuối: 2026</footer>
+</div>
 
+<!-- ========================= VIEW: VIEW-CONTACT ========================= -->
+<div class="view hidden" id="view-contact">
+  <header class="hero" style="padding:34px 24px 30px;">
+    <div class="hero-inner wrap" style="display:block;">
+      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span>Liên hệ</div>
+      <h1 data-ce style="margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);">LIÊN HỆ</h1>
+    </div>
+  </header>
+  <main class="wrap" style="padding-top:28px;">
   <section id="lien-he">
     <div class="card">
       <h2 class="section-title"><span class="num">6.</span> Liên hệ</h2>
@@ -532,27 +592,24 @@
       </div>
     </div>
   </section>
-
-</main>
-
-<footer data-ce>E-Portfolio cá nhân · Nguyễn Chí Nguyên · Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) · Trường Cao đẳng Công nghiệp Huế (HueIC) · Cập nhật lần cuối: 2026</footer>
-
+  </main>
+  <footer data-ce>E-Portfolio cá nhân · Nguyễn Chí Nguyên · Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) · Trường Cao đẳng Công nghiệp Huế (HueIC) · Cập nhật lần cuối: 2026</footer>
 </div>
-<!-- ======================= END VIEW: HOME ======================= -->
+
 
 
 <!-- ========================= VIEW: WS1 – ĐỘNG CƠ ĐỐT TRONG ========================= -->
 <div class="view hidden" id="view-ws1">
   <header class="hero" style="padding:34px 24px 30px;">
     <div class="hero-inner wrap" style="display:block;">
-      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span><button onclick="switchView('view-home','xuong')">Nhật ký thực hành xưởng</button><span>/</span>Thực hành Động cơ</div>
+      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span><button onclick="switchView('view-practice')">Thực hành ô tô</button><span>/</span>Thực hành Động cơ</div>
       <h1 data-ce style="margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);">NHẬT KÝ THỰC HÀNH: ĐỘNG CƠ ĐỐT TRONG</h1>
       <p class="hidden" data-ce>Mô-đun thực hành tháo rã, đo kiểm chi tiết cơ khí và lắp ráp cân chỉnh động cơ xăng 4 xy-lanh tại xưởng HueIC</p>
     </div>
   </header>
   <main class="wrap" style="padding-top:28px;">
     <div class="card ws-photo-card">
-      <div class="detail-nav"><button class="btn-back" onclick="switchView('view-home','xuong')">← Quay lại Trang chủ E-Portfolio</button></div>
+      <div class="detail-nav"><button class="btn-back" onclick="switchView('view-practice')">← Quay lại danh sách</button></div>
     </div>
     <div class="card ws-summary">
       <h2 class="section-title"><span class="num">📝</span> Tóm tắt</h2>
@@ -608,7 +665,7 @@
       <div class="lessons-box" data-ce>Qua mô-đun này, em đã nắm vững quy trình tháo lắp chuẩn công nghiệp, rèn luyện được tính cẩn thận khi dùng thước đo chính xác và hiểu sâu sắc tầm quan trọng của việc siết lực theo đúng thông số của nhà sản xuất.</div>
 
       <div class="detail-nav">
-        <button class="btn-back" onclick="switchView('view-home','xuong')">← Quay lại Trang chủ E-Portfolio</button>
+        <button class="btn-back" onclick="switchView('view-practice')">← Quay lại Trang chủ E-Portfolio</button>
         <button class="btn-next" onclick="switchView('view-ws2')">Xem tiếp: Thực hành Điện – Điện tử Ô tô →</button>
       </div>
     </div>
@@ -624,14 +681,14 @@
 <div class="view hidden" id="view-ws2">
   <header class="hero" style="padding:34px 24px 30px;">
     <div class="hero-inner wrap" style="display:block;">
-      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span><button onclick="switchView('view-home','xuong')">Nhật ký thực hành xưởng</button><span>/</span>Thực hành Điện ô tô</div>
+      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span><button onclick="switchView('view-practice')">Thực hành ô tô</button><span>/</span>Thực hành Điện ô tô</div>
       <h1 data-ce style="margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);">NHẬT KÝ THỰC HÀNH: ĐIỆN – ĐIỆN TỬ Ô TÔ</h1>
       <p class="hidden" data-ce>Mô-đun thực hành đấu nối mạch điện thân xe, kiểm tra hệ thống nạp và đo kiểm cảm biến EFI tại xưởng Điện ô tô HueIC</p>
     </div>
   </header>
   <main class="wrap" style="padding-top:28px;">
     <div class="card ws-photo-card">
-      <div class="detail-nav"><button class="btn-back" onclick="switchView('view-home','xuong')">← Quay lại Trang chủ E-Portfolio</button></div>
+      <div class="detail-nav"><button class="btn-back" onclick="switchView('view-practice')">← Quay lại danh sách</button></div>
     </div>
     <div class="card ws-summary">
       <h2 class="section-title"><span class="num">📝</span> Tóm tắt</h2>
@@ -688,14 +745,14 @@
 <div class="view hidden" id="view-ws3">
   <header class="hero" style="padding:34px 24px 30px;">
     <div class="hero-inner wrap" style="display:block;">
-      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span><button onclick="switchView('view-home','xuong')">Nhật ký thực hành xưởng</button><span>/</span>Thực hành Khung gầm &amp; Phanh</div>
+      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span><button onclick="switchView('view-practice')">Thực hành ô tô</button><span>/</span>Thực hành Khung gầm &amp; Phanh</div>
       <h1 data-ce style="margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);">NHẬT KÝ THỰC HÀNH: KHUNG GẦM &amp; HỆ THỐNG PHANH</h1>
       <p class="hidden" data-ce>Mô-đun bảo dưỡng phanh đĩa thủy lực, kiểm tra hệ thống treo và các khớp rô-tuyn lái tại xưởng Gầm ô tô HueIC</p>
     </div>
   </header>
   <main class="wrap" style="padding-top:28px;">
     <div class="card ws-photo-card">
-      <div class="detail-nav"><button class="btn-back" onclick="switchView('view-home','xuong')">← Quay lại Trang chủ E-Portfolio</button></div>
+      <div class="detail-nav"><button class="btn-back" onclick="switchView('view-practice')">← Quay lại danh sách</button></div>
     </div>
     <div class="card ws-summary">
       <h2 class="section-title"><span class="num">📝</span> Tóm tắt</h2>
@@ -740,14 +797,14 @@
 <div class="view hidden" id="view-ws4">
   <header class="hero" style="padding:34px 24px 30px;">
     <div class="hero-inner wrap" style="display:block;">
-      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span><button onclick="switchView('view-home','xuong')">Nhật ký thực hành xưởng</button><span>/</span>Bảo dưỡng &amp; Chẩn đoán OBD-II</div>
+      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span><button onclick="switchView('view-practice')">Thực hành ô tô</button><span>/</span>Bảo dưỡng &amp; Chẩn đoán OBD-II</div>
       <h1 data-ce style="margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);">CHUYÊN ĐỀ: BẢO DƯỠNG NHANH &amp; CHẨN ĐOÁN OBD-II</h1>
       <p class="hidden" data-ce>Quy trình bảo dưỡng định kỳ Quick Service và phân tích thực tế các mã lỗi động cơ tại xưởng chẩn đoán HueIC &amp; Garage Toyota Huế</p>
     </div>
   </header>
   <main class="wrap" style="padding-top:28px;">
     <div class="card ws-photo-card">
-      <div class="detail-nav"><button class="btn-back" onclick="switchView('view-home','xuong')">← Quay lại Trang chủ E-Portfolio</button></div>
+      <div class="detail-nav"><button class="btn-back" onclick="switchView('view-practice')">← Quay lại danh sách</button></div>
     </div>
     <div class="card ws-summary">
       <h2 class="section-title"><span class="num">📝</span> Tóm tắt</h2>
@@ -773,7 +830,7 @@
 
       <div class="detail-nav">
         <button class="btn-back" onclick="switchView('view-ws3')">← Bài trước: Thực hành Khung gầm</button>
-        <button class="btn-home" onclick="switchView('view-home','xuong')">🏠 Về Trang chủ E-Portfolio</button>
+        <button class="btn-home" onclick="switchView('view-practice')">← Về danh sách thực hành</button>
       </div>
     </div>
     <div class="card report-slot" data-ws="ws4">
@@ -788,7 +845,7 @@
 <div class="view hidden" id="view-ws5">
   <header class="hero" style="padding:34px 24px 30px;">
     <div class="hero-inner wrap" style="display:block;">
-      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span><button onclick="switchView('view-home','tin-hoc')">Tin học</button><span>/</span>Buổi 3</div>
+      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span><button onclick="switchView('view-tinhoc')">Tin học</button><span>/</span>Buổi 3</div>
       <h1 data-ce style="margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);">BÁO CÁO THỰC HÀNH: TIN HỌC (BUỔI 3)</h1>
       <p data-ce>Phiếu bài tập thực hành số 3: Năng lực số và khai thác thông tin — Kiểm chứng tin giả bằng mô hình CRAAP &amp; Thiết lập không gian lưu trữ dữ liệu đám mây chuẩn</p>
     </div>
@@ -929,7 +986,7 @@
       </div>
 
       <div class="detail-nav" style="margin-top:28px;">
-        <button class="btn-home" onclick="switchView('view-home','tin-hoc')">🏠 Về Trang chủ E-Portfolio</button>
+        <button class="btn-home" onclick="switchView('view-tinhoc')">← Về danh sách thực hành</button>
       </div>
     </div>
     <div class="card report-slot" data-ws="ws5">
@@ -951,7 +1008,9 @@
 </div>
 
 <script>
+  const LEGACY_SECTION_VIEW = {'gioi-thieu':'view-home','hoc-tap':'view-results','xuong':'view-practice','tin-hoc':'view-tinhoc','ky-nang':'view-skills','lien-he':'view-contact'};
   function switchView(viewId, scrollToId){
+    if(viewId==='view-home' && scrollToId && LEGACY_SECTION_VIEW[scrollToId]){ viewId = LEGACY_SECTION_VIEW[scrollToId]; scrollToId = null; }
     document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));
     const v = document.getElementById(viewId);
     if(v) v.classList.remove('hidden');
@@ -963,6 +1022,16 @@
       }, 30);
     }
   }
+  // Nội dung cũ đã lưu trên Firestore vẫn chứa đủ các mục trong trang chủ -> tách về đúng trang riêng
+  window.splitHomeSections = function(){
+    const home = document.getElementById('view-home'); if(!home) return;
+    Object.entries({'hoc-tap':'view-results','xuong':'view-practice','tin-hoc':'view-tinhoc','ky-nang':'view-skills','lien-he':'view-contact'}).forEach(([sid,vid])=>{
+      const s = home.querySelector('#'+sid), target = document.querySelector('#'+vid+' main');
+      if(!s || !target) return;
+      target.querySelectorAll('#'+sid).forEach(x=>{ if(x!==s) x.remove(); });
+      target.appendChild(s);
+    });
+  };
   function toggleDropdown(e){
     e.stopPropagation();
     document.getElementById('wsDropdown').classList.toggle('open');
@@ -1095,10 +1164,10 @@
       if(!v){
         v = document.createElement('div'); v.className='view hidden'; v.id='view-th'+n;
         v.innerHTML = '<header class="hero" style="padding:34px 24px 30px;"><div class="hero-inner wrap" style="display:block;">'+
-          '<div class="crumbs"><button onclick="switchView(\'view-home\')">Trang chủ E-Portfolio</button><span>/</span><button onclick="switchView(\'view-home\',\'tin-hoc\')">Tin học</button><span>/</span>Bài '+n+'</div>'+
+          '<div class="crumbs"><button onclick="switchView(\'view-home\')">Trang chủ E-Portfolio</button><span>/</span><button onclick="switchView(\'view-tinhoc\')">Tin học</button><span>/</span>Bài '+n+'</div>'+
           '<h1 style="margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);">TIN HỌC: BÀI '+n+'</h1></div></header>'+
           '<main class="wrap" style="padding-top:28px;">'+
-          '<div class="card"><div class="detail-nav"><button class="btn-back" onclick="switchView(\'view-home\',\'tin-hoc\')">← Quay lại Trang chủ E-Portfolio</button></div></div>'+
+          '<div class="card"><div class="detail-nav"><button class="btn-back" onclick="switchView(\'view-tinhoc\')">← Quay lại danh sách</button></div></div>'+
           '<div class="card report-slot" data-ws="th'+n+'"><h2 class="section-title"><span class="num">📄</span> Báo cáo: Bài '+n+'</h2><div class="report-slot-body"></div></div>'+
           '</main>';
         last.after(v);
@@ -1489,6 +1558,7 @@ else{
       const v=$(id); v.innerHTML=data[id];
       v.querySelectorAll('img[data-img-idx]').forEach(im=>{ const src=origImgs[id][+im.dataset.imgIdx]; if(src) im.src=src; });
     });
+    if(window.splitHomeSections) window.splitHomeSections();
     if(window.ensureReportSlots) window.ensureReportSlots();
     loadPhotos();
   }).catch(e=>console.warn('Không nạp được nội dung đã lưu:',e));
