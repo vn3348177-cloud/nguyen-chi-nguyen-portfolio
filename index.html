@@ -1107,12 +1107,28 @@
     6: '',
     7: ''
   };
+  function docFrameSrc(id, editing){
+    return 'https://docs.google.com/document/d/'+id+(editing ? '/edit?embedded=true' : '/preview');
+  }
+  // Bật/tắt chế độ sửa trực tiếp báo cáo Google Docs (gọi từ chế độ sửa của admin)
+  window.refreshReportFrames = function(){
+    const editing = document.body.classList.contains('edit-mode');
+    document.querySelectorAll('iframe[data-doc]').forEach(f=>{
+      const src = docFrameSrc(f.dataset.doc, editing);
+      if(f.getAttribute('src')!==src) f.setAttribute('src', src);
+      f.style.height = editing ? '90vh' : '80vh';
+      const hint = f.parentElement && f.parentElement.querySelector('.doc-edit-hint');
+      if(hint) hint.style.display = editing ? '' : 'none';
+    });
+  };
   function renderReportInto(body, link){
     link = (link||'').trim();
     const docM = link.match(/docs\.google\.com\/document\/d\/([\w-]+)/);
     if(docM){
-      body.innerHTML = '<iframe src="https://docs.google.com/document/d/'+docM[1]+'/preview" title="Báo cáo" style="width:100%;height:80vh;min-height:480px;border:1px solid var(--border);background:#fff;"></iframe>'+
-        '<p style="margin:10px 0 0;font-size:13.5px;"><a href="https://docs.google.com/document/d/'+docM[1]+'/edit" target="_blank" rel="noopener">Mở trong Google Docs ↗</a></p>';
+      const id = docM[1], editing = document.body.classList.contains('edit-mode');
+      body.innerHTML = '<p class="doc-edit-hint" style="margin:0 0 10px;padding:8px 12px;background:#FCEEE4;border:1px solid #F0C6A2;color:#7A3B12;font-size:13.5px;'+(editing?'':'display:none;')+'">✏️ Đang sửa trực tiếp bằng Google Docs — thay đổi được <b>tự động lưu</b> vào tài liệu (không cần bấm nút Lưu của trang). Nếu khung yêu cầu đăng nhập, hãy đăng nhập Google bằng tài khoản có quyền sửa tài liệu, hoặc bấm “Mở trong Google Docs”.</p>'+
+        '<iframe data-doc="'+id+'" src="'+docFrameSrc(id,editing)+'" title="Báo cáo" style="width:100%;height:'+(editing?'90vh':'80vh')+';min-height:480px;border:1px solid var(--border);background:#fff;"></iframe>'+
+        '<p style="margin:10px 0 0;font-size:13.5px;"><a href="https://docs.google.com/document/d/'+id+'/edit" target="_blank" rel="noopener">Mở trong Google Docs ↗</a></p>';
     } else if(/drive\.google\.com\/drive\/folders\//.test(link)){
       // Hiển thị luôn danh sách tệp trong thư mục Drive (không cần bấm nút)
       const fid = (link.match(/folders\/([\w-]+)/)||[])[1];
@@ -1654,6 +1670,7 @@ else{
     msg.textContent=on?'Đang sửa — bấm vào ảnh để chỉnh, nhớ bấm Lưu':'';
     if(on) attachPhotoUI(); else detachPhotoUI();
     adminMode(on);
+    if(window.refreshReportFrames) window.refreshReportFrames();
   }
 
   let denied='';
