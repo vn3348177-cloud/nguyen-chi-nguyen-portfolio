@@ -263,8 +263,8 @@
   <div class="inner">
     <div class="brand" onclick="switchView('view-home')">E-PORTFOLIO · <span>NGUYỄN CHÍ NGUYÊN</span></div>
     <div class="navlinks">
-      <button class="navbtn" onclick="switchView('view-home')">Giới thiệu</button>
-      <button class="navbtn" onclick="switchView('view-results')">Kết quả học tập</button>
+      <button class="navbtn" onclick="switchView('view-home','gioi-thieu')">Giới thiệu</button>
+      <button class="navbtn" onclick="switchView('view-home','hoc-tap')">Kết quả học tập</button>
       <div class="dropdown" id="wsDropdown">
         <button class="navbtn" onclick="toggleDropdown(event)">Thực hành <span class="dcaret">▾</span></button>
         <div class="dropdown-panel">
@@ -273,7 +273,7 @@
           <a href="#" onclick="switchView('view-skills');closeDropdown();return false;">🛠️ Kỹ năng</a>
         </div>
       </div>
-      <button class="navbtn" onclick="switchView('view-contact')">Liên hệ</button>
+      <button class="navbtn" onclick="switchView('view-home','lien-he')">Liên hệ</button>
     </div>
   </div>
 </nav>
@@ -319,22 +319,6 @@
     </div>
   </section>
 
-</main>
-
-<footer data-ce>E-Portfolio cá nhân · Nguyễn Chí Nguyên · Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) · Trường Cao đẳng Công nghiệp Huế (HueIC) · Cập nhật lần cuối: 2026</footer>
-
-</div>
-<!-- ======================= END VIEW: HOME ======================= -->
-
-<!-- ========================= VIEW: VIEW-RESULTS ========================= -->
-<div class="view hidden" id="view-results">
-  <header class="hero" style="padding:34px 24px 30px;">
-    <div class="hero-inner wrap" style="display:block;">
-      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span>Kết quả học tập</div>
-      <h1 data-ce style="margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);">KẾT QUẢ HỌC TẬP</h1>
-    </div>
-  </header>
-  <main class="wrap" style="padding-top:28px;">
   <section id="hoc-tap">
     <div class="card">
       <h2 class="section-title"><span class="num">2.</span> Kết quả học tập</h2>
@@ -441,9 +425,26 @@
       </div>
     </div>
   </section>
-  </main>
-  <footer data-ce>E-Portfolio cá nhân · Nguyễn Chí Nguyên · Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) · Trường Cao đẳng Công nghiệp Huế (HueIC) · Cập nhật lần cuối: 2026</footer>
+
+  <section id="lien-he">
+    <div class="card">
+      <h2 class="section-title"><span class="num">6.</span> Liên hệ</h2>
+      <div class="contact-grid">
+        <dl class="contact-item"><dt>Họ và tên</dt><dd data-ce>Nguyễn Chí Nguyên</dd></dl>
+        <dl class="contact-item"><dt>Mã sinh viên</dt><dd data-ce>2660935</dd></dl>
+        <dl class="contact-item"><dt>Điện thoại</dt><dd data-ce>0337664650</dd></dl>
+        <dl class="contact-item"><dt>Email</dt><dd data-ce>— điền email của bạn —</dd></dl>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer data-ce>E-Portfolio cá nhân · Nguyễn Chí Nguyên · Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) · Trường Cao đẳng Công nghiệp Huế (HueIC) · Cập nhật lần cuối: 2026</footer>
+
 </div>
+<!-- ======================= END VIEW: HOME ======================= -->
+
 
 <!-- ========================= VIEW: VIEW-PRACTICE ========================= -->
 <div class="view hidden" id="view-practice">
@@ -572,29 +573,6 @@
   <footer data-ce>E-Portfolio cá nhân · Nguyễn Chí Nguyên · Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) · Trường Cao đẳng Công nghiệp Huế (HueIC) · Cập nhật lần cuối: 2026</footer>
 </div>
 
-<!-- ========================= VIEW: VIEW-CONTACT ========================= -->
-<div class="view hidden" id="view-contact">
-  <header class="hero" style="padding:34px 24px 30px;">
-    <div class="hero-inner wrap" style="display:block;">
-      <div class="crumbs"><button onclick="switchView('view-home')">Trang chủ E-Portfolio</button><span>/</span>Liên hệ</div>
-      <h1 data-ce style="margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);">LIÊN HỆ</h1>
-    </div>
-  </header>
-  <main class="wrap" style="padding-top:28px;">
-  <section id="lien-he">
-    <div class="card">
-      <h2 class="section-title"><span class="num">6.</span> Liên hệ</h2>
-      <div class="contact-grid">
-        <dl class="contact-item"><dt>Họ và tên</dt><dd data-ce>Nguyễn Chí Nguyên</dd></dl>
-        <dl class="contact-item"><dt>Mã sinh viên</dt><dd data-ce>2660935</dd></dl>
-        <dl class="contact-item"><dt>Điện thoại</dt><dd data-ce>0337664650</dd></dl>
-        <dl class="contact-item"><dt>Email</dt><dd data-ce>— điền email của bạn —</dd></dl>
-      </div>
-    </div>
-  </section>
-  </main>
-  <footer data-ce>E-Portfolio cá nhân · Nguyễn Chí Nguyên · Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) · Trường Cao đẳng Công nghiệp Huế (HueIC) · Cập nhật lần cuối: 2026</footer>
-</div>
 
 
 
@@ -1008,7 +986,7 @@
 </div>
 
 <script>
-  const LEGACY_SECTION_VIEW = {'gioi-thieu':'view-home','hoc-tap':'view-results','xuong':'view-practice','tin-hoc':'view-tinhoc','ky-nang':'view-skills','lien-he':'view-contact'};
+  const LEGACY_SECTION_VIEW = {'gioi-thieu':'view-home','xuong':'view-practice','tin-hoc':'view-tinhoc','ky-nang':'view-skills'};
   function switchView(viewId, scrollToId){
     if(viewId==='view-home' && scrollToId && LEGACY_SECTION_VIEW[scrollToId]){ viewId = LEGACY_SECTION_VIEW[scrollToId]; scrollToId = null; }
     document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));
@@ -1025,7 +1003,7 @@
   // Nội dung cũ đã lưu trên Firestore vẫn chứa đủ các mục trong trang chủ -> tách về đúng trang riêng
   window.splitHomeSections = function(){
     const home = document.getElementById('view-home'); if(!home) return;
-    Object.entries({'hoc-tap':'view-results','xuong':'view-practice','tin-hoc':'view-tinhoc','ky-nang':'view-skills','lien-he':'view-contact'}).forEach(([sid,vid])=>{
+    Object.entries({'xuong':'view-practice','tin-hoc':'view-tinhoc','ky-nang':'view-skills'}).forEach(([sid,vid])=>{
       const s = home.querySelector('#'+sid), target = document.querySelector('#'+vid+' main');
       if(!s || !target) return;
       target.querySelectorAll('#'+sid).forEach(x=>{ if(x!==s) x.remove(); });
