@@ -187,14 +187,18 @@
   body:not(.edit-mode) .add-row-btn,body:not(.edit-mode) .row-del,body:not(.edit-mode) .wcard-del,body:not(.edit-mode) .add-card-btn,body:not(.edit-mode) .add-skill-btn,body:not(.edit-mode) .li-del,body:not(.edit-mode) .del-col{display:none !important;}
   #editBar{display:none;position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:200;gap:8px;align-items:center;background:var(--card);border:1px solid var(--border);box-shadow:0 8px 24px rgba(0,0,0,0.22);padding:8px 10px;font-family:inherit;}
   #editBar.show{display:flex;}
-  #linkPanel{display:none;position:fixed;right:16px;bottom:calc(78px + env(safe-area-inset-bottom,0px));z-index:200;width:min(380px,calc(100vw - 32px));background:var(--card);color:var(--text);border:1px solid var(--border);border-left:4px solid var(--accent);box-shadow:0 8px 24px rgba(0,0,0,0.22);padding:12px 14px;font-size:13px;}
-  body.edit-mode #linkPanel{display:block;}
-  #linkPanel strong{display:block;margin-bottom:8px;font-size:13.5px;}
-  #linkPanel select,#linkPanel input{width:100%;font-family:inherit;font-size:13px;padding:7px 8px;border:1px solid var(--border);background:var(--bg);color:var(--text);margin-bottom:8px;}
-  #linkPanel .row{display:flex;gap:8px;}
-  #linkPanel button{font-family:inherit;font-size:13px;font-weight:700;padding:7px 12px;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;}
-  #linkPanel button.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
-  #linkPanel small{display:block;margin-top:8px;color:var(--muted);line-height:1.45;}
+  #linkPanel{display:none;position:fixed;right:16px;bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:200;width:min(330px,calc(100vw - 32px));max-height:70vh;overflow:auto;background:var(--card);color:var(--text);border:1px solid var(--border);border-top:3px solid var(--accent);box-shadow:0 8px 24px rgba(0,0,0,0.22);padding:10px 12px 12px;font-size:13px;}
+  body.edit-mode #linkPanel.open{display:block;}
+  body:not(.edit-mode) #btnLinks{display:none;}
+  #linkPanel .lp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-weight:700;font-size:13.5px;}
+  #linkPanel .lp-x{border:0;background:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0 4px;}
+  #linkPanel select,#linkPanel input{width:100%;font-family:inherit;font-size:13px;padding:7px 8px;border:1px solid var(--border);background:var(--bg);color:var(--text);margin-bottom:6px;}
+  #linkPanel label{display:block;font-size:11.5px;font-weight:600;color:var(--muted);margin:2px 0 3px;}
+  #linkPanel .row{display:flex;gap:6px;margin-top:4px;}
+  #linkPanel .row button{font-family:inherit;font-size:13px;font-weight:700;padding:7px 12px;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;}
+  #linkPanel .row button.primary{background:var(--accent);border-color:var(--accent);color:#fff;flex:1;}
+  #linkPanel .row button:disabled{opacity:.45;cursor:default;}
+  #linkPanel small{display:block;margin-top:8px;color:var(--muted);font-size:11.5px;line-height:1.4;}
 
   #editBar button{font-family:inherit;font-size:13px;font-weight:700;padding:8px 14px;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;}
   #editBar button.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
@@ -985,21 +989,22 @@
 </div>
 
 
-<div id="linkPanel" role="region" aria-label="Gắn link Google Drive">
-  <strong>➕ Thêm bài Tin học mới (tự động)</strong>
-  <input id="lpNewUrl" type="url" placeholder="Dán link chia sẻ Google Drive / Docs…">
-  <input id="lpNewName" type="text" placeholder="Tên bài (bỏ trống = lấy tên thư mục Drive)">
-  <div class="row" style="margin-bottom:12px;"><button type="button" id="lpAdd" class="primary">➕ Thêm vào web</button></div>
-  <strong>🔗 Gắn / đổi link cho bài đã có</strong>
+<div id="linkPanel" role="region" aria-label="Quản lý Google Drive">
+  <div class="lp-head"><span>🔗 Quản lý Google Drive</span><button type="button" class="lp-x" id="lpClose" title="Đóng">✕</button></div>
+  <label for="lpUrl">1. Dán link chia sẻ (Drive / Docs)</label>
+  <input id="lpUrl" type="url" placeholder="https://drive.google.com/drive/folders/…">
+  <label for="lpSel">2. Gắn vào</label>
   <select id="lpSel"></select>
-  <input id="lpUrl" type="url" placeholder="Dán link thư mục Drive hoặc Google Docs…">
-  <div class="row"><button type="button" id="lpApply" class="primary">Áp dụng</button><button type="button" id="lpClear">Xoá link</button></div>
-  <small>Chọn bài → dán link → <b>Áp dụng</b>, rồi bấm <b>💾 Lưu</b> ở thanh dưới. Thư mục/tệp cần chia sẻ “Bất kỳ ai có đường liên kết”.</small>
+  <label for="lpName">3. Tên bài (không bắt buộc)</label>
+  <input id="lpName" type="text" placeholder="Bỏ trống = lấy tên thư mục Drive">
+  <div class="row"><button type="button" id="lpApply" class="primary">✔ Thêm vào web</button><button type="button" id="lpClear" title="Gỡ link của bài đang chọn">Xoá link</button></div>
+  <small>Xong bấm <b>💾 Lưu</b>. Thư mục cần chia sẻ “Bất kỳ ai có đường liên kết”.</small>
 </div>
 <div id="editBar" role="toolbar" aria-label="Quản trị">
   <span class="msg" id="editMsg"></span>
   <button type="button" id="btnLogin">🔐 Đăng nhập Google</button>
   <button type="button" id="btnEdit" style="display:none">✏️ Chế độ sửa</button>
+  <button type="button" id="btnLinks">🔗 Drive</button>
   <button type="button" id="btnUndo" style="display:none">↩ Hoàn tác xoá</button>
   <button type="button" id="btnCancel" style="display:none">Hủy</button>
   <button type="button" id="btnSave" class="primary" style="display:none">💾 Lưu</button>
@@ -1623,8 +1628,10 @@ else{
   window.TINHOC_TITLES = window.TINHOC_TITLES || {};
   function rebuildOptions(keep){
     const extra=Object.keys(linkOverrides).filter(k=>/^th\d+$/.test(k)&&+k.slice(2)>7&&linkOverrides[k]).map(k=>[k,'Tin học – Bài '+k.slice(2)]);
-    lpSel.innerHTML=LINK_LABELS.concat(extra).map(([k,t])=>'<option value="'+k+'">'+t+'</option>').join('');
-    if(keep) lpSel.value=keep;
+    const opts=LINK_LABELS.concat(extra).map(([k,t])=>'<option value="'+k+'">'+(curLink(k)?'✔ ':'○ ')+t+'</option>').join('');
+    lpSel.innerHTML='<option value="auto">✨ Tự động (bài Tin học trống kế tiếp)</option>'+opts;
+    lpSel.value=keep||'auto';
+    if(typeof lpClearBtn!=='undefined') lpClearBtn.disabled=(lpSel.value==='auto');
   }
   function curLink(k){ if(k in linkOverrides) return linkOverrides[k]; return /^th\d+$/.test(k)?(TINHOC_REPORTS[+k.slice(2)]||''):(REPORT_FOLDERS[k]||''); }
   function applyLinks(){
@@ -1634,32 +1641,33 @@ else{
     if(typeof lpSel!=='undefined' && lpSel) rebuildOptions(lpSel.value);
     if(window.ensureReportSlots) window.ensureReportSlots();
   }
-  var lpSel=$('lpSel'), lpUrl=$('lpUrl');
-  rebuildOptions('th4'); lpUrl.value=curLink('th4');
-  lpSel.onchange=()=>{ lpUrl.value=curLink(lpSel.value); };
-  $('lpApply').onclick=()=>{
+  var lpSel=$('lpSel'), lpUrl=$('lpUrl'), lpName=$('lpName'), lpClearBtn=$('lpClear'), lpPanel=$('linkPanel');
+  rebuildOptions('auto');
+  $('btnLinks').onclick=()=>lpPanel.classList.toggle('open');
+  $('lpClose').onclick=()=>lpPanel.classList.remove('open');
+  lpSel.onchange=()=>{ lpClearBtn.disabled=(lpSel.value==='auto'); if(lpSel.value!=='auto'){ lpUrl.value=curLink(lpSel.value); lpName.value=window.TINHOC_TITLES[+lpSel.value.slice(2)]||''; } };
+  $('lpApply').onclick=async()=>{
     const v=lpUrl.value.trim();
-    if(v && !/drive\.google\.com\/drive\/folders\/|docs\.google\.com\/document\/d\//.test(v)){ msg.textContent='Link phải là thư mục Google Drive hoặc Google Docs.'; return; }
-    linkOverrides[lpSel.value]=v; applyLinks(); msg.textContent='Đã gắn link — nhớ bấm Lưu.';
-  };
-  $('lpAdd').onclick=async()=>{
-    const v=$('lpNewUrl').value.trim();
     const m=v.match(/drive\.google\.com\/drive\/folders\/([\w-]+)|docs\.google\.com\/document\/d\/([\w-]+)/);
-    if(!m){ msg.textContent='Hãy dán link chia sẻ thư mục Google Drive hoặc Google Docs.'; return; }
-    // tự chọn vị trí: bài trống đầu tiên trong 4–7, hết thì thêm bài 8, 9, ...
-    let n=[4,5,6,7].find(i=>!curLink('th'+i));
-    if(!n){ n=8; while(curLink('th'+n)) n++; }
-    let name=$('lpNewName').value.trim();
-    if(!name){
+    if(!m){ msg.textContent='Link phải là thư mục Google Drive hoặc Google Docs.'; return; }
+    let k=lpSel.value, n;
+    if(k==='auto'){ n=[4,5,6,7].find(i=>!curLink('th'+i)); if(!n){ n=8; while(curLink('th'+n)) n++; } k='th'+n; }
+    let name=lpName.value.trim();
+    if(!name && /^th\d+$/.test(k) && !window.TINHOC_TITLES[+k.slice(2)]){
       try{ const r=await fetch('https://www.googleapis.com/drive/v3/files/'+(m[1]||m[2])+'?supportsAllDrives=true&fields=name&key='+DRIVE_API_KEY); const j=await r.json(); if(r.ok&&j.name) name=j.name; }catch(_){}
     }
-    linkOverrides['th'+n]=v; if(name) linkOverrides['name_th'+n]=name;
-    applyLinks(); rebuildOptions('th'+n); lpUrl.value=v;
-    $('lpNewUrl').value=''; $('lpNewName').value='';
-    msg.textContent='Đã thêm vào Bài '+n+' — nhớ bấm Lưu.';
-    switchView('view-th'+n);
+    linkOverrides[k]=v; if(name && /^th\d+$/.test(k)) linkOverrides['name_'+k]=name;
+    applyLinks(); rebuildOptions(k);
+    lpUrl.value=''; lpName.value=''; lpPanel.classList.remove('open');
+    msg.textContent='Đã gắn vào '+(/^th/.test(k)?'Bài '+k.slice(2):k)+' — nhớ bấm 💾 Lưu.';
+    if(/^th\d+$/.test(k)) switchView(k==='th3'?'view-ws5':'view-'+k);
   };
-  $('lpClear').onclick=()=>{ lpUrl.value=''; linkOverrides[lpSel.value]=''; applyLinks(); msg.textContent='Đã xoá link — nhớ bấm Lưu.'; };
+  lpClearBtn.onclick=()=>{
+    const k=lpSel.value; if(k==='auto') return;
+    linkOverrides[k]=''; if(/^th\d+$/.test(k)) linkOverrides['name_'+k]='';
+    applyLinks(); rebuildOptions('auto'); lpUrl.value=''; lpName.value='';
+    msg.textContent='Đã xoá link — nhớ bấm 💾 Lưu.';
+  };
 
   function serialize(){
     const out={};
