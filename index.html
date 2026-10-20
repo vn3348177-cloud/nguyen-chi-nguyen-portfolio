@@ -187,6 +187,15 @@
   body:not(.edit-mode) .add-row-btn,body:not(.edit-mode) .row-del,body:not(.edit-mode) .wcard-del,body:not(.edit-mode) .add-card-btn,body:not(.edit-mode) .add-skill-btn,body:not(.edit-mode) .li-del,body:not(.edit-mode) .del-col{display:none !important;}
   #editBar{display:none;position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:200;gap:8px;align-items:center;background:var(--card);border:1px solid var(--border);box-shadow:0 8px 24px rgba(0,0,0,0.22);padding:8px 10px;font-family:inherit;}
   #editBar.show{display:flex;}
+  #linkPanel{display:none;position:fixed;right:16px;bottom:calc(78px + env(safe-area-inset-bottom,0px));z-index:200;width:min(380px,calc(100vw - 32px));background:var(--card);color:var(--text);border:1px solid var(--border);border-left:4px solid var(--accent);box-shadow:0 8px 24px rgba(0,0,0,0.22);padding:12px 14px;font-size:13px;}
+  body.edit-mode #linkPanel{display:block;}
+  #linkPanel strong{display:block;margin-bottom:8px;font-size:13.5px;}
+  #linkPanel select,#linkPanel input{width:100%;font-family:inherit;font-size:13px;padding:7px 8px;border:1px solid var(--border);background:var(--bg);color:var(--text);margin-bottom:8px;}
+  #linkPanel .row{display:flex;gap:8px;}
+  #linkPanel button{font-family:inherit;font-size:13px;font-weight:700;padding:7px 12px;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;}
+  #linkPanel button.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+  #linkPanel small{display:block;margin-top:8px;color:var(--muted);line-height:1.45;}
+
   #editBar button{font-family:inherit;font-size:13px;font-weight:700;padding:8px 14px;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;}
   #editBar button.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
   #editBar button:disabled{opacity:.6;cursor:default;}
@@ -975,6 +984,14 @@
   <footer data-ce>© 2026 E-Portfolio Cá nhân — Nguyễn Chí Nguyên | Lớp Cao đẳng Kỹ thuật Ô tô K26 (26CDOT09) — Trường Cao đẳng Công nghiệp Huế</footer>
 </div>
 
+
+<div id="linkPanel" role="region" aria-label="Gắn link Google Drive">
+  <strong>🔗 Gắn Google Drive / Docs cho báo cáo</strong>
+  <select id="lpSel"></select>
+  <input id="lpUrl" type="url" placeholder="Dán link thư mục Drive hoặc Google Docs…">
+  <div class="row"><button type="button" id="lpApply" class="primary">Áp dụng</button><button type="button" id="lpClear">Xoá link</button></div>
+  <small>Chọn bài → dán link → <b>Áp dụng</b>, rồi bấm <b>💾 Lưu</b> ở thanh dưới. Thư mục/tệp cần chia sẻ “Bất kỳ ai có đường liên kết”.</small>
+</div>
 <div id="editBar" role="toolbar" aria-label="Quản trị">
   <span class="msg" id="editMsg"></span>
   <button type="button" id="btnLogin">🔐 Đăng nhập Google</button>
@@ -1102,7 +1119,7 @@
     1: 'https://docs.google.com/document/d/1rEVTW1wJjjBlOQE0Qrd12iTVcL3uZO_P3cLGHPH3nlM/edit?usp=sharing',
     2: 'https://drive.google.com/drive/folders/1U6t9eR6DbXV6JwE-yHUxQHhVt0y2R97C?usp=sharing',
     3: '',  // (bài 3 hiển thị trang "Buổi 3" có sẵn, link ở ws5)
-    4: '',
+    4: 'https://drive.google.com/drive/folders/1LZX45NBp8yJ1gaL_aw00uxXRKOuxHZDo?usp=sharing',
     5: '',
     6: '',
     7: ''
@@ -1580,6 +1597,7 @@ else{
   getDoc(ref).then(snap=>{
     if(!snap.exists()) return;
     const data=JSON.parse(snap.data().json);
+    try{ if(snap.data().links){ linkOverrides=JSON.parse(snap.data().links)||{}; applyLinks(); } }catch(_){}
     VIEW_IDS.forEach(id=>{
       if(typeof data[id]!=='string') return;
       const v=$(id); v.innerHTML=data[id];
@@ -1589,6 +1607,26 @@ else{
     if(window.ensureReportSlots) window.ensureReportSlots();
     loadPhotos();
   }).catch(e=>console.warn('Không nạp được nội dung đã lưu:',e));
+
+  /* ===== ADMIN: gắn link Google Drive / Docs cho từng báo cáo (không cần sửa code) ===== */
+  let linkOverrides={};
+  const LINK_LABELS=[['th1','Tin học – Bài 1'],['th2','Tin học – Bài 2'],['th4','Tin học – Bài 4'],['th5','Tin học – Bài 5'],['th6','Tin học – Bài 6'],['th7','Tin học – Bài 7'],
+    ['ws5','Tin học – Bài 3 (Buổi 3)'],['ws1','Xưởng: Động cơ đốt trong'],['ws2','Xưởng: Điện – Điện tử ô tô'],['ws3','Xưởng: Khung gầm & Phanh'],['ws4','Xưởng: Bảo dưỡng nhanh & OBD-II']];
+  function curLink(k){ if(k in linkOverrides) return linkOverrides[k]; return /^th\d$/.test(k)?(TINHOC_REPORTS[+k.slice(2)]||''):(REPORT_FOLDERS[k]||''); }
+  function applyLinks(){
+    Object.keys(linkOverrides).forEach(k=>{ if(/^th\d$/.test(k)) TINHOC_REPORTS[+k.slice(2)]=linkOverrides[k]; else REPORT_FOLDERS[k]=linkOverrides[k]; });
+    if(window.ensureReportSlots) window.ensureReportSlots();
+  }
+  const lpSel=$('lpSel'), lpUrl=$('lpUrl');
+  lpSel.innerHTML=LINK_LABELS.map(([k,t])=>'<option value="'+k+'">'+t+'</option>').join('');
+  lpSel.value='th4'; lpUrl.value=curLink('th4');
+  lpSel.onchange=()=>{ lpUrl.value=curLink(lpSel.value); };
+  $('lpApply').onclick=()=>{
+    const v=lpUrl.value.trim();
+    if(v && !/drive\.google\.com\/drive\/folders\/|docs\.google\.com\/document\/d\//.test(v)){ msg.textContent='Link phải là thư mục Google Drive hoặc Google Docs.'; return; }
+    linkOverrides[lpSel.value]=v; applyLinks(); msg.textContent='Đã gắn link — nhớ bấm Lưu.';
+  };
+  $('lpClear').onclick=()=>{ lpUrl.value=''; linkOverrides[lpSel.value]=''; applyLinks(); msg.textContent='Đã xoá link — nhớ bấm Lưu.'; };
 
   function serialize(){
     const out={};
@@ -1702,7 +1740,7 @@ else{
       }
       pendingPhotos.clear();
       msg.textContent='Đang lưu nội dung…';
-      await setDoc(ref,{json,updatedBy:auth.currentUser.email,updatedAt:serverTimestamp()});   // 2) rồi mới lưu nội dung
+      await setDoc(ref,{json,links:JSON.stringify(linkOverrides),updatedBy:auth.currentUser.email,updatedAt:serverTimestamp()});   // 2) rồi mới lưu nội dung
       for(const pid of removedPhotos){ try{ await deleteDoc(doc(db,'site','img_'+pid)); }catch(_){} }
       removedPhotos.clear();
       setEditing(false); msg.textContent='Đã lưu ✔';
