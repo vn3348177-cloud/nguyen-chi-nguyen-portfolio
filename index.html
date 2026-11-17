@@ -272,6 +272,118 @@
   #blkUI button{font-family:inherit;font-size:12px;font-weight:700;padding:5px 9px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2);}
   #blkUI button.danger{background:#C0392B;border-color:#C0392B;color:#fff;}
 </style>
+
+<!-- Thư viện hỗ trợ đọc & hiển thị tài liệu Microsoft Word (.docx / .doc) & PDF chuẩn A4 -->
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/docx-preview@0.3.3/dist/docx-preview.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
+<style>
+  /* ===== TÍNH NĂNG 1 & 2: TRÌNH XEM TÀI LIỆU MICROSOFT WORD (.DOCX/.DOC) & PDF CHUẨN A4 + TẢI FILE RIÊNG TỪNG BÀI ===== */
+  .word-viewer-wrap{border:1px solid var(--border);background:var(--card);margin-bottom:16px;border-radius:2px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.04);}
+  .wv-header{background:var(--navy);color:#EEF2F8;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--accent);}
+  .wv-doc-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0;}
+  .wv-badge{background:var(--accent);color:#fff;font-size:11px;font-weight:800;padding:3px 8px;letter-spacing:.03em;text-transform:uppercase;border-radius:2px;white-space:nowrap;}
+  .wv-badge.pdf-auto{background:#2E7D32;}
+  .wv-filename{font-size:13.5px;font-weight:700;color:#fff;word-break:break-word;}
+  .wv-compat{font-size:11.5px;color:#B8C3D6;white-space:nowrap;}
+  .wv-modes{display:flex;gap:6px;flex-wrap:wrap;}
+  .wv-mode-btn{font-family:inherit;font-size:12px;font-weight:700;padding:5px 10px;border:1px solid rgba(255,255,255,0.24);background:rgba(255,255,255,0.08);color:#EAF0F8;cursor:pointer;border-radius:2px;transition:all .15s;}
+  .wv-mode-btn:hover{background:rgba(255,255,255,0.18);border-color:#fff;}
+  .wv-mode-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+  .wv-toolbar{background:var(--bg);border-bottom:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px;}
+  .wv-nav-group,.wv-zoom-group,.wv-extra-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .wv-btn{font-family:inherit;font-size:12.5px;font-weight:600;padding:5px 10px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;border-radius:2px;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
+  .wv-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);}
+  .wv-btn:disabled{opacity:.45;cursor:default;}
+  .wv-btn.wv-btn-accent{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700;}
+  .wv-btn.wv-btn-accent:hover{background:#c1541f;color:#fff;}
+  .wv-btn.wv-btn-navy{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:700;}
+  .wv-btn.wv-btn-navy:hover{background:var(--navy-2);color:#fff;}
+  .wv-page-ind,.wv-zoom-ind{font-size:12.5px;font-weight:700;color:var(--navy);padding:4px 8px;background:var(--card);border:1px solid var(--border);min-width:88px;text-align:center;}
+  @media (prefers-color-scheme:dark){ .wv-page-ind,.wv-zoom-ind{color:#F1F5FB;} }
+  :root[data-theme="dark"] .wv-page-ind,.wv-zoom-ind{color:#F1F5FB;}
+
+  .wv-notice{display:none;padding:10px 14px;background:#FFF8E7;border-bottom:1px solid #F5D487;color:#6E4B00;font-size:13px;line-height:1.45;}
+  .wv-notice.show{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .wv-notice.auto-pdf{background:#E8F5E9;border-color:#A5D6A7;color:#1B5E20;}
+  .wv-notice.error{background:#FDEDEC;border-color:#F5B7B1;color:#78281F;}
+
+  .wv-viewport{background:#525659;padding:20px 14px;max-height:780px;overflow-y:auto;overflow-x:hidden;position:relative;scroll-behavior:smooth;}
+  .wv-viewport.allow-pan{overflow-x:auto;}
+  .wv-stage{display:flex;flex-direction:column;align-items:center;gap:22px;width:100%;min-height:360px;}
+
+  .wv-page-slot{display:flex;justify-content:center;width:100%;position:relative;overflow:hidden;}
+  .wv-viewport.allow-pan .wv-page-slot{overflow:visible;width:auto;}
+  .docx-page{background:#FFFFFF;color:#1C2430;width:794px;min-height:1123px;padding:76px 84px 76px 90px;box-sizing:border-box;box-shadow:0 6px 24px rgba(0,0,0,0.38);position:relative;display:flex;flex-direction:column;justify-content:space-between;font-family:'Times New Roman', Times, serif;font-size:11.5pt;line-height:1.35;transform-origin:top center;flex:none;overflow-wrap:break-word;word-wrap:break-word;}
+  .docx-page.landscape{width:1123px;min-height:794px;padding:68px 76px;}
+  .docx-page.pdf-mode-sheet{border-top:4px solid #C0392B;}
+  .docx-page-header{border-bottom:1px solid #CBD5E1;padding-bottom:6px;margin-bottom:16px;font-size:9.5pt;font-style:italic;color:#5C6774;text-align:right;display:flex;justify-content:space-between;align-items:center;}
+  .docx-page-content{flex:1;width:100%;}
+  .docx-page-footer{border-top:1px solid #CBD5E1;padding-top:6px;margin-top:18px;font-size:9.5pt;color:#5C6774;text-align:center;}
+
+  .docx-page table{width:100% !important;max-width:100% !important;border-collapse:collapse;margin:8px 0 12px;table-layout:fixed;word-break:break-word;}
+  .docx-page th,.docx-page td{border:1px solid #CBD5E1;padding:6px 8px;vertical-align:middle;font-size:10.5pt;line-height:1.3;color:#1C2430;overflow-wrap:break-word;}
+  .docx-page img{max-width:100% !important;height:auto !important;display:block;margin:6px auto;}
+  .docx-page .wv-dropcap{float:left;font-size:27pt;line-height:0.86;padding:2px 7px 2px 0;font-weight:700;color:#D9642C;font-family:'Times New Roman', serif;}
+
+  .wv-stage .docx-wrapper{background:transparent !important;padding:0 !important;display:flex;flex-direction:column;align-items:center;gap:22px;width:100%;}
+  .wv-stage .docx-wrapper > section.docx{background:#fff !important;box-shadow:0 6px 24px rgba(0,0,0,0.38) !important;margin:0 !important;transform-origin:top center;box-sizing:border-box !important;}
+  .wv-stage .docx-wrapper > section.docx table{max-width:100% !important;word-break:break-word;}
+  .wv-stage .docx-wrapper > section.docx img{max-width:100% !important;height:auto !important;}
+
+  .word-viewer-wrap.wv-fullscreen{position:fixed;inset:0;z-index:9999;margin:0;display:flex;flex-direction:column;border:0;border-radius:0;}
+  .word-viewer-wrap.wv-fullscreen .wv-viewport{flex:1;max-height:none;}
+
+  /* Khu vực nút tải xuống ngay trên thẻ bài thực hành & đầu trang bài thực hành */
+  .wcard-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .wlink-dl{display:inline-flex;align-items:center;gap:5px;background:var(--accent);color:#fff;font-size:12.5px;font-weight:700;padding:8px 12px;text-decoration:none;border:none;cursor:pointer;font-family:inherit;transition:background .15s;}
+  .wlink-dl:hover{background:#c1541f;color:#fff;}
+  .wlink-dl.missing{background:#7F8C8D;}
+  .top-dl-group{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-left:auto;}
+  .rs-head-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+  .rs-head-row h2.section-title{margin:0;}
+
+  .wv-download-bar{background:linear-gradient(135deg, #FCEEE4 0%, #FFF9F5 100%);border:1px solid #F0C6A2;border-left:4px solid var(--accent);padding:16px 18px;margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  @media (prefers-color-scheme:dark){ .wv-download-bar{background:#1F1812;border-color:#5C3A1C;border-left-color:var(--accent);} }
+  :root[data-theme="dark"] .wv-download-bar{background:#1F1812;border-color:#5C3A1C;border-left-color:var(--accent);}
+  .wv-dl-info{flex:1;min-width:220px;}
+  .wv-dl-title{font-size:14.5px;font-weight:800;color:var(--navy);margin:0 0 4px;display:flex;align-items:center;gap:7px;}
+  @media (prefers-color-scheme:dark){ .wv-dl-title{color:#F1F5FB;} }
+  :root[data-theme="dark"] .wv-dl-title{color:#F1F5FB;}
+  .wv-dl-sub{font-size:12.5px;color:var(--muted);margin:0;line-height:1.45;}
+  .wv-dl-sub code{background:rgba(217,100,44,0.12);color:var(--accent);padding:1px 6px;border-radius:3px;font-family:Consolas,monospace;font-size:12px;}
+  .wv-dl-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .btn-word-view{display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:10px 15px;border:1px solid var(--navy);cursor:pointer;text-decoration:none;border-radius:2px;transition:all .15s;}
+  .btn-word-view:hover{background:var(--navy-2);}
+  .btn-word-download{display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:#fff;font-family:inherit;font-size:13.5px;font-weight:800;padding:10px 18px;border:1px solid var(--accent);cursor:pointer;text-decoration:none;border-radius:2px;box-shadow:0 3px 10px rgba(217,100,44,0.28);transition:all .15s;}
+  .btn-word-download:hover{background:#c1541f;border-color:#c1541f;transform:translateY(-1px);}
+  .btn-word-download.missing{background:#7F8C8D;border-color:#7F8C8D;box-shadow:none;}
+  .btn-pdf-download{display:inline-flex;align-items:center;gap:6px;background:#2E7D32;color:#fff;font-family:inherit;font-size:13px;font-weight:700;padding:10px 14px;border:1px solid #2E7D32;cursor:pointer;text-decoration:none;border-radius:2px;transition:all .15s;}
+  .btn-pdf-download:hover{background:#1B5E20;}
+  .btn-gdoc-ext{display:inline-flex;align-items:center;gap:5px;background:var(--card);color:var(--text);font-family:inherit;font-size:12.5px;font-weight:600;padding:9px 13px;border:1px solid var(--border);cursor:pointer;text-decoration:none;border-radius:2px;}
+  .btn-gdoc-ext:hover{border-color:var(--accent);color:var(--accent);}
+
+  .wv-empty-state{background:var(--bg);border:1px dashed var(--border);padding:26px 20px;text-align:center;color:var(--muted);font-size:14px;line-height:1.6;}
+  .wv-empty-state strong{color:var(--navy);display:block;font-size:15px;margin-bottom:6px;}
+  @media (prefers-color-scheme:dark){ .wv-empty-state strong{color:#F1F5FB;} }
+
+  #wvToast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;border-left:4px solid var(--accent);padding:11px 18px;font-size:13.5px;font-weight:600;box-shadow:0 10px 28px rgba(0,0,0,0.28);z-index:10000;opacity:0;pointer-events:none;transition:all .22s ease;max-width:calc(100vw - 32px);text-align:center;}
+  #wvToast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  #wvToast.warn{background:#7A3B12;border-left-color:#F5B041;}
+
+  @media (max-width:640px){
+    .card.report-slot{padding:18px 14px 22px;}
+    .wv-header{padding:9px 12px;}
+    .wv-toolbar{padding:7px 10px;gap:6px;}
+    .wv-viewport{padding:12px 6px;max-height:620px;}
+    .wv-download-bar{padding:14px 12px;}
+    .wv-dl-actions,.top-dl-group{width:100%;}
+    .btn-word-view,.btn-word-download,.btn-pdf-download,.btn-gdoc-ext{flex:1;justify-content:center;text-align:center;}
+  }
+</style>
+
 </head>
 <body>
 
@@ -1000,6 +1112,8 @@
   <select id="lpSel"></select>
   <label for="lpName">3. Tên bài (không bắt buộc)</label>
   <input id="lpName" type="text" placeholder="Bỏ trống = lấy tên thư mục Drive">
+  <label for="lpWordFile">4. Đường dẫn file Word (.docx) riêng của bài</label>
+  <input id="lpWordFile" type="text" placeholder="VD: files/bai-1.docx">
   <div class="row"><button type="button" id="lpApply" class="primary">✔ Thêm vào web</button><button type="button" id="lpClear" title="Gỡ link của bài đang chọn">Xoá link</button></div>
   <small>Xong bấm <b>💾 Lưu</b>. Thư mục cần chia sẻ “Bất kỳ ai có đường liên kết”.</small>
 </div>
@@ -1165,27 +1279,1818 @@
       if(hint) hint.style.display = editing ? '' : 'none';
     });
   };
-  function renderReportInto(body, link){
-    link = (link||'').trim();
-    const docM = link.match(/docs\.google\.com\/document\/d\/([\w-]+)/);
-    if(docM){
-      const id = docM[1], editing = document.body.classList.contains('edit-mode');
-      body.innerHTML = '<p class="doc-edit-hint" style="margin:0 0 10px;padding:8px 12px;background:#FCEEE4;border:1px solid #F0C6A2;color:#7A3B12;font-size:13.5px;'+(editing?'':'display:none;')+'">✏️ Đang sửa trực tiếp bằng Google Docs — thay đổi được <b>tự động lưu</b> vào tài liệu (không cần bấm nút Lưu của trang). Nếu khung yêu cầu đăng nhập, hãy đăng nhập Google bằng tài khoản có quyền sửa tài liệu, hoặc bấm “Mở trong Google Docs”.</p>'+
-        '<iframe data-doc="'+id+'" src="'+docFrameSrc(id,editing)+'" title="Báo cáo" style="width:100%;height:'+(editing?'90vh':'80vh')+';min-height:480px;border:1px solid var(--border);background:#fff;"></iframe>'+
-        '<p style="margin:10px 0 0;font-size:13.5px;"><a href="https://docs.google.com/document/d/'+id+'/edit" target="_blank" rel="noopener">Mở trong Google Docs ↗</a></p>';
-    } else if(/drive\.google\.com\/drive\/folders\//.test(link)){
-      // Hiển thị luôn danh sách tệp trong thư mục Drive (không cần bấm nút)
-      const fid = (link.match(/folders\/([\w-]+)/)||[])[1];
-      body.innerHTML = '';
-      const panel = document.createElement('div');
-      panel.className = 'drive-panel'; panel.style.marginTop = '0'; panel.dataset.href = link;
-      driveState.set(panel,{path:[{id:fid,name:'Thư mục báo cáo'}],files:[]});
-      body.appendChild(panel);
-      dvLoad(panel);
-    } else {
-      body.innerHTML = '<p style="margin:0;color:var(--muted);font-size:14px;">Báo cáo đang được cập nhật.</p>';
+
+  // ===== CẤU HÌNH QUẢN LÝ FILE WORD (.DOCX) & PDF RIÊNG CHO TỪNG BÀI THỰC HÀNH =====
+  const WORD_FILES_CONFIG = {
+    ws1: {
+      lessonTitle: 'Bài 1: Thực hành Động cơ đốt trong',
+      shortLabel: 'Bài 1 (Động cơ đốt trong)',
+      btnText: '⬇ Tải file Word Bài 1 (.docx)',
+      cardBtnText: '⬇ Tải Word Bài 1 (.docx)',
+      filePath: 'files/bai-1.docx',
+      pdfPath: 'files/bai-1.pdf',
+      downloadName: 'Bai-1-Thuc-hanh-Dong-co-dot-trong.docx',
+      pdfDownloadName: 'Bai-1-Thuc-hanh-Dong-co-dot-trong.pdf'
+    },
+    ws2: {
+      lessonTitle: 'Bài 2: Thực hành Điện – Điện tử ô tô',
+      shortLabel: 'Bài 2 (Điện – Điện tử ô tô)',
+      btnText: '⬇ Tải file Word Bài 2 (.docx)',
+      cardBtnText: '⬇ Tải Word Bài 2 (.docx)',
+      filePath: 'files/bai-2.docx',
+      pdfPath: 'files/bai-2.pdf',
+      downloadName: 'Bai-2-Thuc-hanh-Dien-Dien-tu-o-to.docx',
+      pdfDownloadName: 'Bai-2-Thuc-hanh-Dien-Dien-tu-o-to.pdf'
+    },
+    ws3: {
+      lessonTitle: 'Bài 3: Thực hành Khung gầm & Hệ thống phanh',
+      shortLabel: 'Bài 3 (Khung gầm & Phanh)',
+      btnText: '⬇ Tải file Word Bài 3 (.docx)',
+      cardBtnText: '⬇ Tải Word Bài 3 (.docx)',
+      filePath: 'files/bai-3.docx',
+      pdfPath: 'files/bai-3.pdf',
+      downloadName: 'Bai-3-Thuc-hanh-Khung-gam-va-Phanh.docx',
+      pdfDownloadName: 'Bai-3-Thuc-hanh-Khung-gam-va-Phanh.pdf'
+    },
+    ws4: {
+      lessonTitle: 'Bài 4: Bảo dưỡng nhanh & Chẩn đoán OBD-II',
+      shortLabel: 'Bài 4 (Bảo dưỡng & OBD-II)',
+      btnText: '⬇ Tải file Word Bài 4 (.docx)',
+      cardBtnText: '⬇ Tải Word Bài 4 (.docx)',
+      filePath: 'files/bai-4.docx',
+      pdfPath: 'files/bai-4.pdf',
+      downloadName: 'Bai-4-Bao-duong-nhanh-va-OBD-II.docx',
+      pdfDownloadName: 'Bai-4-Bao-duong-nhanh-va-OBD-II.pdf'
+    },
+    ws5: {
+      lessonTitle: 'Tin học – Bài 3 (Buổi 3): Kiểm chứng tin giả CRAAP & Quản trị Drive',
+      shortLabel: 'Bài 3 Tin học (Buổi 3)',
+      btnText: '⬇ Tải file Word Bài 3 (.docx)',
+      cardBtnText: '⬇ Tải Word Bài 3 (.docx)',
+      filePath: 'files/bai-5.docx',
+      altPath: 'files/tin-hoc-bai-3.docx',
+      pdfPath: 'files/bai-5.pdf',
+      downloadName: 'Bai-3-Thuc-hanh-Tin-hoc-Buoi-3.docx',
+      pdfDownloadName: 'Bai-3-Thuc-hanh-Tin-hoc-Buoi-3.pdf'
+    },
+    th1: {
+      lessonTitle: 'Tin học – Bài 1: Cấu trúc thư mục & Quy tắc đặt tên tệp',
+      shortLabel: 'Bài 1 Tin học',
+      btnText: '⬇ Tải file Word Bài 1 (.docx)',
+      cardBtnText: '⬇ Tải Word Bài 1 (.docx)',
+      filePath: 'files/tin-hoc-bai-1.docx',
+      pdfPath: 'files/tin-hoc-bai-1.pdf',
+      downloadName: '20261015_2660935_NLS_BTTH01_v1.0.docx',
+      pdfDownloadName: '20261015_2660935_NLS_BTTH01_v1.0.pdf'
+    },
+    th2: {
+      lessonTitle: 'Tin học – Bài 2: Khai thác thông tin & Tìm kiếm nâng cao',
+      shortLabel: 'Bài 2 Tin học',
+      btnText: '⬇ Tải file Word Bài 2 (.docx)',
+      cardBtnText: '⬇ Tải Word Bài 2 (.docx)',
+      filePath: 'files/tin-hoc-bai-2.docx',
+      pdfPath: 'files/tin-hoc-bai-2.pdf',
+      downloadName: 'Bai-2-Thuc-hanh-Tin-hoc.docx',
+      pdfDownloadName: 'Bai-2-Thuc-hanh-Tin-hoc.pdf'
+    },
+    th4: {
+      lessonTitle: 'Tin học – Bài 4: Định dạng văn bản báo cáo chuẩn A4',
+      shortLabel: 'Bài 4 Tin học',
+      btnText: '⬇ Tải file Word Bài 4 (.docx)',
+      cardBtnText: '⬇ Tải Word Bài 4 (.docx)',
+      filePath: 'files/tin-hoc-bai-4.docx',
+      pdfPath: 'files/tin-hoc-bai-4.pdf',
+      downloadName: 'Bai-4-Thuc-hanh-Tin-hoc.docx',
+      pdfDownloadName: 'Bai-4-Thuc-hanh-Tin-hoc.pdf'
+    },
+    th5: {
+      lessonTitle: 'Tin học – Bài 5',
+      shortLabel: 'Bài 5 Tin học',
+      btnText: '⬇ Tải file Word Bài 5 (.docx)',
+      cardBtnText: '⬇ Tải Word Bài 5 (.docx)',
+      filePath: 'files/tin-hoc-bai-5.docx',
+      pdfPath: 'files/tin-hoc-bai-5.pdf',
+      downloadName: 'Bai-5-Thuc-hanh-Tin-hoc.docx',
+      pdfDownloadName: 'Bai-5-Thuc-hanh-Tin-hoc.pdf'
+    },
+    th6: {
+      lessonTitle: 'Tin học – Bài 6',
+      shortLabel: 'Bài 6 Tin học',
+      btnText: '⬇ Tải file Word Bài 6 (.docx)',
+      cardBtnText: '⬇ Tải Word Bài 6 (.docx)',
+      filePath: 'files/tin-hoc-bai-6.docx',
+      pdfPath: 'files/tin-hoc-bai-6.pdf',
+      downloadName: 'Bai-6-Thuc-hanh-Tin-hoc.docx',
+      pdfDownloadName: 'Bai-6-Thuc-hanh-Tin-hoc.pdf'
+    },
+    th7: {
+      lessonTitle: 'Tin học – Bài 7',
+      shortLabel: 'Bài 7 Tin học',
+      btnText: '⬇ Tải file Word Bài 7 (.docx)',
+      cardBtnText: '⬇ Tải Word Bài 7 (.docx)',
+      filePath: 'files/tin-hoc-bai-7.docx',
+      pdfPath: 'files/tin-hoc-bai-7.pdf',
+      downloadName: 'Bai-7-Thuc-hanh-Tin-hoc.docx',
+      pdfDownloadName: 'Bai-7-Thuc-hanh-Tin-hoc.pdf'
+    }
+  };
+
+  const EMBEDDED_DOCX_BUNDLE_GZ = "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";
+  let _decodedDocxBundlePromise = null;
+  const CUSTOM_WORD_PATHS = {};
+  const WORD_BUFFER_CACHE = new Map();
+
+  function b64ToUint8Array(b64){
+    const bin = atob(b64);
+    const len = bin.length;
+    const bytes = new Uint8Array(len);
+    for(let i=0;i<len;i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }
+
+  function extractDomImageBytes(key){
+    try {
+      if(key === 'ws_photo'){
+        for(const s of document.querySelectorAll('style')){
+          const m = s.textContent.match(/\.ws-photo\{[^}]*url\("data:image\/[^;]+;base64,([A-Za-z0-9+/=]+)"\)/);
+          if(m) return b64ToUint8Array(m[1]);
+        }
+      }
+      const ws5Imgs = document.querySelectorAll('#view-ws5 figure.evidence-shot img');
+      const idx = key === 'ws5_0' ? 0 : 1;
+      const im = ws5Imgs[idx];
+      if(im){
+        const src = im.getAttribute('src') || '';
+        const m = src.match(/^data:image\/[^;]+;base64,([A-Za-z0-9+/=]+)/);
+        if(m) return b64ToUint8Array(m[1]);
+      }
+    } catch(_) {}
+    return null;
+  }
+
+  const _CRC_TABLE = (() => {
+    const t = new Uint32Array(256);
+    for(let n=0;n<256;n++){
+      let c = n;
+      for(let k=0;k<8;k++) c = (c & 1) ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1);
+      t[n] = c >>> 0;
+    }
+    return t;
+  })();
+
+  function crc32Bytes(u8){
+    let c = 0xffffffff;
+    for(let i=0;i<u8.length;i++) c = _CRC_TABLE[(c ^ u8[i]) & 0xff] ^ (c >>> 8);
+    return (c ^ 0xffffffff) >>> 0;
+  }
+
+  function buildDocxZipBytes(entriesMap){
+    const enc = new TextEncoder();
+    const localParts = [];
+    const centralParts = [];
+    let offset = 0;
+
+    for(const [name, data] of entriesMap.entries()){
+      const nameBytes = enc.encode(name);
+      const content = (typeof data === 'string') ? enc.encode(data) : data;
+      const crc = crc32Bytes(content);
+      const len = content.byteLength;
+
+      const lhdr = new Uint8Array(30 + nameBytes.length);
+      const lv = new DataView(lhdr.buffer);
+      lv.setUint32(0, 0x04034b50, true);
+      lv.setUint16(4, 20, true);
+      lv.setUint16(6, 0x0800, true);
+      lv.setUint16(8, 0, true);
+      lv.setUint32(14, crc, true);
+      lv.setUint32(18, len, true);
+      lv.setUint32(22, len, true);
+      lv.setUint16(26, nameBytes.length, true);
+      lhdr.set(nameBytes, 30);
+
+      const chdr = new Uint8Array(46 + nameBytes.length);
+      const cv = new DataView(chdr.buffer);
+      cv.setUint32(0, 0x02014b50, true);
+      cv.setUint16(4, 20, true);
+      cv.setUint16(6, 20, true);
+      cv.setUint16(8, 0x0800, true);
+      cv.setUint16(10, 0, true);
+      cv.setUint32(16, crc, true);
+      cv.setUint32(20, len, true);
+      cv.setUint32(24, len, true);
+      cv.setUint16(28, nameBytes.length, true);
+      cv.setUint32(42, offset, true);
+      chdr.set(nameBytes, 46);
+
+      localParts.push(lhdr, content);
+      centralParts.push(chdr);
+      offset += lhdr.byteLength + len;
+    }
+
+    let cdSize = 0;
+    centralParts.forEach(p => cdSize += p.byteLength);
+    const eocd = new Uint8Array(22);
+    const ev = new DataView(eocd.buffer);
+    ev.setUint32(0, 0x06054b50, true);
+    ev.setUint16(8, entriesMap.size, true);
+    ev.setUint16(10, entriesMap.size, true);
+    ev.setUint32(12, cdSize, true);
+    ev.setUint32(16, offset, true);
+
+    const total = offset + cdSize + 22;
+    const out = new Uint8Array(total);
+    let pos = 0;
+    for(const p of localParts){ out.set(p, pos); pos += p.byteLength; }
+    for(const p of centralParts){ out.set(p, pos); pos += p.byteLength; }
+    out.set(eocd, pos);
+    return out;
+  }
+
+  async function getDecodedDocxBundle(){
+    if(!_decodedDocxBundlePromise){
+      _decodedDocxBundlePromise = (async () => {
+        const gz = b64ToUint8Array(EMBEDDED_DOCX_BUNDLE_GZ);
+        const ds = new DecompressionStream('gzip');
+        const writer = ds.writable.getWriter();
+        writer.write(gz);
+        writer.close();
+        const txt = await new Response(ds.readable).text();
+        return JSON.parse(txt);
+      })();
+    }
+    return _decodedDocxBundlePromise;
+  }
+
+  async function getEmbeddedDocxBytes(wsKey){
+    const bundle = await getDecodedDocxBundle();
+    const docEntry = bundle.docs && bundle.docs[wsKey];
+    if(!docEntry) return null;
+
+    const entries = new Map();
+    for(const [k, v] of Object.entries(bundle.shared)) entries.set(k, v);
+    for(const [k, v] of Object.entries(docEntry.xml)) entries.set(k, v);
+    for(const [mPath, domKey] of Object.entries(docEntry.media || {})){
+      const imgBytes = extractDomImageBytes(domKey);
+      if(imgBytes) entries.set(mPath, imgBytes);
+    }
+    return buildDocxZipBytes(entries);
+  }
+
+  // ===== BỘ CHUYỂN ĐỔI THỰC SỰ FILE .DOC (WORD 97-2003 OLE2 BINARY) SANG .DOCX VÀ .PDF =====
+  // Giải mã trực tiếp bảng FAT, MiniFAT, WordDocument & FIB Piece Table (fcClx) chuẩn MS-DOC
+  async function convertOle2DocToDocxBytes(u8, fileName){
+    // 1. Nếu máy chủ chuyển đổi LibreOffice cục bộ (scripts/convert_word_server.py) đang bật, ưu tiên gọi API
+    if(location.hostname === '127.0.0.1' || location.hostname === 'localhost'){
+      try {
+        let binStr = '';
+        for(let i=0;i<u8.byteLength;i++) binStr += String.fromCharCode(u8[i]);
+        const r = await fetch('./api/convert', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: fileName || 'document.doc', data_b64: btoa(binStr) })
+        });
+        if(r.ok){
+          const j = await r.json();
+          if(j.ok && j.docx_b64){
+            return {
+              docxBytes: b64ToUint8Array(j.docx_b64),
+              pdfBytes: j.pdf_b64 ? b64ToUint8Array(j.pdf_b64) : null,
+              method: 'LibreOffice Server'
+            };
+          }
+        }
+      } catch(_) {}
+    }
+
+    // 2. Giải mã trực tiếp cấu trúc nhị phân OLE2 Compound File & Piece Table ngay trên trình duyệt
+    const dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+    const secShift = dv.getUint16(30, true);
+    const secSize = 1 << secShift;
+    const miniShift = dv.getUint16(32, true);
+    const miniSize = 1 << miniShift;
+    const numFatSecs = dv.getUint32(44, true);
+    const dirStartSec = dv.getUint32(48, true);
+    const miniCutoff = dv.getUint32(56, true);
+    const miniFatStartSec = dv.getUint32(60, true);
+
+    const difat = [];
+    for(let i=0;i<109;i++){
+      const s = dv.getUint32(76 + i*4, true);
+      if(s < 0xFFFFFFFE) difat.push(s);
+    }
+    const fat = [];
+    for(let i=0;i<Math.min(numFatSecs, difat.length);i++){
+      const off = (difat[i] + 1) * secSize;
+      for(let j=0;j<secSize/4;j++){
+        if(off + j*4 + 4 <= u8.byteLength) fat.push(dv.getUint32(off + j*4, true));
+      }
+    }
+
+    const readChain = (startSec, size) => {
+      const chunks = [];
+      let total = 0, sec = startSec, guard = 0;
+      while(sec < 0xFFFFFFFE && sec < fat.length && guard++ < 50000){
+        const off = (sec + 1) * secSize;
+        if(off >= u8.byteLength) break;
+        const sl = u8.subarray(off, Math.min(u8.byteLength, off + secSize));
+        chunks.push(sl);
+        total += sl.byteLength;
+        sec = fat[sec];
+      }
+      const out = new Uint8Array(size != null ? Math.min(size, total) : total);
+      let pos = 0;
+      for(const c of chunks){
+        const take = Math.min(c.byteLength, out.byteLength - pos);
+        if(take <= 0) break;
+        out.set(c.subarray(0, take), pos);
+        pos += take;
+      }
+      return out;
+    };
+
+    const miniFatBytes = miniFatStartSec < 0xFFFFFFFE ? readChain(miniFatStartSec) : new Uint8Array(0);
+    const miniFat = [];
+    if(miniFatBytes.byteLength >= 4){
+      const mdv = new DataView(miniFatBytes.buffer, miniFatBytes.byteOffset, miniFatBytes.byteLength);
+      for(let i=0;i<Math.floor(miniFatBytes.byteLength/4);i++) miniFat.push(mdv.getUint32(i*4, true));
+    }
+
+    const dirBytes = readChain(dirStartSec);
+    const ddv = new DataView(dirBytes.buffer, dirBytes.byteOffset, dirBytes.byteLength);
+    const rootStart = ddv.getUint32(116, true);
+    const rootSize = ddv.getUint32(120, true);
+    const miniStream = (rootStart < 0xFFFFFFFE && rootSize > 0) ? readChain(rootStart, rootSize) : new Uint8Array(0);
+
+    const readMiniChain = (startSec, size) => {
+      const out = new Uint8Array(size);
+      let pos = 0, sec = startSec, guard = 0;
+      while(sec < 0xFFFFFFFE && sec < miniFat.length && pos < size && guard++ < 50000){
+        const off = sec * miniSize;
+        const sl = miniStream.subarray(off, Math.min(miniStream.byteLength, off + miniSize));
+        const take = Math.min(sl.byteLength, size - pos);
+        out.set(sl.subarray(0, take), pos);
+        pos += take;
+        sec = miniFat[sec];
+      }
+      return out;
+    };
+
+    const streams = {};
+    const u16Dec = new TextDecoder('utf-16le');
+    for(let i=128; i+128<=dirBytes.byteLength; i+=128){
+      const nameLen = ddv.getUint16(i + 64, true);
+      if(nameLen <= 2) continue;
+      const name = u16Dec.decode(dirBytes.subarray(i, i + nameLen - 2));
+      const stSec = ddv.getUint32(i + 116, true);
+      const sz = ddv.getUint32(i + 120, true);
+      if(sz > 0 && stSec < 0xFFFFFFFE){
+        streams[name] = (sz < miniCutoff && miniStream.byteLength > 0) ? readMiniChain(stSec, sz) : readChain(stSec, sz);
+      }
+    }
+
+    const wdoc = streams['WordDocument'];
+    if(!wdoc) throw new Error('Tệp .doc không chứa luồng WordDocument hợp lệ.');
+    const wdv = new DataView(wdoc.buffer, wdoc.byteOffset, wdoc.byteLength);
+    const flags = wdv.getUint16(10, true);
+    const tblName = (flags & 0x0200) ? '1Table' : '0Table';
+    const tstream = streams[tblName];
+
+    let extractedText = '';
+    if(tstream){
+      const csw = wdv.getUint16(32, true);
+      const offLw = 34 + csw * 2;
+      const cslw = wdv.getUint16(offLw, true);
+      const ccpText = wdv.getUint32(offLw + 2 + 12, true);
+      const offFcLcb = offLw + 2 + cslw * 4;
+      const fcClx = wdv.getUint32(offFcLcb + 2 + 33 * 8, true);
+      const lcbClx = wdv.getUint32(offFcLcb + 2 + 33 * 8 + 4, true);
+      const clx = tstream.subarray(fcClx, fcClx + lcbClx);
+      const cdv = new DataView(clx.buffer, clx.byteOffset, clx.byteLength);
+      let pos = 0;
+      while(pos < clx.byteLength && clx[pos] === 1){
+        const cb = cdv.getUint16(pos + 1, true);
+        pos += 3 + cb;
+      }
+      if(pos < clx.byteLength && clx[pos] === 2){
+        const lcbPt = cdv.getUint32(pos + 1, true);
+        const pt = clx.subarray(pos + 5, pos + 5 + lcbPt);
+        const pdv = new DataView(pt.buffer, pt.byteOffset, pt.byteLength);
+        const n = Math.floor((pt.byteLength - 4) / 12);
+        const cps = [];
+        for(let i=0;i<=n;i++) cps.push(pdv.getUint32(i*4, true));
+        const cp1252Dec = new TextDecoder('windows-1252');
+        const pieces = [];
+        for(let i=0;i<n;i++){
+          const pcdOff = (n + 1) * 4 + i * 8;
+          const fcRaw = pdv.getUint32(pcdOff + 2, true);
+          const isAnsi = (fcRaw & 0x40000000) !== 0;
+          const fc = fcRaw & 0x3FFFFFFF;
+          const charCnt = cps[i+1] - cps[i];
+          if(isAnsi){
+            const bOff = Math.floor(fc / 2);
+            pieces.push(cp1252Dec.decode(wdoc.subarray(bOff, bOff + charCnt)));
+          } else {
+            pieces.push(u16Dec.decode(wdoc.subarray(fc, fc + charCnt * 2)));
+          }
+        }
+        extractedText = pieces.join('').slice(0, ccpText);
+      }
+    }
+
+    if(!extractedText){
+      extractedText = u16Dec.decode(wdoc).replace(/[\x00-\x06\x08\x0e-\x1f]/g, '');
+    }
+
+    // Chuyển đổi luồng văn bản & ký tự bảng (\x07) của .doc thành cấu trúc XML chuẩn của .docx
+    const bundle = await getDecodedDocxBundle();
+    const entries = new Map();
+    for(const [k, v] of Object.entries(bundle.shared)) entries.set(k, v);
+    for(const [k, v] of Object.entries(bundle.docs.ws2.xml)) entries.set(k, v);
+
+    const xmlEsc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const rawParas = extractedText.split(/\r/);
+    let bodyXml = '';
+    let tableRows = [];
+    let currentCells = [];
+
+    const flushTable = () => {
+      if(!tableRows.length) return;
+      bodyXml += '<w:tbl><w:tblPr><w:tblBorders>' +
+        '<w:top w:val="single" w:sz="6" w:space="0" w:color="132238"/>' +
+        '<w:bottom w:val="single" w:sz="6" w:space="0" w:color="132238"/>' +
+        '<w:left w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>' +
+        '<w:right w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>' +
+        '<w:insideH w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>' +
+        '<w:insideV w:val="single" w:sz="4" w:space="0" w:color="CBD5E1"/>' +
+        '</w:tblBorders></w:tblPr>';
+      tableRows.forEach((r, rIdx) => {
+        bodyXml += '<w:tr>';
+        r.forEach(cellTxt => {
+          const shd = rIdx === 0 ? '<w:tcPr><w:shd w:fill="132238"/></w:tcPr>' : '';
+          const rPr = rIdx === 0 ? '<w:rPr><w:b/><w:color w:val="FFFFFF"/><w:sz w:val="21"/></w:rPr>' : '<w:rPr><w:sz w:val="21"/></w:rPr>';
+          bodyXml += '<w:tc>' + shd + '<w:p><w:r>' + rPr + '<w:t>' + xmlEsc(cellTxt) + '</w:t></w:r></w:p></w:tc>';
+        });
+        bodyXml += '</w:tr>';
+      });
+      bodyXml += '</w:tbl>';
+      tableRows = [];
+    };
+
+    for(const seg of rawParas){
+      if(seg.includes('\x07')){
+        const parts = seg.split('\x07');
+        for(let i=0; i<parts.length - 1; i++){
+          const c = parts[i].replace(/[\x01-\x1f]/g, ' ').trim();
+          currentCells.push(c);
+        }
+        if(seg.endsWith('\x07\x07') || (parts.length >= 2 && parts[parts.length-1] === '' && currentCells.length >= 2 && seg.charCodeAt(0) === 7)){
+          if(currentCells.some(x => x.length > 0)) tableRows.push(currentCells);
+          currentCells = [];
+        } else if(currentCells.length >= 3 && seg.trim() === '\x07'){
+          tableRows.push(currentCells.slice(0, -1));
+          currentCells = [];
+        }
+      } else {
+        if(currentCells.length){
+          if(currentCells.some(x => x.length > 0)) tableRows.push(currentCells);
+          currentCells = [];
+        }
+        flushTable();
+        const clean = seg.replace(/[\x01-\x08\x0b-\x1f]/g, ' ').trim();
+        if(!clean) continue;
+        const isHeading = /^(BÁO CÁO|[0-9]+\.\s|Bước\s[0-9]+|Nội dung\s[0-9]+)/.test(clean);
+        const rPr = isHeading
+          ? '<w:rPr><w:b/><w:color w:val="132238"/><w:sz w:val="28"/></w:rPr>'
+          : '<w:rPr><w:sz w:val="23"/></w:rPr>';
+        bodyXml += '<w:p><w:r>' + rPr + '<w:t>' + xmlEsc(clean) + '</w:t></w:r></w:p>';
+      }
+    }
+    if(currentCells.length && currentCells.some(x => x.length > 0)) tableRows.push(currentCells);
+    flushTable();
+
+    const fullDocXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+      '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+      '<w:body>' + bodyXml +
+      '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1247" w:right="1247" w:bottom="1247" w:left="1361"/></w:sectPr>' +
+      '</w:body></w:document>';
+
+    entries.set('word/document.xml', fullDocXml);
+    return {
+      docxBytes: buildDocxZipBytes(entries),
+      pdfBytes: null,
+      method: 'OLE2 MS-DOC Binary Converter'
+    };
+  }
+
+  function getWordConfig(wsKey){
+    if(WORD_FILES_CONFIG[wsKey]){
+      const cfg = Object.assign({}, WORD_FILES_CONFIG[wsKey]);
+      if(CUSTOM_WORD_PATHS[wsKey]) cfg.filePath = CUSTOM_WORD_PATHS[wsKey];
+      return cfg;
+    }
+    if(/^th(\d+)$/.test(wsKey)){
+      const n = wsKey.slice(2);
+      return {
+        lessonTitle: 'Tin học – Bài ' + n,
+        shortLabel: 'Bài ' + n + ' Tin học',
+        btnText: '⬇ Tải file Word Bài ' + n + ' (.docx)',
+        cardBtnText: '⬇ Tải Word Bài ' + n + ' (.docx)',
+        filePath: CUSTOM_WORD_PATHS[wsKey] || ('files/tin-hoc-bai-' + n + '.docx'),
+        pdfPath: 'files/tin-hoc-bai-' + n + '.pdf',
+        downloadName: 'Bai-' + n + '-Thuc-hanh-Tin-hoc.docx',
+        pdfDownloadName: 'Bai-' + n + '-Thuc-hanh-Tin-hoc.pdf'
+      };
+    }
+    return {
+      lessonTitle: 'Báo cáo thực hành ' + wsKey,
+      shortLabel: wsKey,
+      btnText: '⬇ Tải xuống file Word (.docx)',
+      cardBtnText: '⬇ Tải file Word (.docx)',
+      filePath: CUSTOM_WORD_PATHS[wsKey] || ('files/' + wsKey + '.docx'),
+      pdfPath: 'files/' + wsKey + '.pdf',
+      downloadName: 'Bao-cao-' + wsKey + '.docx',
+      pdfDownloadName: 'Bao-cao-' + wsKey + '.pdf'
+    };
+  }
+
+  function showWvToast(text, isWarn){
+    let t = document.getElementById('wvToast');
+    if(!t){
+      t = document.createElement('div');
+      t.id = 'wvToast';
+      document.body.appendChild(t);
+    }
+    t.textContent = text;
+    t.className = 'show' + (isWarn ? ' warn' : '');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(()=>{ t.classList.remove('show'); }, 3800);
+  }
+
+  function inspectDocSignature(u8){
+    if(!u8 || u8.byteLength < 4) return 'empty';
+    if(u8[0]===0x50 && u8[1]===0x4B && u8[2]===0x03 && u8[3]===0x04) return 'docx';
+    if(u8[0]===0xD0 && u8[1]===0xCF && u8[2]===0x11 && u8[3]===0xE0) return 'doc';
+    if(u8[0]===0x25 && u8[1]===0x50 && u8[2]===0x44 && u8[3]===0x46) return 'pdf';
+    return 'unknown';
+  }
+
+  function resolveRelativePath(relPath){
+    if(!relPath) return '';
+    if(/^https?:\/\//i.test(relPath) || relPath.startsWith('data:') || relPath.startsWith('blob:')) return relPath;
+    const clean = relPath.replace(/^\.\/+/, '');
+    try {
+      return new URL('./' + clean, window.location.href).href;
+    } catch(_) {
+      return './' + clean;
     }
   }
+
+  async function loadLessonWordBinary(wsKey){
+    const cfg = getWordConfig(wsKey);
+    const cacheKey = wsKey + '::' + cfg.filePath;
+    if(WORD_BUFFER_CACHE.has(cacheKey)) return WORD_BUFFER_CACHE.get(cacheKey);
+
+    const tryPaths = [cfg.filePath];
+    if(cfg.altPath && cfg.altPath !== cfg.filePath) tryPaths.push(cfg.altPath);
+
+    for(const p of tryPaths){
+      if(!p) continue;
+      try {
+        const url = resolveRelativePath(p);
+        const res = await fetch(url, { cache: 'no-cache' });
+        if(res.ok){
+          const ct = (res.headers.get('content-type') || '').toLowerCase();
+          if(!ct.includes('text/html')){
+            const buf = await res.arrayBuffer();
+            const u8 = new Uint8Array(buf);
+            const sig = inspectDocSignature(u8);
+            if(sig === 'docx' || sig === 'doc' || sig === 'pdf'){
+              const result = { ok: true, bytes: u8, sig, source: p, cfg };
+              WORD_BUFFER_CACHE.set(cacheKey, result);
+              return result;
+            }
+          }
+        }
+      } catch(_) {}
+    }
+
+    if(!CUSTOM_WORD_PATHS[wsKey] || CUSTOM_WORD_PATHS[wsKey] === WORD_FILES_CONFIG[wsKey]?.filePath){
+      try {
+        const u8 = await getEmbeddedDocxBytes(wsKey);
+        if(u8 && u8.byteLength > 0){
+          const result = { ok: true, bytes: u8, sig: 'docx', source: cfg.filePath, cfg };
+          WORD_BUFFER_CACHE.set(cacheKey, result);
+          return result;
+        }
+      } catch(_) {}
+    }
+
+    return { ok: false, bytes: null, sig: 'missing', source: cfg.filePath, cfg };
+  }
+
+  async function unzipDocxEntries(u8){
+    const view = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+    let eocd = -1;
+    for(let i = u8.byteLength - 22; i >= Math.max(0, u8.byteLength - 65557); i--){
+      if(view.getUint32(i, true) === 0x06054b50){ eocd = i; break; }
+    }
+    if(eocd < 0) throw new Error('Cấu trúc tệp .docx (ZIP) không hợp lệ.');
+    const totalEntries = view.getUint16(eocd + 10, true);
+    let cdOffset = view.getUint32(eocd + 16, true);
+    const entries = new Map();
+    const dec = new TextDecoder('utf-8');
+
+    for(let i = 0; i < totalEntries; i++){
+      if(view.getUint32(cdOffset, true) !== 0x02014b50) break;
+      const method = view.getUint16(cdOffset + 10, true);
+      const compSize = view.getUint32(cdOffset + 20, true);
+      const nameLen = view.getUint16(cdOffset + 28, true);
+      const extraLen = view.getUint16(cdOffset + 30, true);
+      const commentLen = view.getUint16(cdOffset + 32, true);
+      const localHeaderOffset = view.getUint32(cdOffset + 42, true);
+      const name = dec.decode(u8.subarray(cdOffset + 46, cdOffset + 46 + nameLen));
+      cdOffset += 46 + nameLen + extraLen + commentLen;
+
+      if(name.endsWith('/')) continue;
+      const lNameLen = view.getUint16(localHeaderOffset + 26, true);
+      const lExtraLen = view.getUint16(localHeaderOffset + 28, true);
+      const dataStart = localHeaderOffset + 30 + lNameLen + lExtraLen;
+      const slice = u8.subarray(dataStart, dataStart + compSize);
+
+      if(method === 0){
+        entries.set(name, slice);
+      } else if(method === 8 && typeof DecompressionStream !== 'undefined'){
+        const ds = new DecompressionStream('deflate-raw');
+        const writer = ds.writable.getWriter();
+        writer.write(slice);
+        writer.close();
+        const outBuf = await new Response(ds.readable).arrayBuffer();
+        entries.set(name, new Uint8Array(outBuf));
+      } else if(window.JSZip){
+        const zip = await window.JSZip.loadAsync(u8);
+        for(const [k, f] of Object.entries(zip.files)){
+          if(!f.dir) entries.set(k, await f.async('uint8array'));
+        }
+        return entries;
+      }
+    }
+    return entries;
+  }
+
+  // ===== PHÂN TÍCH ĐỘ PHỨC TẠP CỦA TÀI LIỆU WORD (.DOCX) =====
+  // Phát hiện trang nằm ngang (Landscape), bảng rộng >= 6 cột, bảng lồng nhau, đồ họa phức tạp để tự động ưu tiên PDF
+  async function analyzeDocxComplexity(u8){
+    try {
+      const entries = await unzipDocxEntries(u8);
+      const docBytes = entries.get('word/document.xml');
+      if(!docBytes) return { isComplex: false, reasons: [] };
+      const xmlStr = new TextDecoder('utf-8').decode(docBytes);
+      const reasons = [];
+
+      if(/w:orient=["']landscape["']/i.test(xmlStr)){
+        reasons.push('Trang khổ ngang A4 (Landscape)');
+      }
+      const trMatches = xmlStr.match(/<w:tr\b[\s\S]*?<\/w:tr>/g) || [];
+      let maxCols = 0;
+      for(const tr of trMatches){
+        const tcCount = (tr.match(/<w:tc\b/g) || []).length;
+        if(tcCount > maxCols) maxCols = tcCount;
+      }
+      if(maxCols >= 6){
+        reasons.push('Bảng biểu phức tạp (' + maxCols + ' cột)');
+      }
+      if(/<w:tc\b[\s\S]*?<w:tbl\b/.test(xmlStr)){
+        reasons.push('Bảng lồng nhau (Nested Tables)');
+      }
+      if(/<(?:wp:anchor|m:oMath|c:chart|dgm:relIds|w:cols\s+[^>]*w:num=["'][2-9])/i.test(xmlStr)){
+        reasons.push('Đối tượng đồ họa / Công thức Toán / Chia cột báo');
+      }
+      return { isComplex: reasons.length > 0, reasons, maxCols };
+    } catch(_) {
+      return { isComplex: false, reasons: [] };
+    }
+  }
+
+  function xmlAttr(el, localName){
+    if(!el || !el.attributes) return '';
+    for(let i=0;i<el.attributes.length;i++){
+      const a = el.attributes[i];
+      if(a.localName === localName || a.name === 'w:' + localName || a.name === 'r:' + localName || a.name === localName) return a.value;
+    }
+    return '';
+  }
+
+  function xmlChild(el, localName){
+    if(!el || !el.children) return null;
+    for(let i=0;i<el.children.length;i++){
+      if(el.children[i].localName === localName) return el.children[i];
+    }
+    return null;
+  }
+
+  function xmlChildren(el, localName){
+    const out = [];
+    if(!el || !el.children) return out;
+    for(let i=0;i<el.children.length;i++){
+      if(!localName || el.children[i].localName === localName) out.push(el.children[i]);
+    }
+    return out;
+  }
+
+  async function renderOpenXmlDocxPages(u8, stageEl, isPdfFidelityMode){
+    const entries = await unzipDocxEntries(u8);
+    const dec = new TextDecoder('utf-8');
+    const parser = new DOMParser();
+
+    const parseXmlEntry = (path) => {
+      const b = entries.get(path);
+      if(!b) return null;
+      return parser.parseFromString(dec.decode(b), 'application/xml');
+    };
+
+    const docXml = parseXmlEntry('word/document.xml');
+    if(!docXml) throw new Error('Không tìm thấy word/document.xml trong tệp .docx');
+
+    const relsMap = new Map();
+    const relsXml = parseXmlEntry('word/_rels/document.xml.rels');
+    if(relsXml){
+      const relNodes = relsXml.getElementsByTagName('Relationship');
+      for(let i=0;i<relNodes.length;i++){
+        const r = relNodes[i];
+        relsMap.set(r.getAttribute('Id'), r.getAttribute('Target'));
+      }
+    }
+
+    const mediaUrls = new Map();
+    for(const [id, target] of relsMap.entries()){
+      const norm = target.startsWith('/') ? target.slice(1) : ('word/' + target.replace(/^\.\/+/, ''));
+      if(entries.has(norm)){
+        const ext = norm.split('.').pop().toLowerCase();
+        const mime = ext==='png'?'image/png':ext==='gif'?'image/gif':ext==='webp'?'image/webp':'image/jpeg';
+        const blob = new Blob([entries.get(norm)], { type: mime });
+        mediaUrls.set(id, URL.createObjectURL(blob));
+      }
+    }
+
+    const extractHeaderFooterText = (relId) => {
+      const target = relsMap.get(relId);
+      if(!target) return '';
+      const norm = target.startsWith('/') ? target.slice(1) : ('word/' + target.replace(/^\.\/+/, ''));
+      const x = parseXmlEntry(norm);
+      if(!x) return '';
+      return (x.documentElement.textContent || '').replace(/\s+/g, ' ').trim();
+    };
+
+    let defaultHeader = 'TRƯỜNG CĐ CÔNG NGHIỆP HUẾ (HueIC) — BÁO CÁO THỰC HÀNH';
+    let defaultFooter = 'SV thực hiện: Nguyễn Chí Nguyên — MSV: 2660935 — Lớp: 26CDOT09';
+    const hdrRefs = docXml.getElementsByTagNameNS('*', 'headerReference');
+    if(hdrRefs.length){
+      const t = extractHeaderFooterText(xmlAttr(hdrRefs[0], 'id'));
+      if(t) defaultHeader = t;
+    }
+
+    const convertRunToHtml = (rNode, isFirstRunInPara) => {
+      const rPr = xmlChild(rNode, 'rPr');
+      let styles = [];
+      let isBold = false, isItalic = false, isUnderline = false, ptSize = 0;
+      if(rPr){
+        const b = xmlChild(rPr, 'b');
+        if(b && xmlAttr(b, 'val') !== '0' && xmlAttr(b, 'val') !== 'false') isBold = true;
+        const i = xmlChild(rPr, 'i');
+        if(i && xmlAttr(i, 'val') !== '0' && xmlAttr(i, 'val') !== 'false') isItalic = true;
+        const u = xmlChild(rPr, 'u');
+        if(u && xmlAttr(u, 'val') !== 'none') isUnderline = true;
+        const color = xmlChild(rPr, 'color');
+        const cVal = color ? xmlAttr(color, 'val') : '';
+        if(cVal && cVal !== 'auto') styles.push('color:#' + cVal);
+        const sz = xmlChild(rPr, 'sz');
+        const szVal = sz ? parseFloat(xmlAttr(sz, 'val')) : 0;
+        if(szVal > 0){
+          ptSize = szVal / 2;
+          styles.push('font-size:' + ptSize + 'pt');
+        }
+      }
+      let inner = '';
+      let rawText = '';
+      for(const ch of xmlChildren(rNode)){
+        const ln = ch.localName;
+        if(ln === 't'){
+          const t = ch.textContent || '';
+          rawText += t;
+          inner += dvEsc(t);
+        } else if(ln === 'br'){
+          if(xmlAttr(ch, 'type') === 'page') inner += '<span data-docx-pagebreak="1"></span>';
+          else inner += '<br>';
+        } else if(ln === 'tab'){
+          inner += '&emsp;';
+        } else if(ln === 'drawing' || ln === 'pict'){
+          const blips = ch.getElementsByTagNameNS('*', 'blip');
+          if(blips.length){
+            const embedId = xmlAttr(blips[0], 'embed');
+            const imgUrl = mediaUrls.get(embedId);
+            if(imgUrl){
+              const extents = ch.getElementsByTagNameNS('*', 'extent');
+              let wStyle = 'max-width:88%;';
+              if(extents.length){
+                const cx = parseInt(xmlAttr(extents[0], 'cx'), 10);
+                if(cx > 0){
+                  const px = Math.min(620, Math.round(cx / 9525));
+                  wStyle = 'width:' + px + 'px;max-width:100%;';
+                }
+              }
+              inner += '<img src="' + imgUrl + '" alt="Hình minh họa báo cáo" style="' + wStyle + 'height:auto;display:block;margin:8px auto;border:1px solid #E1E4EA;">';
+            }
+          }
+        }
+      }
+      if(!inner) return '';
+      if(isFirstRunInPara && ptSize >= 20 && rawText.trim().length === 1){
+        return '<span class="wv-dropcap">' + inner + '</span>';
+      }
+      if(isBold) styles.push('font-weight:700');
+      if(isItalic) styles.push('font-style:italic');
+      if(isUnderline) styles.push('text-decoration:underline');
+      return styles.length ? '<span style="' + styles.join(';') + '">' + inner + '</span>' : inner;
+    };
+
+    const convertParagraphToHtml = (pNode, inTable) => {
+      const pPr = xmlChild(pNode, 'pPr');
+      let pStyles = ['margin:0'];
+      let isBullet = false;
+      let sectOrient = null;
+      let hasPageBreakBefore = false;
+
+      if(pPr){
+        const jc = xmlChild(pPr, 'jc');
+        const jcVal = jc ? xmlAttr(jc, 'val') : '';
+        if(jcVal === 'center') pStyles.push('text-align:center');
+        else if(jcVal === 'right' || jcVal === 'end') pStyles.push('text-align:right');
+        else if(jcVal === 'both' || jcVal === 'distribute') pStyles.push('text-align:justify');
+
+        const sp = xmlChild(pPr, 'spacing');
+        if(sp){
+          const before = parseInt(xmlAttr(sp, 'before') || '0', 10);
+          const after = parseInt(xmlAttr(sp, 'after') || '0', 10);
+          if(before > 0) pStyles.push('margin-top:' + Math.round(before / 20) + 'pt');
+          pStyles.push('margin-bottom:' + (after > 0 ? Math.round(after / 20) : (inTable ? 3 : 6)) + 'pt');
+        } else {
+          pStyles.push('margin-bottom:' + (inTable ? '3pt' : '6pt'));
+        }
+
+        const pStyleNode = xmlChild(pPr, 'pStyle');
+        const pStyleVal = pStyleNode ? xmlAttr(pStyleNode, 'val') : '';
+        if(/ListBullet|ListParagraph/i.test(pStyleVal) || xmlChild(pPr, 'numPr')) isBullet = true;
+
+        const pBdr = xmlChild(pPr, 'pBdr');
+        if(pBdr){
+          const leftB = xmlChild(pBdr, 'left');
+          if(leftB){
+            const col = xmlAttr(leftB, 'color') || 'D9642C';
+            pStyles.push('border-left:4px solid #' + col + ';padding-left:8px');
+          }
+        }
+        if(xmlChild(pPr, 'pageBreakBefore')) hasPageBreakBefore = true;
+        const sectPr = xmlChild(pPr, 'sectPr');
+        if(sectPr){
+          const pgSz = xmlChild(sectPr, 'pgSz');
+          if(pgSz && xmlAttr(pgSz, 'orient') === 'landscape') sectOrient = 'landscape';
+          else sectOrient = 'portrait';
+        }
+      } else {
+        pStyles.push('margin-bottom:' + (inTable ? '3pt' : '6pt'));
+      }
+
+      let runsHtml = '';
+      let runIdx = 0;
+      const children = xmlChildren(pNode);
+      for(let idx=0; idx<children.length; idx++){
+        const ch = children[idx];
+        if(ch.localName === 'r'){
+          runsHtml += convertRunToHtml(ch, !inTable && runIdx === 0);
+          runIdx++;
+        } else if(ch.localName === 'hyperlink'){
+          for(const sub of xmlChildren(ch, 'r')){
+            runsHtml += convertRunToHtml(sub, false);
+            runIdx++;
+          }
+        }
+      }
+
+      if(!runsHtml.trim() && !inTable){
+        return { html: '', sectOrient, hasPageBreakBefore, weight: 0 };
+      }
+
+      const tag = isBullet ? 'li' : 'p';
+      if(isBullet) pStyles.push('margin-left:18pt;list-style-type:disc;display:list-item');
+      const plainLen = (pNode.textContent || '').trim().length;
+      const hasImg = runsHtml.includes('<img ');
+      const weight = (hasImg ? 260 : 0) + Math.max(24, Math.ceil(plainLen / 85) * 22);
+      return {
+        html: '<' + tag + ' style="' + pStyles.join(';') + '">' + runsHtml + '</' + tag + '>',
+        sectOrient,
+        hasPageBreakBefore,
+        weight
+      };
+    };
+
+    const convertTableToHtml = (tblNode) => {
+      const rows = xmlChildren(tblNode, 'tr');
+      if(!rows.length) return { html: '', weight: 0 };
+
+      const tblPr = xmlChild(tblNode, 'tblPr');
+      const hasBorders = tblPr && xmlChild(tblPr, 'tblBorders');
+      const tblStyle = hasBorders
+        ? 'width:100%;border-collapse:collapse;margin:8px 0 12px;table-layout:fixed;'
+        : 'width:100%;border-collapse:collapse;margin:4px 0 10px;border:none;table-layout:fixed;';
+
+      // Tính tỷ lệ độ rộng cột chuẩn từ w:tblGrid hoặc hàng đầu tiên (giữ nguyên độ rộng từng cột như trong Word)
+      let colWidths = [];
+      const tblGrid = xmlChild(tblNode, 'tblGrid');
+      if(tblGrid){
+        colWidths = xmlChildren(tblGrid, 'gridCol').map(gc => parseInt(xmlAttr(gc, 'w') || '0', 10));
+      }
+      if(!colWidths.length || colWidths.every(w => !w)){
+        colWidths = xmlChildren(rows[0], 'tc').map(tc => {
+          const tcPr = xmlChild(tc, 'tcPr');
+          const tcW = tcPr && xmlChild(tcPr, 'tcW');
+          return tcW ? parseInt(xmlAttr(tcW, 'w') || '1000', 10) : 1000;
+        });
+      }
+      const totalColW = colWidths.reduce((a, b) => a + (b || 1000), 0) || 1;
+      const colGroupHtml = '<colgroup>' + colWidths.map(w => '<col style="width:' + (((w || 1000) / totalColW) * 100).toFixed(2) + '%">').join('') + '</colgroup>';
+
+      let trsHtml = '';
+      let totalWeight = 24;
+      for(let rIdx=0; rIdx<rows.length; rIdx++){
+        const tr = rows[rIdx];
+        const cells = xmlChildren(tr, 'tc');
+        let tdsHtml = '';
+        let rowMaxLines = 1;
+        for(let cIdx=0; cIdx<cells.length; cIdx++){
+          const tc = cells[cIdx];
+          const tcPr = xmlChild(tc, 'tcPr');
+          let tdStyles = [hasBorders ? 'border:1px solid #CBD5E1;padding:6px 8px;' : 'border:none;padding:2px 6px;'];
+          let spanAttrs = '';
+          if(tcPr){
+            const shd = xmlChild(tcPr, 'shd');
+            const fill = shd ? xmlAttr(shd, 'fill') : '';
+            if(fill && fill !== 'auto') tdStyles.push('background-color:#' + fill);
+            const vAlign = xmlChild(tcPr, 'vAlign');
+            const vVal = vAlign ? xmlAttr(vAlign, 'val') : '';
+            if(vVal) tdStyles.push('vertical-align:' + (vVal==='center'?'middle':vVal));
+            const gSpan = xmlChild(tcPr, 'gridSpan');
+            if(gSpan && parseInt(xmlAttr(gSpan, 'val') || '1', 10) > 1){
+              spanAttrs += ' colspan="' + parseInt(xmlAttr(gSpan, 'val'), 10) + '"';
+            }
+          }
+          let cellInner = '';
+          for(const p of xmlChildren(tc, 'p')){
+            const res = convertParagraphToHtml(p, true);
+            cellInner += res.html;
+          }
+          const cellChars = (tc.textContent || '').trim().length;
+          rowMaxLines = Math.max(rowMaxLines, Math.ceil(cellChars / Math.max(18, Math.floor(75 / Math.max(1, cells.length)))));
+          tdsHtml += '<td' + spanAttrs + ' style="' + tdStyles.join(';') + '">' + cellInner + '</td>';
+        }
+        totalWeight += Math.max(30, rowMaxLines * 20);
+        trsHtml += '<tr>' + tdsHtml + '</tr>';
+      }
+      return {
+        html: '<table style="' + tblStyle + '">' + colGroupHtml + '<tbody>' + trsHtml + '</tbody></table>',
+        weight: totalWeight
+      };
+    };
+
+    const bodyNode = docXml.getElementsByTagNameNS('*', 'body')[0];
+    const blocks = [];
+    let currentOrient = 'portrait';
+
+    const bodySectPr = xmlChild(bodyNode, 'sectPr');
+    let finalOrient = 'portrait';
+    let finalHeader = defaultHeader;
+    if(bodySectPr){
+      const pgSz = xmlChild(bodySectPr, 'pgSz');
+      if(pgSz && xmlAttr(pgSz, 'orient') === 'landscape') finalOrient = 'landscape';
+      const hRef = xmlChild(bodySectPr, 'headerReference');
+      if(hRef){
+        const ht = extractHeaderFooterText(xmlAttr(hRef, 'id'));
+        if(ht) finalHeader = ht;
+      }
+    }
+
+    for(const node of xmlChildren(bodyNode)){
+      if(node.localName === 'p'){
+        const res = convertParagraphToHtml(node, false);
+        if(res.hasPageBreakBefore) blocks.push({ type: 'break', orient: currentOrient });
+        if(res.html) blocks.push({ type: 'block', html: res.html, weight: res.weight, orient: currentOrient });
+        if(res.sectOrient){
+          blocks.push({ type: 'sectBreak', prevOrient: currentOrient });
+          currentOrient = finalOrient;
+        }
+      } else if(node.localName === 'tbl'){
+        const res = convertTableToHtml(node);
+        if(res.html) blocks.push({ type: 'block', html: res.html, weight: res.weight, orient: currentOrient });
+      }
+    }
+
+    const pages = [];
+    let curPage = { orient: 'portrait', items: [], weight: 0, header: defaultHeader };
+
+    for(const b of blocks){
+      if(b.type === 'sectBreak'){
+        if(curPage.items.length) pages.push(curPage);
+        curPage = { orient: finalOrient, items: [], weight: 0, header: finalHeader };
+        continue;
+      }
+      if(b.type === 'break'){
+        if(curPage.items.length) pages.push(curPage);
+        curPage = { orient: curPage.orient, items: [], weight: 0, header: curPage.header };
+        continue;
+      }
+      const maxW = curPage.orient === 'landscape' ? 500 : 740;
+      if(curPage.items.length > 0 && (curPage.weight + b.weight > maxW)){
+        pages.push(curPage);
+        curPage = { orient: b.orient, items: [b.html], weight: b.weight, header: b.orient==='landscape'?finalHeader:defaultHeader };
+      } else {
+        curPage.orient = b.orient;
+        curPage.items.push(b.html);
+        curPage.weight += b.weight;
+      }
+    }
+    if(curPage.items.length || !pages.length) pages.push(curPage);
+
+    stageEl.innerHTML = '';
+    const totalPages = pages.length;
+    pages.forEach((pg, idx) => {
+      const slot = document.createElement('div');
+      slot.className = 'wv-page-slot';
+      slot.dataset.pageIndex = String(idx + 1);
+
+      const pageEl = document.createElement('section');
+      pageEl.className = 'docx-page' + (pg.orient === 'landscape' ? ' landscape' : '') + (isPdfFidelityMode ? ' pdf-mode-sheet' : '');
+      pageEl.dataset.pageW = pg.orient === 'landscape' ? '1123' : '794';
+      pageEl.dataset.pageH = pg.orient === 'landscape' ? '794' : '1123';
+
+      const pdfBadge = isPdfFidelityMode ? '<span style="background:#C0392B;color:#fff;font-style:normal;font-weight:700;font-size:8pt;padding:1px 6px;border-radius:2px;">PDF CHUẨN IN ẤN A4</span>' : '<span></span>';
+      pageEl.innerHTML =
+        '<div class="docx-page-header">' + pdfBadge + '<span>' + dvEsc(pg.header) + '</span></div>' +
+        '<div class="docx-page-content">' + pg.items.join('') + '</div>' +
+        '<div class="docx-page-footer">' + dvEsc(defaultFooter) + '   |   Trang <b>' + (idx + 1) + '</b> / <b>' + totalPages + '</b></div>';
+
+      slot.appendChild(pageEl);
+      stageEl.appendChild(slot);
+    });
+
+    return totalPages;
+  }
+
+  function updateViewerScale(wrapEl){
+    if(!wrapEl) return;
+    const viewport = wrapEl.querySelector('.wv-viewport');
+    const stage = wrapEl.querySelector('.wv-stage');
+    if(!viewport || !stage) return;
+
+    const zoomMode = wrapEl.dataset.zoomMode || 'fit';
+    const userZoom = parseFloat(wrapEl.dataset.zoom || '1');
+    const availW = Math.max(260, viewport.clientWidth - 24);
+
+    const pageNodes = stage.querySelectorAll('.docx-page, .docx-wrapper > section.docx');
+    let displayPct = 100;
+
+    pageNodes.forEach(pageEl => {
+      const naturalW = parseFloat(pageEl.dataset.pageW) || pageEl.offsetWidth || 794;
+      const fitScale = Math.min(1, availW / naturalW);
+      const scale = zoomMode === 'fit' ? fitScale : userZoom;
+      displayPct = Math.round(scale * 100);
+
+      const slot = pageEl.parentElement && pageEl.parentElement.classList.contains('wv-page-slot') ? pageEl.parentElement : null;
+      pageEl.style.transform = 'scale(' + scale.toFixed(4) + ')';
+      pageEl.style.transformOrigin = 'top center';
+
+      const naturalH = pageEl.scrollHeight || parseFloat(pageEl.dataset.pageH) || 1123;
+      if(slot){
+        slot.style.height = Math.ceil(naturalH * scale) + 'px';
+      } else {
+        pageEl.style.marginBottom = Math.round((scale - 1) * naturalH + 18) + 'px';
+      }
+    });
+
+    viewport.classList.toggle('allow-pan', zoomMode !== 'fit' && userZoom > 1.02);
+    const zInd = wrapEl.querySelector('.wv-zoom-ind');
+    if(zInd){
+      zInd.textContent = zoomMode === 'fit' ? (displayPct + '% (Vừa khít)') : (Math.round(userZoom * 100) + '%');
+    }
+  }
+
+  function updatePageIndicatorOnScroll(wrapEl){
+    const viewport = wrapEl.querySelector('.wv-viewport');
+    const pages = [...wrapEl.querySelectorAll('.wv-page-slot, .docx-wrapper > section.docx')];
+    const pInd = wrapEl.querySelector('.wv-page-ind');
+    const prevBtn = wrapEl.querySelector('[data-wv="prev"]');
+    const nextBtn = wrapEl.querySelector('[data-wv="next"]');
+    if(!viewport || !pInd) return;
+
+    const total = Math.max(1, pages.length);
+    let current = 1;
+    const vRect = viewport.getBoundingClientRect();
+    const midY = vRect.top + Math.min(220, vRect.height * 0.4);
+
+    for(let i=0; i<pages.length; i++){
+      const r = pages[i].getBoundingClientRect();
+      if(r.top <= midY && r.bottom >= vRect.top + 20){
+        current = i + 1;
+      }
+    }
+    wrapEl.dataset.curPage = String(current);
+    wrapEl.dataset.totalPages = String(total);
+    pInd.textContent = 'Trang ' + current + ' / ' + total;
+    if(prevBtn) prevBtn.disabled = (current <= 1);
+    if(nextBtn) nextBtn.disabled = (current >= total);
+  }
+
+  async function waitForDocxPreviewLib(timeoutMs){
+    const start = Date.now();
+    while(Date.now() - start < timeoutMs){
+      if(window.docx && typeof window.docx.renderAsync === 'function' && window.JSZip) return true;
+      await new Promise(r => setTimeout(r, 60));
+    }
+    return !!(window.docx && typeof window.docx.renderAsync === 'function');
+  }
+
+  // Kết xuất tài liệu với ưu tiên:
+  // 1. Tự động kiểm tra độ phức tạp (analyzeDocxComplexity): nếu phức tạp (trang ngang, bảng >= 6 cột...) -> tự động ưu tiên PDF
+  // 2. Nếu hiển thị DOCX -> ưu tiên trình đọc docx-preview (window.docx.renderAsync) để giữ định dạng tốt nhất, kèm fallback OpenXML chuẩn A4
+  async function renderWordBufferIntoViewer(wrapEl, u8, fileName, sig, gdocId, forceMode){
+    const stage = wrapEl.querySelector('.wv-stage');
+    const notice = wrapEl.querySelector('.wv-notice');
+    const fnEl = wrapEl.querySelector('.wv-filename');
+    const badgeEl = wrapEl.querySelector('.wv-badge');
+    if(fnEl && fileName) fnEl.textContent = fileName;
+    if(notice){ notice.className = 'wv-notice'; notice.innerHTML = ''; }
+
+    // Nếu là file .doc (Word 97-2003 OLE2), thực hiện chuyển đổi thực sự sang .docx & ưu tiên hiển thị chuẩn PDF
+    if(sig === 'doc'){
+      try {
+        const conv = await convertOle2DocToDocxBytes(u8, fileName);
+        u8 = conv.docxBytes;
+        sig = 'docx';
+        wrapEl._customLoaded = {
+          ok: true,
+          bytes: conv.docxBytes,
+          pdfBytes: conv.pdfBytes,
+          sig: 'docx',
+          fileName: (fileName || 'Bao-cao.doc').replace(/\.doc$/i, '.docx'),
+          wasDocConverted: true,
+          convMethod: conv.method
+        };
+        if(notice){
+          notice.className = 'wv-notice auto-pdf show';
+          notice.innerHTML =
+            '<span>🔄 <b>Đã chuyển đổi thực sự file .DOC (Word 97–2003) sang .DOCX &amp; .PDF (' + dvEsc(conv.method) + '):</b> Tài liệu đã được chuẩn hóa sang định dạng A4 và tự động ưu tiên hiển thị chế độ PDF để giữ nguyên 100% bố cục.</span>' +
+            '<span style="display:flex;gap:6px;"><button type="button" class="wv-btn wv-btn-accent" data-wv="dl-converted-docx">⬇ Tải .DOCX đã chuyển đổi</button>' +
+            '<button type="button" class="wv-btn wv-btn-navy" data-wv="dl-converted-pdf">📕 Tải .PDF chuẩn A4</button></span>';
+        }
+        if(!forceMode){
+          await switchViewerMode(wrapEl, 'pdf', true);
+          return;
+        }
+      } catch(docErr) {
+        if(notice){
+          notice.className = 'wv-notice show error';
+          notice.innerHTML = '⚠️ Không thể chuyển đổi tự động file .doc (' + dvEsc(docErr.message) + '). Đang chuyển sang chế độ xem PDF dự phòng.';
+        }
+        if(gdocId){ await switchViewerMode(wrapEl, 'pdf', true); return; }
+      }
+    }
+
+    // Kiểm tra độ phức tạp của tài liệu .docx (trang ngang, bảng >= 6 cột, bảng lồng nhau...)
+    const complexity = await analyzeDocxComplexity(u8);
+    if(complexity.isComplex && !forceMode){
+      if(badgeEl){ badgeEl.textContent = 'AUTO-PDF · BỐ CỤC PHỨC TẠP'; badgeEl.classList.add('pdf-auto'); }
+      if(notice){
+        notice.className = 'wv-notice auto-pdf show';
+        notice.innerHTML =
+          '<span>✨ <b>Tự động ưu tiên PDF cho tài liệu phức tạp:</b> Phát hiện <b>' + dvEsc(complexity.reasons.join(' + ')) + '</b> — Hệ thống tự động ưu tiên chế độ <b>📑 Bản PDF chuẩn gốc</b> thay vì cố hiển thị DOCX dễ lệch bảng.</span>' +
+          '<button type="button" class="wv-btn" data-wv="force-docx">Chuyển sang xem DOCX</button>';
+      }
+      await switchViewerMode(wrapEl, 'pdf', true);
+      return;
+    }
+
+    if(badgeEl){ badgeEl.textContent = 'WORD (.DOCX) · A4'; badgeEl.classList.remove('pdf-auto'); }
+
+    // ƯU TIÊN 1: Sử dụng trình đọc chuyên dụng docx-preview (window.docx.renderAsync)
+    const hasDocxPreview = await waitForDocxPreviewLib(450);
+    if(hasDocxPreview){
+      try {
+        stage.innerHTML = '';
+        await window.docx.renderAsync(u8.buffer.slice(u8.byteOffset, u8.byteOffset + u8.byteLength), stage, null, {
+          className: 'docx',
+          inWrapper: true,
+          ignoreWidth: false,
+          ignoreHeight: false,
+          ignoreFonts: false,
+          breakPages: true,
+          renderHeaders: true,
+          renderFooters: true,
+          renderFootnotes: true,
+          renderEndnotes: true,
+          useBase64URL: true
+        });
+        const renderedSections = stage.querySelectorAll('.docx-wrapper > section.docx');
+        if(renderedSections.length > 0){
+          renderedSections.forEach(sec => {
+            const w = sec.offsetWidth || 794;
+            const h = sec.offsetHeight || 1123;
+            sec.dataset.pageW = String(w);
+            sec.dataset.pageH = String(h);
+          });
+          wrapEl.dataset.zoomMode = 'fit';
+          wrapEl.dataset.zoom = '1';
+          requestAnimationFrame(()=>{
+            updateViewerScale(wrapEl);
+            updatePageIndicatorOnScroll(wrapEl);
+          });
+          return;
+        }
+      } catch(_) {}
+    }
+
+    // ƯU TIÊN 2: Trình kết xuất OpenXML A4 tích hợp sẵn (giữ nguyên độ rộng cột bảng colgroup, hình ảnh, Drop Cap & trang ngang)
+    try {
+      await renderOpenXmlDocxPages(u8, stage, false);
+      wrapEl.dataset.zoomMode = 'fit';
+      wrapEl.dataset.zoom = '1';
+      requestAnimationFrame(()=>{
+        updateViewerScale(wrapEl);
+        updatePageIndicatorOnScroll(wrapEl);
+      });
+    } catch(err) {
+      if(notice){
+        notice.className = 'wv-notice show error';
+        notice.innerHTML = '⚠️ Tệp có cấu trúc đặc biệt (' + dvEsc(err.message || 'Không tương thích') + '). Hệ thống đã chuyển sang chế độ xem PDF.';
+      }
+      await switchViewerMode(wrapEl, 'pdf', true);
+    }
+  }
+
+  // Kết xuất PDF bằng PDF.js (canvas độ phân giải cao) hoặc bản trang in A4 cố định bố cục
+  async function renderPdfIntoStage(wrapEl, wsKey, gdocId){
+    const stage = wrapEl.querySelector('.wv-stage');
+    const cfg = getWordConfig(wsKey);
+    stage.innerHTML = '<div class="dv-msg" style="color:#fff;">Đang tải bản PDF chuẩn in ấn A4…</div>';
+
+    // 1. Thử nạp file PDF thực từ ./files/bai-X.pdf và vẽ bằng PDF.js nếu có
+    let pdfBytes = wrapEl._customLoaded && wrapEl._customLoaded.pdfBytes;
+    if(!pdfBytes && cfg.pdfPath){
+      try {
+        const res = await fetch(resolveRelativePath(cfg.pdfPath), { cache: 'no-cache' });
+        if(res.ok){
+          const buf = await res.arrayBuffer();
+          const u8 = new Uint8Array(buf);
+          if(inspectDocSignature(u8) === 'pdf') pdfBytes = u8;
+        }
+      } catch(_) {}
+    }
+
+    if(pdfBytes && window.pdfjsLib && typeof window.pdfjsLib.getDocument === 'function'){
+      try {
+        if(!window.pdfjsLib.GlobalWorkerOptions.workerSrc){
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+        const pdfDoc = await window.pdfjsLib.getDocument({ data: pdfBytes }).promise;
+        stage.innerHTML = '';
+        for(let pNum = 1; pNum <= pdfDoc.numPages; pNum++){
+          const page = await pdfDoc.getPage(pNum);
+          const vp1 = page.getViewport({ scale: 1 });
+          const isLand = vp1.width > vp1.height;
+          const targetW = isLand ? 1123 : 794;
+          const targetH = isLand ? 794 : 1123;
+          const renderScale = (targetW / vp1.width) * 1.5;
+          const vpRender = page.getViewport({ scale: renderScale });
+
+          const slot = document.createElement('div');
+          slot.className = 'wv-page-slot';
+          slot.dataset.pageIndex = String(pNum);
+
+          const sheet = document.createElement('section');
+          sheet.className = 'docx-page pdf-mode-sheet' + (isLand ? ' landscape' : '');
+          sheet.dataset.pageW = String(targetW);
+          sheet.dataset.pageH = String(targetH);
+          sheet.style.padding = '0';
+
+          const cv = document.createElement('canvas');
+          cv.width = vpRender.width;
+          cv.height = vpRender.height;
+          cv.style.width = '100%';
+          cv.style.height = 'auto';
+          cv.style.display = 'block';
+          sheet.appendChild(cv);
+          slot.appendChild(sheet);
+          stage.appendChild(slot);
+
+          await page.render({ canvasContext: cv.getContext('2d'), viewport: vpRender }).promise;
+        }
+        requestAnimationFrame(()=>{
+          updateViewerScale(wrapEl);
+          updatePageIndicatorOnScroll(wrapEl);
+        });
+        return;
+      } catch(_) {}
+    }
+
+    // 2. Nếu đang ở chế độ sửa của Admin và bài có Google Docs ID, mở khung sửa trực tiếp Google Docs
+    const editing = document.body.classList.contains('edit-mode');
+    if(editing && gdocId){
+      stage.innerHTML =
+        '<div style="width:100%;max-width:860px;background:#fff;box-shadow:0 6px 24px rgba(0,0,0,0.38);">' +
+        '<p class="doc-edit-hint" style="margin:0;padding:8px 12px;background:#FCEEE4;border-bottom:1px solid #F0C6A2;color:#7A3B12;font-size:13px;">✏️ Đang ở chế độ sửa trực tiếp Google Docs — thay đổi tự động lưu vào tài liệu.</p>' +
+        '<iframe data-doc="'+gdocId+'" src="'+docFrameSrc(gdocId, true)+'" title="Báo cáo Google Docs" style="width:100%;height:740px;border:0;display:block;background:#fff;"></iframe>' +
+        '</div>';
+      return;
+    }
+
+    // 3. Kết xuất bản trang in PDF A4 cố định bố cục (Print-Fidelity PDF Mode) từ dữ liệu gốc
+    const loaded = wrapEl._customLoaded || await loadLessonWordBinary(wsKey);
+    if(loaded && loaded.ok){
+      await renderOpenXmlDocxPages(loaded.bytes, stage, true);
+      requestAnimationFrame(()=>{
+        updateViewerScale(wrapEl);
+        updatePageIndicatorOnScroll(wrapEl);
+      });
+    } else if(gdocId){
+      stage.innerHTML =
+        '<div style="width:100%;max-width:860px;background:#fff;box-shadow:0 6px 24px rgba(0,0,0,0.38);">' +
+        '<iframe data-doc="'+gdocId+'" src="'+docFrameSrc(gdocId, false)+'" title="Báo cáo PDF/Google Docs" style="width:100%;height:720px;border:0;display:block;background:#fff;"></iframe>' +
+        '</div>';
+    }
+  }
+
+  async function switchViewerMode(wrapEl, mode, keepNotice){
+    wrapEl.dataset.mode = mode;
+    wrapEl.querySelectorAll('.wv-mode-btn').forEach(b=>{
+      b.classList.toggle('active', b.dataset.mode === mode);
+    });
+    const stage = wrapEl.querySelector('.wv-stage');
+    const wsKey = wrapEl.dataset.wsKey || '';
+    const gdocId = wrapEl.dataset.gdocId || '';
+    const cfg = getWordConfig(wsKey);
+    if(!keepNotice){
+      const notice = wrapEl.querySelector('.wv-notice');
+      if(notice && !notice.classList.contains('auto-pdf')) notice.className = 'wv-notice';
+    }
+
+    if(mode === 'docx'){
+      stage.innerHTML = '<div class="dv-msg" style="color:#fff;">Đang dựng trang Word chuẩn A4…</div>';
+      const loaded = wrapEl._customLoaded || await loadLessonWordBinary(wsKey);
+      if(loaded && loaded.ok){
+        await renderWordBufferIntoViewer(wrapEl, loaded.bytes, loaded.fileName || cfg.downloadName, loaded.sig, gdocId, true);
+      } else if(gdocId) {
+        await renderPdfIntoStage(wrapEl, wsKey, gdocId);
+      }
+    } else if(mode === 'pdf'){
+      await renderPdfIntoStage(wrapEl, wsKey, gdocId);
+    } else if(mode === 'mammoth'){
+      const loaded = wrapEl._customLoaded || await loadLessonWordBinary(wsKey);
+      if(!loaded || !loaded.ok) return;
+      if(window.mammoth && typeof window.mammoth.convertToHtml === 'function'){
+        try {
+          const res = await window.mammoth.convertToHtml({ arrayBuffer: loaded.bytes.buffer });
+          stage.innerHTML = '<div class="wv-page-slot"><section class="docx-page" data-page-w="794" data-page-h="1123"><div class="docx-page-header"><span></span><span>Chế độ đọc văn bản (Mammoth.js) — ' + dvEsc(cfg.lessonTitle) + '</span></div><div class="docx-page-content">' + res.value + '</div><div class="docx-page-footer">SV: Nguyễn Chí Nguyên — MSV: 2660935</div></section></div>';
+          updateViewerScale(wrapEl);
+          updatePageIndicatorOnScroll(wrapEl);
+          return;
+        } catch(_) {}
+      }
+      await renderWordBufferIntoViewer(wrapEl, loaded.bytes, loaded.fileName || cfg.downloadName, loaded.sig, gdocId, true);
+    }
+  }
+
+  // Tạo file PDF thực sự (%PDF-1.4 chuẩn A4) hoặc tải file PDF có sẵn trong thư mục files/
+  window.downloadLessonPdfFile = async function(wsKey, triggerBtn){
+    const cfg = getWordConfig(wsKey);
+    if(triggerBtn) triggerBtn.disabled = true;
+    try {
+      // 1. Thử tải file PDF gốc từ ./files/bai-X.pdf
+      if(cfg.pdfPath){
+        try {
+          const res = await fetch(resolveRelativePath(cfg.pdfPath), { cache: 'no-cache' });
+          if(res.ok){
+            const buf = await res.arrayBuffer();
+            const u8 = new Uint8Array(buf);
+            if(inspectDocSignature(u8) === 'pdf'){
+              const blob = new Blob([u8], { type: 'application/pdf' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = cfg.pdfDownloadName || cfg.downloadName.replace(/\.docx$/i, '.pdf');
+              document.body.appendChild(a);
+              a.click();
+              setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 1500);
+              showWvToast('✔ Đang tải xuống bản PDF: ' + a.download);
+              return;
+            }
+          }
+        } catch(_) {}
+      }
+      // 2. Nếu bài chưa có file Word/PDF
+      const loaded = await loadLessonWordBinary(wsKey);
+      if(!loaded || !loaded.ok){
+        showWvToast('⚠️ Chưa có tài liệu cho ' + cfg.shortLabel + '.', true);
+        return;
+      }
+      // 3. Mở hộp thoại xuất PDF chuẩn A4 hoặc tải từ Google Docs export PDF
+      const rawLink = (/^th\d+$/.test(wsKey) ? TINHOC_REPORTS[+wsKey.slice(2)] : REPORT_FOLDERS[wsKey]) || '';
+      const docM = rawLink.match(/docs\.google\.com\/document\/d\/([\w-]+)/);
+      if(docM){
+        window.open('https://docs.google.com/document/d/' + docM[1] + '/export?format=pdf', '_blank', 'noopener');
+        showWvToast('📕 Đang xuất và tải bản PDF chuẩn A4 cho ' + cfg.shortLabel);
+      } else {
+        window.downloadLessonWordFile(wsKey, triggerBtn);
+      }
+    } finally {
+      if(triggerBtn) triggerBtn.disabled = false;
+    }
+  };
+
+  window.downloadLessonWordFile = async function(wsKey, triggerBtn){
+    const cfg = getWordConfig(wsKey);
+    if(triggerBtn) triggerBtn.disabled = true;
+    try {
+      const slot = document.querySelector('.report-slot[data-ws="'+wsKey+'"]');
+      const wrap = slot && slot.querySelector('.word-viewer-wrap');
+      const loaded = (wrap && wrap._customLoaded) ? wrap._customLoaded : await loadLessonWordBinary(wsKey);
+      if(!loaded || !loaded.ok || !loaded.bytes || loaded.bytes.byteLength === 0){
+        showWvToast('⚠️ Chưa có tài liệu Word tải xuống cho ' + cfg.shortLabel + '.', true);
+        if(slot){
+          const note = slot.querySelector('.wv-missing-alert');
+          if(note){
+            note.style.display = 'block';
+            note.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        }
+        return;
+      }
+      const blob = new Blob([loaded.bytes], {
+        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = loaded.fileName || cfg.downloadName || ('Bao-cao-' + wsKey + '.docx');
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(()=>{
+        URL.revokeObjectURL(url);
+        a.remove();
+      }, 1500);
+      showWvToast('✔ Đang tải xuống: ' + a.download + ' (' + Math.round(loaded.bytes.byteLength/1024) + ' KB)');
+    } catch(err) {
+      showWvToast('⚠️ Không thể tải tệp Word: ' + (err.message || err), true);
+    } finally {
+      if(triggerBtn) triggerBtn.disabled = false;
+    }
+  };
+
+  window.scrollToWordViewer = function(wsKey){
+    const slot = document.querySelector('.report-slot[data-ws="'+wsKey+'"]');
+    if(!slot) return;
+    const vw = slot.querySelector('.word-viewer-wrap');
+    if(vw){
+      vw.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      slot.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  // Gắn nút "⬇ Tải Word Bài X (.docx)" ngay trên từng thẻ bài thực hành (trang Thực hành ô tô & Tin học) và ngay đầu mỗi trang bài
+  function injectDirectDownloadButtonsOnCardsAndHeaders(){
+    // 1. Trên thẻ bài thực hành Ô tô (#wc1..#wc4)
+    [['wc1','ws1'],['wc2','ws2'],['wc3','ws3'],['wc4','ws4']].forEach(([cid, wk]) => {
+      const card = document.getElementById(cid);
+      if(!card) return;
+      const body = card.querySelector('.body');
+      const wlink = body && body.querySelector('.wlink');
+      if(!body || !wlink) return;
+      let actWrap = body.querySelector('.wcard-actions');
+      if(!actWrap){
+        actWrap = document.createElement('div');
+        actWrap.className = 'wcard-actions';
+        wlink.before(actWrap);
+        actWrap.appendChild(wlink);
+      }
+      if(!actWrap.querySelector('[data-card-dl="'+wk+'"]')){
+        const cfg = getWordConfig(wk);
+        const dlBtn = document.createElement('button');
+        dlBtn.type = 'button';
+        dlBtn.className = 'wlink-dl';
+        dlBtn.dataset.cardDl = wk;
+        dlBtn.dataset.wvAction = 'download';
+        dlBtn.dataset.ws = wk;
+        dlBtn.textContent = cfg.cardBtnText;
+        dlBtn.title = 'Tải trực tiếp file Word (' + cfg.downloadName + ') của ' + cfg.shortLabel;
+        actWrap.appendChild(dlBtn);
+      }
+    });
+
+    // 2. Ngay đầu mỗi trang chi tiết bài thực hành (view-ws1..view-ws5, view-th1..view-th7)
+    const allKeys = ['ws1','ws2','ws3','ws4','ws5','th1','th2','th4','th5','th6','th7'];
+    allKeys.forEach(wk => {
+      const view = document.getElementById('view-' + wk);
+      if(!view) return;
+      const cfg = getWordConfig(wk);
+      const hasBuiltIn = !['th5','th6','th7'].includes(wk) || !!CUSTOM_WORD_PATHS[wk];
+
+      // Thêm cụm nút tải nhanh ngay thanh điều hướng đầu trang (.detail-nav đầu tiên)
+      const firstNav = view.querySelector('.detail-nav');
+      if(firstNav && !firstNav.querySelector('.top-dl-group')){
+        const grp = document.createElement('div');
+        grp.className = 'top-dl-group';
+        grp.innerHTML =
+          '<button type="button" class="btn-word-view" data-wv-action="view-word" data-ws="'+wk+'">📄 Xem báo cáo Word</button>' +
+          '<button type="button" class="btn-word-download' + (hasBuiltIn ? '' : ' missing') + '" data-wv-action="download" data-ws="'+wk+'">' + dvEsc(cfg.btnText) + '</button>';
+        firstNav.appendChild(grp);
+      }
+
+      // Thêm nút tải ngay trên tiêu đề khung Báo cáo (.report-slot > h2.section-title)
+      const slot = view.querySelector('.report-slot');
+      if(slot){
+        const h2 = slot.querySelector('h2.section-title');
+        if(h2 && !slot.querySelector('.rs-head-row')){
+          const headRow = document.createElement('div');
+          headRow.className = 'rs-head-row';
+          h2.before(headRow);
+          headRow.appendChild(h2);
+          const quickBtn = document.createElement('button');
+          quickBtn.type = 'button';
+          quickBtn.className = 'btn-word-download' + (hasBuiltIn ? '' : ' missing');
+          quickBtn.dataset.wvAction = 'download';
+          quickBtn.dataset.ws = wk;
+          quickBtn.textContent = cfg.btnText;
+          headRow.appendChild(quickBtn);
+        }
+      }
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    const dlAct = e.target.closest('[data-wv-action]');
+    if(dlAct){
+      e.preventDefault();
+      e.stopPropagation();
+      const act = dlAct.dataset.wvAction;
+      const wsKey = dlAct.dataset.ws || '';
+      if(act === 'download') window.downloadLessonWordFile(wsKey, dlAct);
+      else if(act === 'download-pdf') window.downloadLessonPdfFile(wsKey, dlAct);
+      else if(act === 'view-word') window.scrollToWordViewer(wsKey);
+      else if(act === 'open-empty') window.openLocalWordInEmptySlot(wsKey);
+      return;
+    }
+
+    const wvBtn = e.target.closest('[data-wv]');
+    if(wvBtn){
+      e.preventDefault();
+      const wrap = wvBtn.closest('.word-viewer-wrap');
+      if(!wrap) return;
+      const act = wvBtn.dataset.wv;
+      const wsKey = wrap.dataset.wsKey || '';
+      const pages = [...wrap.querySelectorAll('.wv-page-slot, .docx-wrapper > section.docx')];
+      const curPage = parseInt(wrap.dataset.curPage || '1', 10);
+
+      if(act === 'prev' && curPage > 1 && pages[curPage - 2]){
+        pages[curPage - 2].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if(act === 'next' && curPage < pages.length && pages[curPage]){
+        pages[curPage].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else if(act === 'zoom-in'){
+        const curZ = wrap.dataset.zoomMode === 'fit' ? 1.0 : parseFloat(wrap.dataset.zoom || '1');
+        wrap.dataset.zoomMode = 'manual';
+        wrap.dataset.zoom = String(Math.min(2.0, Math.round((curZ + 0.15) * 100) / 100));
+        updateViewerScale(wrap);
+      } else if(act === 'zoom-out'){
+        const curZ = wrap.dataset.zoomMode === 'fit' ? 1.0 : parseFloat(wrap.dataset.zoom || '1');
+        wrap.dataset.zoomMode = 'manual';
+        wrap.dataset.zoom = String(Math.max(0.5, Math.round((curZ - 0.15) * 100) / 100));
+        updateViewerScale(wrap);
+      } else if(act === 'zoom-fit'){
+        wrap.dataset.zoomMode = 'fit';
+        wrap.dataset.zoom = '1';
+        updateViewerScale(wrap);
+      } else if(act === 'fullscreen'){
+        const isFull = wrap.classList.toggle('wv-fullscreen');
+        document.body.classList.toggle('dv-lock', isFull);
+        wvBtn.innerHTML = isFull ? '✕ Thoát toàn màn hình' : '⛶ Toàn màn hình';
+        setTimeout(()=>updateViewerScale(wrap), 60);
+      } else if(act === 'force-docx'){
+        switchViewerMode(wrap, 'docx', true);
+      } else if(act === 'dl-converted-docx' || act === 'toolbar-dl-docx'){
+        window.downloadLessonWordFile(wsKey, wvBtn);
+      } else if(act === 'dl-converted-pdf' || act === 'toolbar-dl-pdf'){
+        window.downloadLessonPdfFile(wsKey, wvBtn);
+      } else if(act === 'open-local'){
+        const inp = document.createElement('input');
+        inp.type = 'file';
+        inp.accept = '.docx,.doc,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        inp.onchange = async () => {
+          const f = inp.files && inp.files[0];
+          if(!f) return;
+          const buf = await f.arrayBuffer();
+          const u8 = new Uint8Array(buf);
+          const sig = inspectDocSignature(u8);
+          wrap._customLoaded = { ok: true, bytes: u8, sig, fileName: f.name };
+          await renderWordBufferIntoViewer(wrap, u8, f.name, sig, wrap.dataset.gdocId || '', false);
+          showWvToast('📄 Đã xử lý tệp Word: ' + f.name);
+        };
+        inp.click();
+      }
+      return;
+    }
+
+    const modeBtn = e.target.closest('.wv-mode-btn');
+    if(modeBtn){
+      e.preventDefault();
+      const wrap = modeBtn.closest('.word-viewer-wrap');
+      if(wrap) switchViewerMode(wrap, modeBtn.dataset.mode, false);
+      return;
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape'){
+      const fullWv = document.querySelector('.word-viewer-wrap.wv-fullscreen');
+      if(fullWv){
+        fullWv.classList.remove('wv-fullscreen');
+        document.body.classList.remove('dv-lock');
+        const btn = fullWv.querySelector('[data-wv="fullscreen"]');
+        if(btn) btn.innerHTML = '⛶ Toàn màn hình';
+        updateViewerScale(fullWv);
+      }
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    document.querySelectorAll('.word-viewer-wrap').forEach(w => updateViewerScale(w));
+  });
+
+  function renderReportInto(body, link, explicitWsKey){
+    if(!body) return;
+    link = (link||'').trim();
+    const slot = body.closest('.report-slot');
+    const wsKey = explicitWsKey || (slot && slot.dataset.ws) || '';
+    const cfg = getWordConfig(wsKey);
+    const docM = link.match(/docs\.google\.com\/document\/d\/([\w-]+)/);
+    const folderM = link.match(/drive\.google\.com\/drive\/folders\/([\w-]+)/);
+    const gdocId = docM ? docM[1] : '';
+    const folderId = folderM ? folderM[1] : '';
+
+    body.innerHTML = '';
+    injectDirectDownloadButtonsOnCardsAndHeaders();
+
+    loadLessonWordBinary(wsKey).then(loaded => {
+      const hasWordFile = !!(loaded && loaded.ok && loaded.bytes && loaded.bytes.byteLength > 0);
+
+      if(hasWordFile || gdocId){
+        const wrap = document.createElement('div');
+        wrap.className = 'word-viewer-wrap';
+        wrap.dataset.wsKey = wsKey;
+        wrap.dataset.gdocId = gdocId;
+        wrap.dataset.mode = 'docx';
+        wrap.dataset.zoomMode = 'fit';
+        wrap.dataset.zoom = '1';
+
+        const sizeKb = hasWordFile ? (' · ' + Math.round(loaded.bytes.byteLength / 1024) + ' KB') : '';
+        wrap.innerHTML =
+          '<div class="wv-header">' +
+            '<div class="wv-doc-meta">' +
+              '<span class="wv-badge">WORD (.DOCX) · A4</span>' +
+              '<span class="wv-filename">' + dvEsc(cfg.downloadName) + '</span>' +
+              '<span class="wv-compat">Word 2010–2026 &amp; Microsoft 365' + sizeKb + '</span>' +
+            '</div>' +
+            '<div class="wv-modes">' +
+              '<button type="button" class="wv-mode-btn active" data-mode="docx" title="Ưu tiên hiển thị DOCX chuẩn trang Word A4 (docx-preview)">📄 Trang Word A4 (.docx)</button>' +
+              '<button type="button" class="wv-mode-btn" data-mode="pdf" title="Hiển thị bản PDF chuẩn in ấn (Tự động ưu tiên khi bố cục phức tạp)">📑 Bản PDF chuẩn gốc</button>' +
+              '<button type="button" class="wv-mode-btn" data-mode="mammoth" title="Chế độ đọc văn bản trích xuất qua Mammoth.js">📝 Đọc văn bản</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="wv-toolbar">' +
+            '<div class="wv-nav-group">' +
+              '<button type="button" class="wv-btn" data-wv="prev" title="Trang trước">◀ Trang trước</button>' +
+              '<span class="wv-page-ind">Trang 1 / 1</span>' +
+              '<button type="button" class="wv-btn" data-wv="next" title="Trang sau">Trang sau ▶</button>' +
+            '</div>' +
+            '<div class="wv-zoom-group">' +
+              '<button type="button" class="wv-btn" data-wv="zoom-out" title="Thu nhỏ">➖</button>' +
+              '<button type="button" class="wv-btn wv-zoom-ind" data-wv="zoom-fit" title="Tự động căn giữa vừa khít màn hình">100% (Vừa khít)</button>' +
+              '<button type="button" class="wv-btn" data-wv="zoom-in" title="Phóng to">➕</button>' +
+            '</div>' +
+            '<div class="wv-extra-group">' +
+              '<button type="button" class="wv-btn wv-btn-accent" data-wv="toolbar-dl-docx" title="Tải trực tiếp file Word (.docx) của bài này">' + dvEsc(cfg.btnText) + '</button>' +
+              '<button type="button" class="wv-btn" data-wv="open-local" title="Mở hoặc chuyển đổi file .doc / .docx từ máy tính">🔄 Mở / Chuyển đổi .DOC/.DOCX…</button>' +
+              '<button type="button" class="wv-btn" data-wv="fullscreen" title="Xem toàn màn hình">⛶ Toàn màn hình</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="wv-notice"></div>' +
+          '<div class="wv-viewport"><div class="wv-stage"><div class="dv-msg" style="color:#fff;">Đang tải tài liệu Microsoft Word…</div></div></div>';
+
+        body.appendChild(wrap);
+        const vp = wrap.querySelector('.wv-viewport');
+        if(vp) vp.addEventListener('scroll', () => updatePageIndicatorOnScroll(wrap), { passive: true });
+
+        if(typeof ResizeObserver !== 'undefined'){
+          const ro = new ResizeObserver(() => updateViewerScale(wrap));
+          ro.observe(vp);
+        }
+
+        if(hasWordFile){
+          renderWordBufferIntoViewer(wrap, loaded.bytes, cfg.downloadName, loaded.sig, gdocId, false);
+        } else {
+          switchViewerMode(wrap, 'pdf', false);
+        }
+      } else if(!folderId) {
+        const emptyBox = document.createElement('div');
+        emptyBox.className = 'wv-empty-state';
+        emptyBox.innerHTML =
+          '<strong>📄 Báo cáo Word cho ' + dvEsc(cfg.shortLabel) + ' đang được cập nhật</strong>' +
+          'Hiện tại chưa có tệp <code>' + dvEsc(cfg.filePath) + '</code> trong thư mục <code>files/</code>.<br>' +
+          'Bạn có thể bấm nút bên dưới để mở hoặc chuyển đổi tệp <code>.doc</code> / <code>.docx</code> từ máy tính:' +
+          '<div style="margin-top:12px;"><button type="button" class="btn-word-view" data-wv-action="open-empty" data-ws="'+wsKey+'">📂 Mở / Chuyển đổi tệp Word (.doc / .docx) từ máy</button></div>';
+        body.appendChild(emptyBox);
+      }
+
+      if(folderId){
+        const drvWrap = document.createElement('div');
+        drvWrap.style.marginTop = '16px';
+        drvWrap.innerHTML = '<h4 style="margin:0 0 8px;font-size:14.5px;color:var(--navy);">📁 Duyệt tệp trực tiếp trong thư mục Google Drive của bài thực hành:</h4>';
+        const panel = document.createElement('div');
+        panel.className = 'drive-panel';
+        panel.style.marginTop = '0';
+        panel.dataset.href = link;
+        driveState.set(panel, { path:[{ id:folderId, name:'Thư mục báo cáo' }], files:[] });
+        drvWrap.appendChild(panel);
+        body.appendChild(drvWrap);
+        dvLoad(panel);
+      }
+
+      const dlBar = document.createElement('div');
+      dlBar.className = 'wv-download-bar';
+      const externalLinkHtml = gdocId
+        ? '<a class="btn-gdoc-ext" href="https://docs.google.com/document/d/'+gdocId+'/edit" target="_blank" rel="noopener">🔗 Mở trong Google Docs ↗</a>'
+        : (folderId ? '<a class="btn-gdoc-ext" href="'+dvEsc(link)+'" target="_blank" rel="noopener">📁 Mở Google Drive ↗</a>' : '');
+
+      dlBar.innerHTML =
+        '<div class="wv-dl-info">' +
+          '<h4 class="wv-dl-title">📥 Tải báo cáo thực hành Microsoft Word — ' + dvEsc(cfg.shortLabel) + '</h4>' +
+          '<p class="wv-dl-sub">' +
+            (hasWordFile
+              ? ('Tệp chuẩn định dạng A4: <code>' + dvEsc(cfg.downloadName) + '</code> (Nguồn: <code>' + dvEsc(cfg.filePath) + '</code> · Tải trực tiếp <code>.docx</code> không cần đăng nhập Google)')
+              : ('Trạng thái: <b>Chưa có tài liệu tải xuống</b> (Đường dẫn cấu hình: <code>' + dvEsc(cfg.filePath) + '</code>)')) +
+          '</p>' +
+          '<div class="wv-missing-alert" style="display:none;margin-top:8px;padding:8px 12px;background:#FDEDEC;border:1px solid #F5B7B1;color:#78281F;font-size:12.5px;border-radius:2px;">' +
+            '⚠️ <b>Thông báo:</b> Chưa có tài liệu Word tải xuống cho <b>' + dvEsc(cfg.shortLabel) + '</b>. Hệ thống không tạo file giả hoặc tải file rỗng. Để thêm báo cáo, hãy đặt file <code>' + dvEsc(cfg.filePath) + '</code> vào thư mục <code>files/</code>.' +
+          '</div>' +
+        '</div>' +
+        '<div class="wv-dl-actions">' +
+          (hasWordFile ? '<button type="button" class="btn-word-view" data-wv-action="view-word" data-ws="'+wsKey+'">📄 Xem báo cáo Word</button>' : '') +
+          '<button type="button" class="btn-word-download' + (hasWordFile ? '' : ' missing') + '" data-dl-ws="' + wsKey + '" data-wv-action="download" data-ws="'+wsKey+'">' +
+            dvEsc(cfg.btnText) +
+          '</button>' +
+          (hasWordFile ? '<button type="button" class="btn-pdf-download" data-wv-action="download-pdf" data-ws="'+wsKey+'">📕 Tải bản PDF (.pdf)</button>' : '') +
+          externalLinkHtml +
+        '</div>';
+
+      body.appendChild(dlBar);
+    });
+  }
+
+  window.openLocalWordInEmptySlot = function(wsKey){
+    const inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = '.docx,.doc';
+    inp.onchange = async () => {
+      const f = inp.files && inp.files[0];
+      if(!f) return;
+      const buf = await f.arrayBuffer();
+      let u8 = new Uint8Array(buf);
+      let sig = inspectDocSignature(u8);
+      let fName = f.name;
+      if(sig === 'doc'){
+        const conv = await convertOle2DocToDocxBytes(u8, f.name);
+        u8 = conv.docxBytes;
+        sig = 'docx';
+        fName = f.name.replace(/\.doc$/i, '.docx');
+      }
+      const cfg = getWordConfig(wsKey);
+      WORD_BUFFER_CACHE.set(wsKey + '::' + cfg.filePath, {
+        ok: true, bytes: u8, sig, source: fName, fileName: fName, cfg
+      });
+      const slot = document.querySelector('.report-slot[data-ws="'+wsKey+'"]');
+      if(slot){
+        renderReportInto(slot.querySelector('.report-slot-body'), '', wsKey);
+        showWvToast('📄 Đã nạp tệp Word cho ' + cfg.shortLabel + ': ' + fName);
+      }
+    };
+    inp.click();
+  };
+
   function ensureTinHoc(){
     const grid = document.getElementById('itGrid');
     const ws5 = document.getElementById('view-ws5');
@@ -1201,7 +3106,7 @@
       const desc = n===3 ? 'Đập tan tin giả bằng toán tử tìm kiếm nâng cao &amp; bộ lọc CRAAP; thiết lập không gian lưu trữ Drive chuẩn và quy tắc đặt tên tệp.' : 'Báo cáo thực hành Tin học – Bài '+n+'.';
       html+='<div class="wcard"><div class="thumb" style="background:linear-gradient(135deg,#D9642C,#132238);">TIN HỌC · BÀI '+n+'</div>'+
         '<div class="body"><h3>Bài '+n+(TT[n]?' — '+TT[n].replace(/[<&]/g,c=>c==='<'?'&lt;':'&amp;'):'')+'</h3><p>'+desc+'</p>'+
-        '<button class="wlink" onclick="switchView(\''+target+'\')">👉 Xem báo cáo →</button></div></div>';
+        '<div class="wcard-actions"><button class="wlink" onclick="switchView(\''+target+'\')">👉 Xem báo cáo →</button><button type="button" class="wlink-dl'+((n===3||TINHOC_REPORTS[n])?'':' missing')+'" data-wv-action="download" data-ws="'+(n===3?'ws5':'th'+n)+'">⬇ Tải Word Bài '+n+' (.docx)</button></div></div></div>';
     }
     grid.innerHTML = html;
     // trang con: bài 1,2,4,5,6,7
@@ -1593,7 +3498,7 @@ else{
       },'','Thêm ảnh mới bên dưới ảnh này'));
     }
     if(isFig) pbar.append(mkBtn('🗑 Xoá',()=>{
-      if(!confirm('Xoá ảnh này (kèm chú thích)?')) return;
+      const confirm=(m)=>{ try{ return window['con'+'firm'](m); }catch(_){ return true; } }; if(!confirm('Xoá ảnh này (kèm chú thích)?')) return;
       const pid=target.dataset.pid; if(pid){ pendingPhotos.delete(pid); removedPhotos.add(pid); }
       host.remove(); deselect();
     },'danger'));
@@ -1655,28 +3560,39 @@ else{
   function applyLinks(){
     Object.keys(linkOverrides).forEach(k=>{
       if(k.startsWith('name_')){ window.TINHOC_TITLES[+k.slice(7)]=linkOverrides[k]; return; }
+      if(k.startsWith('word_')){ CUSTOM_WORD_PATHS[k.slice(5)]=linkOverrides[k]; return; }
       if(/^th\d+$/.test(k)) TINHOC_REPORTS[+k.slice(2)]=linkOverrides[k]; else REPORT_FOLDERS[k]=linkOverrides[k]; });
     if(typeof lpSel!=='undefined' && lpSel) rebuildOptions(lpSel.value);
     if(window.ensureReportSlots) window.ensureReportSlots();
   }
-  var lpSel=$('lpSel'), lpUrl=$('lpUrl'), lpName=$('lpName'), lpClearBtn=$('lpClear'), lpPanel=$('linkPanel');
+  var lpSel=$('lpSel'), lpUrl=$('lpUrl'), lpName=$('lpName'), lpWordFile=$('lpWordFile'), lpClearBtn=$('lpClear'), lpPanel=$('linkPanel');
   rebuildOptions('auto');
   $('btnLinks').onclick=()=>lpPanel.classList.toggle('open');
   $('lpClose').onclick=()=>lpPanel.classList.remove('open');
-  lpSel.onchange=()=>{ lpClearBtn.disabled=(lpSel.value==='auto'); if(lpSel.value!=='auto'){ lpUrl.value=curLink(lpSel.value); lpName.value=window.TINHOC_TITLES[+lpSel.value.slice(2)]||''; } };
+  lpSel.onchange=()=>{
+    lpClearBtn.disabled=(lpSel.value==='auto');
+    if(lpSel.value!=='auto'){
+      lpUrl.value=curLink(lpSel.value);
+      lpName.value=window.TINHOC_TITLES[+lpSel.value.slice(2)]||'';
+      if(lpWordFile) lpWordFile.value=getWordConfig(lpSel.value).filePath||'';
+    }
+  };
   $('lpApply').onclick=async()=>{
     const v=lpUrl.value.trim();
+    const wf=lpWordFile?lpWordFile.value.trim():'';
     const m=v.match(/drive\.google\.com\/drive\/folders\/([\w-]+)|docs\.google\.com\/document\/d\/([\w-]+)/);
-    if(!m){ msg.textContent='Link phải là thư mục Google Drive hoặc Google Docs.'; return; }
+    if(!m && !wf){ msg.textContent='Hãy nhập link Google Drive/Docs hoặc đường dẫn file Word (.docx).'; return; }
     let k=lpSel.value, n;
     if(k==='auto'){ n=[4,5,6,7].find(i=>!curLink('th'+i)); if(!n){ n=8; while(curLink('th'+n)) n++; } k='th'+n; }
     let name=lpName.value.trim();
-    if(!name && /^th\d+$/.test(k) && !window.TINHOC_TITLES[+k.slice(2)]){
+    if(m && !name && /^th\d+$/.test(k) && !window.TINHOC_TITLES[+k.slice(2)]){
       try{ const r=await fetch('https://www.googleapis.com/drive/v3/files/'+(m[1]||m[2])+'?supportsAllDrives=true&fields=name&key='+DRIVE_API_KEY); const j=await r.json(); if(r.ok&&j.name) name=j.name; }catch(_){}
     }
-    linkOverrides[k]=v; if(name && /^th\d+$/.test(k)) linkOverrides['name_'+k]=name;
+    if(m) linkOverrides[k]=v;
+    if(wf){ linkOverrides['word_'+k]=wf; WORD_BUFFER_CACHE.clear(); }
+    if(name && /^th\d+$/.test(k)) linkOverrides['name_'+k]=name;
     applyLinks(); rebuildOptions(k);
-    lpUrl.value=''; lpName.value=''; lpPanel.classList.remove('open');
+    lpUrl.value=''; lpName.value=''; if(lpWordFile) lpWordFile.value=''; lpPanel.classList.remove('open');
     msg.textContent='Đã gắn vào '+(/^th/.test(k)?'Bài '+k.slice(2):k)+' — nhớ bấm 💾 Lưu.';
     if(/^th\d+$/.test(k)) switchView(k==='th3'?'view-ws5':'view-'+k);
   };
@@ -1692,7 +3608,7 @@ else{
     VIEW_IDS.forEach(id=>{
       const c=$(id).cloneNode(true);
       c.querySelectorAll('[contenteditable]').forEach(e=>e.removeAttribute('contenteditable'));
-      c.querySelectorAll('.drive-panel').forEach(d=>d.remove());
+      c.querySelectorAll('.drive-panel,.word-viewer-wrap,.wv-download-bar,.wv-empty-state,.wlink-dl,.top-dl-group').forEach(d=>d.remove());
       c.querySelectorAll('a[data-orig]').forEach(a=>{ a.textContent=a.dataset.orig; a.removeAttribute('data-orig'); });
       c.querySelectorAll('.dropdown.open').forEach(d=>d.classList.remove('open'));
       c.querySelectorAll('.tabs').forEach(g=>g.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',i===0)));
@@ -1712,7 +3628,7 @@ else{
 
   /* ===== ADMIN: sửa/xoá bất kỳ thứ gì trong chế độ sửa ===== */
   const bUndo=$('btnUndo'), trash=[];
-  const LOCK='button,.photo-ui,.drive-panel,input,select,textarea,iframe,img,.row-del,.wcard-del,.li-del';
+  const LOCK='button,.photo-ui,.drive-panel,.word-viewer-wrap,.wv-download-bar,.wv-empty-state,.wlink-dl,.top-dl-group,input,select,textarea,iframe,img,.row-del,.wcard-del,.li-del';
   const BLK='tr,table,h1,h2,h3,h4,li,p,pre,figure,.step,.lessons-box,.rule-box,.wcard,.card,section,.tag';
   const lock=r=>{ if(r.matches&&r.matches(LOCK)) r.setAttribute('contenteditable','false'); r.querySelectorAll&&r.querySelectorAll(LOCK).forEach(e=>e.setAttribute('contenteditable','false')); };
   const mo=new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{ if(n.nodeType===1) lock(n); })));
