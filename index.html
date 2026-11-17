@@ -271,6 +271,52 @@
   #blkUI .tb{position:absolute;top:0;right:0;display:flex;gap:4px;pointer-events:auto;}
   #blkUI button{font-family:inherit;font-size:12px;font-weight:700;padding:5px 9px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2);}
   #blkUI button.danger{background:#C0392B;border-color:#C0392B;color:#fff;}
+
+/* ===== TÀI LIỆU WORD: xem / tải / in (bổ sung, không đổi giao diện cũ) ===== */
+.wr-admin-box{display:none;border:1px dashed var(--accent);background:var(--bg);padding:16px;margin-bottom:22px;font-size:13.5px}
+body.wr-admin .wr-admin-box{display:block}
+.wr-admin-box h3{margin:0 0 10px;font-size:14.5px;color:var(--navy)}
+@media (prefers-color-scheme:dark){.wr-admin-box h3{color:#F1F5FB}} :root[data-theme="dark"] .wr-admin-box h3{color:#F1F5FB}
+.wr-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+@media (max-width:640px){.wr-grid{grid-template-columns:1fr}}
+.wr-admin-box label{display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin:0 0 3px}
+.wr-admin-box input[type=text],.wr-admin-box input[type=file]{width:100%;font:inherit;font-size:13px;padding:7px 8px;border:1px solid var(--border);background:var(--card);color:var(--text)}
+.wr-btn{font:inherit;font-size:13px;font-weight:600;padding:8px 13px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;min-height:36px}
+.wr-btn:hover{border-color:var(--accent);color:var(--accent)} .wr-btn:disabled{opacity:.5;cursor:default}
+.wr-btn.pri{background:var(--accent);border-color:var(--accent);color:#fff} .wr-btn.dng:hover{border-color:#C0392B;color:#C0392B}
+.wr-prog{height:6px;background:var(--border);margin-top:10px;display:none} .wr-prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .15s}
+.wr-cat{margin:22px 0 10px;font-size:15px;font-weight:800;color:var(--navy);border-bottom:2px solid var(--accent);padding-bottom:5px}
+@media (prefers-color-scheme:dark){.wr-cat{color:#F1F5FB}} :root[data-theme="dark"] .wr-cat{color:#F1F5FB}
+.wr-item{border:1px solid var(--border);background:var(--bg);padding:14px 16px;margin-bottom:12px}
+.wr-item h4{margin:0 0 4px;font-size:15px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.wr-badge{font-size:11px;font-weight:700;padding:2px 7px;background:var(--navy);color:#fff}
+.wr-badge.w{background:#B7791F} .wr-badge.d{background:#7A869A}
+.wr-meta{font-size:12.5px;color:var(--muted);margin:0 0 10px} .wr-desc{font-size:13.5px;margin:0 0 10px}
+.wr-acts{display:flex;gap:8px;flex-wrap:wrap} .wr-adm{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);gap:6px;flex-wrap:wrap}
+body.wr-admin .wr-adm{display:flex}
+#wrViewer{display:none;position:fixed;inset:0;z-index:10000;background:var(--bg);flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+#wrViewer.open{display:flex} body.wr-lock{overflow:hidden}
+.wr-bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 10px;background:var(--card);border-bottom:1px solid var(--border)}
+.wr-bar b{flex:1 1 160px;min-width:120px;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wr-bar input{font:inherit;font-size:13px;padding:7px 8px;border:1px solid var(--border);background:var(--bg);color:var(--text);width:130px}
+.wr-info{font-size:12.5px;color:var(--muted);min-width:70px;text-align:center}
+.wr-note{padding:8px 14px;background:#FCEEE4;border-bottom:1px solid #F0C6A2;color:#7A3B12;font-size:13px;display:none}
+.wr-stage{flex:1;overflow:auto;background:#8A93A3;-webkit-overflow-scrolling:touch}
+.wr-stage .docx-wrapper{background:transparent!important;padding:14px 0!important}
+.wr-flow{background:#fff;color:#111;max-width:860px;margin:14px auto;padding:36px 44px;line-height:1.6;overflow-wrap:anywhere}
+.wr-flow img{max-width:100%;height:auto} .wr-flow table{border-collapse:collapse;min-width:0;width:auto;font-size:inherit} .wr-flow td,.wr-flow th{border:1px solid #999;padding:4px 7px;text-transform:none;letter-spacing:0;font-size:inherit;color:#111}
+.wr-stage iframe{width:100%;height:100%;border:0;background:#fff;display:block}
+.wr-msg{max-width:560px;margin:40px auto;padding:22px;background:var(--card);border:1px solid var(--border);font-size:14px}
+mark.wr-hit{background:#FFE066;color:#000} mark.wr-hit.cur{background:#F0965A}
+#wrToast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:10001;background:#132238;color:#fff;padding:10px 16px;font-size:13.5px;font-weight:600;max-width:90vw;display:none;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+#wrToast.err{background:#C0392B}
+@media print{
+  body.wr-printing>*:not(#wrViewer){display:none!important}
+  body.wr-printing #wrViewer{position:static;display:block}
+  body.wr-printing .wr-bar,body.wr-printing .wr-note{display:none!important}
+  body.wr-printing .wr-stage{overflow:visible;background:#fff} body.wr-printing .wr-stage>div{zoom:1!important}
+  body.wr-printing .docx-wrapper{padding:0!important} body.wr-printing .docx-wrapper>section.docx{box-shadow:none!important;margin:0!important}
+}
 </style>
 </head>
 <body>
@@ -287,6 +333,7 @@
           <a href="#" onclick="switchView('view-practice');closeDropdown();return false;">🚗 Thực hành ô tô</a>
           <a href="#" onclick="switchView('view-tinhoc');closeDropdown();return false;">💻 Tin học</a>
           <a href="#" onclick="switchView('view-skills');closeDropdown();return false;">🛠️ Kỹ năng</a>
+          <a href="#" onclick="switchView('view-words');closeDropdown();return false;">📄 Tài liệu Word</a>
         </div>
       </div>
       <button class="navbtn" onclick="switchView('view-home','lien-he')">Liên hệ</button>
@@ -992,6 +1039,10 @@
 </div>
 
 
+<!-- ========================= VIEW: TÀI LIỆU WORD ========================= -->
+<div class="view hidden" id="view-words"></div>
+
+
 <div id="linkPanel" role="region" aria-label="Quản lý Google Drive">
   <div class="lp-head"><span>🔗 Quản lý Google Drive</span><button type="button" class="lp-x" id="lpClose" title="Đóng">✕</button></div>
   <label for="lpUrl">1. Dán link chia sẻ (Drive / Docs)</label>
@@ -1364,6 +1415,265 @@
   });
 </script>
 
+<script id="wr-script">
+/* ===== TÀI LIỆU WORD: kiểm tra – lưu (Firestore) – xem – tải – in ===== */
+(function(){
+'use strict';
+const COL='site', IDX='wr_index', CH=524288, MAX=8*1048576, EXT=['doc','docx','docm','dotx','dotm'];
+const LIBS={jszip:['https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js','https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'],
+  docx:['https://cdn.jsdelivr.net/npm/docx-preview@0.3.7/dist/docx-preview.min.js'],
+  mammoth:['https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js','https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.8.0/mammoth.browser.min.js']};
+const GL={jszip:'JSZip',docx:'docx',mammoth:'mammoth'}, pend={};
+const $=id=>document.getElementById(id);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>n<1024?n+' B':n<1048576?Math.round(n/1024)+' KB':(n/1048576).toFixed(1)+' MB';
+const S={docs:[],ready:false}, cache=new Map(), B=()=>window.WordBridge;
+const dref=id=>B().doc(B().db,COL,id);
+
+function lib(k){
+  if(window[GL[k]]) return Promise.resolve();
+  return pend[k]||(pend[k]=(async()=>{
+    for(const u of LIBS[k]){
+      try{ await new Promise((ok,no)=>{const s=document.createElement('script');s.src=u;s.onload=ok;s.onerror=no;document.head.appendChild(s);}); if(window[GL[k]]) return; }catch(_){}
+    }
+    pend[k]=null; throw new Error('Không tải được thư viện '+GL[k]+' (kiểm tra mạng).');
+  })());
+}
+function toast(m,err){ let t=$('wrToast'); if(!t){t=document.createElement('div');t.id='wrToast';document.body.appendChild(t);} t.textContent=m; t.className=err?'err':''; t.style.display='block'; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display='none',err?6000:3200); }
+
+/* ---------- 1. KIỂM TRA FILE THẬT (không chỉ dựa vào đuôi) ---------- */
+async function inspect(file, allowed){
+  const ext=(file.name.split('.').pop()||'').toLowerCase();
+  if(!allowed.includes(ext)) throw new Error('Định dạng ".'+ext+'" không được hỗ trợ. Chỉ nhận: '+allowed.map(e=>'.'+e).join(', ')+'.');
+  if(!file.size) throw new Error('Tệp rỗng (0 byte).');
+  if(file.size>MAX) throw new Error('Tệp '+fmt(file.size)+' vượt giới hạn '+fmt(MAX)+'.');
+  const h=new Uint8Array(await file.slice(0,8).arrayBuffer());
+  const zip=h[0]===0x50&&h[1]===0x4B&&h[2]===3&&h[3]===4, ole=h[0]===0xD0&&h[1]===0xCF&&h[2]===0x11&&h[3]===0xE0, pdf=h[0]===0x25&&h[1]===0x50&&h[2]===0x44&&h[3]===0x46;
+  if(ext==='pdf'){ if(!pdf) throw new Error('Tệp ".pdf" này không phải PDF thật.'); return {ext,kind:'pdf'}; }
+  if(ext==='doc'){
+    if(ole) return {ext,kind:'ole'};
+    if(zip) throw new Error('Tệp ".doc" này thực chất là định dạng mới (.docx) bị đổi đuôi. Đổi tên không phải chuyển đổi — hãy mở bằng Word rồi “Lưu thành” .docx, hoặc chọn đúng đuôi .docx.');
+    throw new Error('Tệp ".doc" không đúng cấu trúc Word 97–2003 (hỏng hoặc không phải Word).');
+  }
+  if(!zip){
+    if(ole) throw new Error('Tệp ".'+ext+'" thực chất là Word cũ (.doc) bị đổi đuôi. Hãy tải lên với đuôi .doc, hoặc lưu lại thành .docx bằng Word.');
+    throw new Error('Tệp ".'+ext+'" không phải tài liệu Word hợp lệ (không đúng cấu trúc OOXML).');
+  }
+  await lib('jszip');
+  let z; try{ z=await JSZip.loadAsync(file); }catch(e){ throw new Error('Tệp Word bị hỏng, không giải nén được.'); }
+  const names=Object.keys(z.files); let total=0; names.forEach(n=>{ const u=z.files[n]._data&&z.files[n]._data.uncompressedSize; if(u) total+=u; });
+  if(names.length>3000||total>300*1048576) throw new Error('Cấu trúc tệp bất thường (nghi ngờ tệp nén độc hại), đã từ chối.');
+  const ct=z.file('[Content_Types].xml'); if(!ct||!z.file('word/document.xml')) throw new Error('Không phải tài liệu Word (thiếu word/document.xml).');
+  const x=await ct.async('string');
+  if(!/wordprocessingml/.test(x)) throw new Error('Không phải tài liệu Word (sai loại nội dung).');
+  const macro=!!z.file('word/vbaProject.bin')||/macroEnabled/.test(x), tpl=/wordprocessingml\.template/.test(x);
+  if(macro&&(ext==='docx'||ext==='dotx')) throw new Error('Tệp chứa macro nhưng mang đuôi ".'+ext+'". Hãy dùng đúng đuôi .docm/.dotm hoặc xoá macro.');
+  if(!macro&&(ext==='docm'||ext==='dotm')) throw new Error('Tệp ".'+ext+'" không chứa macro — hãy dùng đuôi .docx/.dotx.');
+  if(tpl!==(ext==='dotx'||ext==='dotm')) throw new Error(tpl?'Đây là Word Template nhưng đuôi không phải .dotx/.dotm.':'Đây không phải Word Template nhưng đuôi là .'+ext+'.');
+  return {ext,kind:'ooxml',macro,template:tpl};
+}
+async function sha(buf){ try{ if(!(window.crypto&&crypto.subtle)) return ''; return [...new Uint8Array(await crypto.subtle.digest('SHA-256',buf))].map(b=>b.toString(16).padStart(2,'0')).join(''); }catch(_){ return ''; } }
+const b64=blob=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(',')[1]||'');r.onerror=()=>no(r.error);r.readAsDataURL(blob);});
+
+/* ---------- 2. LƯU TRỮ: Firestore (collection site, dùng chung Rules hiện có) ---------- */
+const cid=(d,tag,i)=>'wr_'+d.id+'_'+d.rev+tag+i;
+async function loadIndex(){
+  const s=await B().getDoc(dref(IDX));
+  S.docs=s.exists()?(JSON.parse(s.data().json)||[]):[]; S.docs.sort((a,b)=>(a.order||0)-(b.order||0));
+}
+async function saveIndex(){ const u=B().user(); await B().setDoc(dref(IDX),{json:JSON.stringify(S.docs),updatedBy:u?u.email:'',updatedAt:B().serverTimestamp()}); }
+async function delChunks(d,tag,n){ for(let i=0;i<n;i++){ try{ await B().deleteDoc(dref(cid(d,tag,i))); }catch(_){} } }
+async function putChunks(d,tag,file,prog){ for(let i=0;i<Math.ceil(file.size/CH);i++){ await B().setDoc(dref(cid(d,tag,i)),{d:await b64(file.slice(i*CH,(i+1)*CH))}); prog&&prog(); } }
+async function getBlob(d,tag,onp){
+  const key=d.id+'|'+d.rev+tag; if(cache.has(key)) return cache.get(key);
+  const f=tag==='p'?d.pv:d, parts=[];
+  for(let i=0;i<f.n;i+=4){
+    const r=await Promise.all([...Array(Math.min(4,f.n-i)).keys()].map(async k=>{
+      const s=await B().getDoc(dref(cid(d,tag,i+k))); if(!s.exists()) throw new Error('Thiếu mảnh dữ liệu '+(i+k+1)+'/'+f.n+' — tệp trên máy chủ không đầy đủ.');
+      const bin=atob(s.data().d), u=new Uint8Array(bin.length); for(let j=0;j<bin.length;j++) u[j]=bin.charCodeAt(j); return u;
+    }));
+    parts.push(...r); onp&&onp(Math.min(i+4,f.n)/f.n);
+  }
+  const blob=new Blob(parts,{type:tag==='p'&&f.ext==='pdf'?'application/pdf':'application/octet-stream'});
+  if(tag==='f'&&d.sha){ const h=await sha(await blob.arrayBuffer()); if(h&&h!==d.sha) throw new Error('Tệp tải về không khớp bản gốc (sai mã SHA-256) — đã huỷ để tránh đưa file hỏng.'); }
+  if(cache.size>4) cache.delete(cache.keys().next().value); cache.set(key,blob); return blob;
+}
+
+/* ---------- 3. TẢI FILE GỐC VỀ MÁY ---------- */
+async function download(d,tag){
+  tag=tag||'f'; const f=tag==='p'?d.pv:d, name=tag==='p'?(d.pv.name||'xem-truoc.'+d.pv.ext):d.fileName;
+  try{
+    toast('Đang chuẩn bị tải “'+name+'”…');
+    const blob=await getBlob(d,tag,p=>toast('Đang tải từ máy chủ… '+Math.round(p*100)+'%'));
+    const u=URL.createObjectURL(blob), a=document.createElement('a'); a.href=u; a.download=name; a.rel='noopener'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),4000);
+    toast('Đã tải xong: '+name+' ('+fmt(f.size)+')');
+  }catch(e){ toast('Tải thất bại: '+(e.message||e),1); }
+}
+
+/* ---------- 4. TRÌNH ĐỌC ---------- */
+let ov,stage,host,note,mode='',zoom=1,cur=null,hits=[],hi=-1;
+function build(){
+  if(ov) return; ov=document.createElement('div'); ov.id='wrViewer'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-label','Trình đọc tài liệu Word');
+  ov.innerHTML='<div class="wr-bar"><button class="wr-btn" data-v="close" title="Đóng (Esc)">✕</button><b id="wrT"></b>'+
+   '<button class="wr-btn" data-v="prev" title="Trang trước">◀</button><span class="wr-info" id="wrPg">–</span><button class="wr-btn" data-v="next" title="Trang sau">▶</button>'+
+   '<button class="wr-btn" data-v="zo" title="Thu nhỏ">🔍−</button><span class="wr-info" id="wrZ">100%</span><button class="wr-btn" data-v="zi" title="Phóng to">🔍+</button>'+
+   '<input id="wrQ" type="search" placeholder="Tìm trong tài liệu…" aria-label="Tìm kiếm"><button class="wr-btn" data-v="find">Tìm</button><span class="wr-info" id="wrH"></span>'+
+   '<button class="wr-btn" data-v="full" title="Toàn màn hình">⛶</button><button class="wr-btn" data-v="print">🖨️ In</button><button class="wr-btn pri" data-v="dl">⬇️ Tải file Word</button></div>'+
+   '<div class="wr-note" id="wrN"></div><div class="wr-stage" id="wrS"><div id="wrH0"></div></div>';
+  document.body.appendChild(ov); stage=$('wrS'); host=$('wrH0'); note=$('wrN');
+  ov.addEventListener('click',e=>{ const b=e.target.closest('[data-v]'); if(!b) return; const a=b.dataset.v;
+    if(a==='close') close(); else if(a==='prev') go(page()-1); else if(a==='next') go(page()+1);
+    else if(a==='zi') setZ(zoom+.25); else if(a==='zo') setZ(zoom-.25); else if(a==='find') find(1);
+    else if(a==='full'){ if(document.fullscreenElement) document.exitFullscreen(); else if(ov.requestFullscreen) ov.requestFullscreen().catch(()=>toast('Trình duyệt không cho bật toàn màn hình.',1)); }
+    else if(a==='print') doPrint(); else if(a==='dl'&&cur) download(cur); });
+  $('wrQ').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); find(e.shiftKey?-1:1); } });
+  stage.addEventListener('scroll',updPg,{passive:true});
+}
+const pages=()=>host?[...host.querySelectorAll('section.docx')]:[];
+function page(){ const p=pages(),t=stage.getBoundingClientRect().top+stage.clientHeight*.3; let c=1; p.forEach((e,i)=>{ if(e.getBoundingClientRect().top<=t) c=i+1; }); return c; }
+function go(n){ const p=pages(); if(!p.length) return; n=Math.max(1,Math.min(p.length,n)); p[n-1].scrollIntoView({block:'start'}); updPg(); }
+function updPg(){ const p=pages(); $('wrPg').textContent=p.length?('Trang '+page()+' / '+p.length):(mode==='pdf'?'PDF':'Cuộn liên tục'); }
+function setZ(z){ zoom=Math.max(.5,Math.min(3,Math.round(z*100)/100)); host.style.zoom=zoom; $('wrZ').textContent=Math.round(zoom*100)+'%'; updPg(); }
+function msg(h){ host.innerHTML='<div class="wr-msg">'+h+'</div>'; mode='msg'; updPg(); }
+function clean(root){
+  root.querySelectorAll('script,iframe,object,embed,form,base,meta[http-equiv]').forEach(n=>n.remove());
+  root.querySelectorAll('*').forEach(n=>{ [...n.attributes].forEach(a=>{ const v=a.value.replace(/[\s\u0000-\u001f]/g,'').toLowerCase();
+    if(/^on/i.test(a.name)||((a.name==='href'||a.name==='src'||a.name==='xlink:href')&&/^(javascript|vbscript):/.test(v))||(a.name==='src'&&/^data:text\/html/.test(v))) n.removeAttribute(a.name); });
+    if(n.tagName==='A'){ n.target='_blank'; n.rel='noopener noreferrer'; } });
+}
+async function renderDocx(blob){
+  const buf=await blob.arrayBuffer(); let ok=false;
+  try{ await lib('jszip'); await lib('docx'); host.innerHTML='';
+    await docx.renderAsync(buf,host,null,{className:'docx',inWrapper:true,breakPages:true,ignoreLastRenderedPageBreak:false,renderHeaders:true,renderFooters:true,renderFootnotes:true,renderEndnotes:true,useBase64URL:true});
+    ok=!!host.querySelector('section.docx'); mode='pages';
+  }catch(e){ console.warn('docx-preview lỗi, chuyển sang Mammoth:',e); }
+  if(!ok){
+    await lib('mammoth'); const r=await mammoth.convertToHtml({arrayBuffer:buf}), doc=new DOMParser().parseFromString(r.value,'text/html');
+    host.innerHTML='<article class="wr-flow"></article>'; host.firstChild.innerHTML=doc.body.innerHTML; mode='flow';
+    note.style.display='block'; note.textContent='Đang dùng chế độ đọc dự phòng (Mammoth): giữ chữ, bảng, ảnh, danh sách nhưng không giữ đúng ngắt trang/bố cục. Bấm “Tải file Word” để xem đúng bản gốc.';
+  }
+  clean(host);
+}
+async function openViewer(d,o){
+  o=o||{}; build(); cur=d; zoom=1; host.style.zoom=1; note.style.display='none'; $('wrZ').textContent='100%'; $('wrQ').value=''; $('wrH').textContent=''; hits=[];
+  $('wrT').textContent=d.title; $('wrPg').textContent='…'; ov.classList.add('open'); document.body.classList.add('wr-lock');
+  msg('⏳ Đang tải tài liệu… <div class="wr-prog" style="display:block"><i id="wrPi"></i></div>');
+  const onp=p=>{ const i=$('wrPi'); if(i) i.style.width=Math.round(p*100)+'%'; };
+  try{
+    let blob=null, pvext='';
+    if(d.pv){ blob=await getBlob(d,'p',onp); pvext=d.pv.ext; }
+    else if(d.kind!=='ole') blob=await getBlob(d,'f',onp);
+    if(!blob){ msg('<b>Tệp .doc (Word 97–2003) không thể hiển thị trực tiếp trên trình duyệt.</b><p>Bạn vẫn tải được đúng file gốc bằng nút “⬇️ Tải file Word”. Để xem ngay trên web, người quản trị cần đính kèm bản xem trước (.pdf hoặc .docx chuyển đổi bằng Word/LibreOffice) khi tải tài liệu lên.</p>'); }
+    else if(pvext==='pdf'){ host.innerHTML=''; const f=document.createElement('iframe'); f.title=d.title; f.src=URL.createObjectURL(blob); host.appendChild(f); host.style.height='100%'; mode='pdf'; updPg(); }
+    else { host.style.height=''; await renderDocx(blob); }
+    if(d.macro) { note.style.display='block'; note.textContent='Tài liệu có chứa macro VBA. Trang web KHÔNG chạy macro; chỉ hiển thị nội dung. Chỉ mở file tải về khi bạn tin tưởng nguồn.'; }
+    stage.scrollTop=0; updPg(); if(o.zoom) setZ(o.zoom);
+    if(o.print) setTimeout(doPrint,400);
+  }catch(e){ msg('<b>Không mở được tài liệu.</b><p>'+esc(e.message||e)+'</p><p>Bạn vẫn có thể thử “⬇️ Tải file Word”.</p>'); toast('Lỗi: '+(e.message||e),1); }
+}
+function close(){ if(document.fullscreenElement) document.exitFullscreen(); ov&&ov.classList.remove('open'); document.body.classList.remove('wr-lock'); const f=host&&host.querySelector('iframe'); if(f) URL.revokeObjectURL(f.src); host&&(host.innerHTML=''); }
+function doPrint(){
+  if(mode==='pdf'){ const f=host.querySelector('iframe'); try{ f.contentWindow.focus(); f.contentWindow.print(); }catch(_){ toast('Hãy tải PDF về rồi in.',1); } return; }
+  if(mode==='msg'||!mode){ toast('Chưa có nội dung để in. Hãy tải file Word về và in bằng Word.',1); return; }
+  document.body.classList.add('wr-printing'); window.print();
+}
+window.addEventListener('afterprint',()=>document.body.classList.remove('wr-printing'));
+function unmark(){ host.querySelectorAll('mark.wr-hit').forEach(m=>{ const p=m.parentNode; p.replaceChild(document.createTextNode(m.textContent),m); p.normalize(); }); hits=[]; hi=-1; }
+function find(dir){
+  if(mode==='pdf'){ toast('Tìm kiếm: dùng Ctrl+F trong khung PDF.'); return; }
+  const q=$('wrQ').value.trim().normalize('NFC'); if(!q||mode==='msg'){ unmark(); $('wrH').textContent=''; return; }
+  if(!hits.length||hits.q!==q){
+    unmark(); const re=new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'), w=document.createTreeWalker(host,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentNode.closest('style,script')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT}), nodes=[]; while(w.nextNode()) nodes.push(w.currentNode);
+    nodes.forEach(n=>{ const t=n.nodeValue.normalize('NFC'); re.lastIndex=0; let m,last=0,frag=null; while((m=re.exec(t))){ frag=frag||document.createDocumentFragment(); frag.appendChild(document.createTextNode(t.slice(last,m.index))); const k=document.createElement('mark'); k.className='wr-hit'; k.textContent=m[0]; frag.appendChild(k); last=m.index+m[0].length; if(!m[0].length) re.lastIndex++; }
+      if(frag){ frag.appendChild(document.createTextNode(t.slice(last))); n.parentNode.replaceChild(frag,n); } });
+    hits=[...host.querySelectorAll('mark.wr-hit')]; hits.q=q; hi=-1;
+  }
+  if(!hits.length){ $('wrH').textContent='0 kết quả'; return; }
+  if(hi>=0) hits[hi].classList.remove('cur'); hi=(hi+dir+hits.length)%hits.length; hits[hi].classList.add('cur'); hits[hi].scrollIntoView({block:'center'}); $('wrH').textContent=(hi+1)+' / '+hits.length; updPg();
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&ov&&ov.classList.contains('open')&&!document.fullscreenElement) close(); });
+
+/* ---------- 5. GIAO DIỆN DANH SÁCH + QUẢN TRỊ ---------- */
+const CATS=['Xưởng: Động cơ đốt trong','Xưởng: Điện – Điện tử ô tô','Xưởng: Khung gầm & Phanh','Xưởng: Bảo dưỡng nhanh & OBD-II','Tin học – Bài 1','Tin học – Bài 2','Tin học – Bài 3','Tin học – Bài 4','Tin học – Bài 5','Tin học – Bài 6','Tin học – Bài 7','Khác'];
+const isAdm=()=>document.body.classList.contains('wr-admin');
+function card(d){
+  const w=d.ext==='doc'||d.ext==='dot', pub=d.pub!==false;
+  return '<div class="wr-item" data-id="'+esc(d.id)+'"><h4>'+esc(d.title)+'<span class="wr-badge'+(w?' d':'')+'">.'+esc(d.ext)+'</span>'+(d.macro?'<span class="wr-badge w">có macro</span>':'')+(pub?'':'<span class="wr-badge w">Bản nháp – chỉ quản trị thấy</span>')+'</h4>'+
+   '<p class="wr-meta">'+esc(d.fileName)+' · '+fmt(d.size)+(d.pv?' · có bản xem trước .'+esc(d.pv.ext):'')+'</p>'+(d.desc?'<p class="wr-desc">'+esc(d.desc)+'</p>':'')+
+   '<div class="wr-acts"><button class="wr-btn pri" data-wr="view">📄 Xem tài liệu</button><button class="wr-btn" data-wr="dl">⬇️ Tải file Word</button>'+(d.pv&&d.pv.ext==='pdf'?'<button class="wr-btn" data-wr="dlp">⬇️ Tải PDF</button>':'')+'<button class="wr-btn" data-wr="print">🖨️ In tài liệu</button><button class="wr-btn" data-wr="zoom">🔍 Phóng to tài liệu</button></div>'+
+   '<div class="wr-adm"><button class="wr-btn" data-wr="edit">✏️ Đổi tên/mô tả/mục</button><button class="wr-btn" data-wr="rep">⇄ Thay file</button><button class="wr-btn" data-wr="up">↑</button><button class="wr-btn" data-wr="dn">↓</button><button class="wr-btn" data-wr="pub">'+(pub?'🙈 Chuyển thành nháp':'🌐 Công khai')+'</button><button class="wr-btn dng" data-wr="del">🗑 Xoá</button></div></div>';
+}
+function renderList(){
+  const L=$('wrList'); if(!L) return; const list=S.docs.filter(d=>isAdm()||d.pub!==false);
+  if(!list.length){ L.innerHTML='<p style="color:var(--muted);font-size:14px">Chưa có tài liệu Word nào được công khai.</p>'; return; }
+  const g=new Map(); list.forEach(d=>{ const c=d.cat||'Khác'; if(!g.has(c)) g.set(c,[]); g.get(c).push(d); });
+  L.innerHTML=[...g].map(([c,a])=>'<h3 class="wr-cat">'+esc(c)+'</h3>'+a.map(card).join('')).join('');
+}
+function shell(){
+  const v=$('view-words'); if(!v) return;
+  v.innerHTML='<header class="hero" style="padding:34px 24px 30px;"><div class="hero-inner wrap" style="display:block;"><div class="crumbs"><button onclick="switchView(\'view-home\')">Trang chủ E-Portfolio</button><span>/</span>Tài liệu Word</div><h1 style="margin:0 0 8px;font-size:clamp(22px,3.4vw,30px);">TÀI LIỆU WORD</h1></div></header>'+
+  '<main class="wrap" style="padding-top:28px;"><div class="card"><h2 class="section-title"><span class="num">📄</span> Đọc &amp; tải tài liệu Word</h2>'+
+  '<p class="lede">Xem trực tiếp trên web (Word 2010 → mới nhất: .docx, .docm, .dotx, .dotm) hoặc tải đúng file gốc về máy. File .doc cũ được tải về nguyên vẹn; xem trước khi quản trị viên đính kèm bản PDF/DOCX chuyển đổi.</p>'+
+  '<div class="wr-admin-box"><h3>⚙️ Quản lý tài liệu (chỉ quản trị viên)</h3><div class="wr-grid">'+
+  '<div><label for="wrFile">File Word gốc (.doc .docx .docm .dotx .dotm, ≤ 8 MB)</label><input type="file" id="wrFile" accept=".doc,.docx,.docm,.dotx,.dotm"></div>'+
+  '<div><label for="wrPrev">Bản xem trước riêng (tuỳ chọn: .pdf hoặc .docx)</label><input type="file" id="wrPrev" accept=".pdf,.docx"></div>'+
+  '<div><label for="wrTitle">Tên tài liệu</label><input type="text" id="wrTitle" placeholder="Bỏ trống = tên file"></div>'+
+  '<div><label for="wrCat">Môn học / bài tập</label><input type="text" id="wrCat" list="wrCats" placeholder="Chọn hoặc gõ mục mới"><datalist id="wrCats">'+CATS.map(c=>'<option value="'+esc(c)+'">').join('')+'</datalist></div></div>'+
+  '<div style="margin-top:10px"><label for="wrDesc">Mô tả</label><input type="text" id="wrDesc" placeholder="Mô tả ngắn"></div>'+
+  '<div style="margin:10px 0"><label style="display:inline-flex;gap:6px;align-items:center;font-size:13px"><input type="checkbox" id="wrPub" checked> Công khai ngay (bỏ chọn = bản nháp để xem trước)</label></div>'+
+  '<button class="wr-btn pri" id="wrUp" data-wr="upload">⬆️ Kiểm tra &amp; tải lên</button> <span id="wrUm" style="font-size:12.5px;color:var(--muted)"></span><div class="wr-prog" id="wrPr"><i></i></div></div>'+
+  '<div id="wrList"><p style="color:var(--muted)">Đang tải danh sách…</p></div></div></main>'+
+  '<footer>E-Portfolio cá nhân · Nguyễn Chí Nguyên</footer>';
+}
+async function show(){
+  shell();
+  if(!B()){ $('wrList').innerHTML='<p style="color:var(--muted)">Chưa kết nối được máy chủ lưu trữ (Firebase). Kiểm tra cấu hình hoặc mạng.</p>'; return; }
+  try{ await loadIndex(); S.ready=true; renderList(); }catch(e){ $('wrList').innerHTML='<p style="color:#C0392B">Không đọc được danh sách: '+esc(e.code==='permission-denied'?'Firestore Rules chưa cho phép đọc.':(e.message||e))+'</p>'; }
+}
+function prog(p,m){ const w=$('wrPr'); if(!w) return; w.style.display=p>=1||p<0?'none':'block'; w.firstChild.style.width=Math.round(p*100)+'%'; if(m!=null) $('wrUm').textContent=m; }
+async function upload(o){
+  const b=$('wrUp'); b.disabled=true;
+  try{
+    if(!isAdm()||!B().user()) throw new Error('Cần đăng nhập quản trị viên.');
+    prog(.02,'Đang kiểm tra file…'); const info=await inspect(o.file,EXT), pinfo=o.prev?await inspect(o.prev,['pdf','docx']):null;
+    const old=o.id?S.docs.find(x=>x.id===o.id):null, id=old?old.id:'d'+Date.now().toString(36), rev=(old?old.rev||0:0)+1;
+    const d=Object.assign({},old||{},{id,rev,title:o.title||(old&&old.title)||o.file.name.replace(/\.[^.]+$/,''),desc:o.desc!=null?o.desc:(old&&old.desc)||'',cat:o.cat||(old&&old.cat)||'Khác',pub:o.pub!==undefined?o.pub:(old?old.pub!==false:true),
+      fileName:o.file.name,ext:info.ext,kind:info.kind,macro:!!info.macro,size:o.file.size,n:Math.ceil(o.file.size/CH),sha:await sha(await o.file.arrayBuffer()),order:old?old.order:(S.docs.reduce((m,x)=>Math.max(m,x.order||0),0)+1),added:old?old.added:Date.now(),upd:Date.now(),
+      pv:pinfo?{ext:pinfo.ext,name:o.prev.name,size:o.prev.size,n:Math.ceil(o.prev.size/CH)}:null});
+    const tot=d.n+(d.pv?d.pv.n:0); let k=0; const step=()=>prog(.05+.9*(++k/tot),'Đang tải lên '+k+'/'+tot+'…');
+    try{ await putChunks(d,'f',o.file,step); if(d.pv) await putChunks(d,'p',o.prev,step); }
+    catch(e){ await delChunks(d,'f',d.n); if(d.pv) await delChunks(d,'p',d.pv.n); throw e; }   // lỗi giữa chừng: dọn phần mới, dữ liệu cũ còn nguyên
+    const idx=S.docs.findIndex(x=>x.id===id); if(idx>=0) S.docs[idx]=d; else S.docs.push(d);
+    try{ await saveIndex(); }catch(e){ if(old) S.docs[idx]=old; else S.docs.pop(); await delChunks(d,'f',d.n); if(d.pv) await delChunks(d,'p',d.pv.n); throw e; }
+    if(old){ await delChunks(old,'f',old.n); if(old.pv) await delChunks(old,'p',old.pv.n); }
+    prog(1,''); toast('Đã tải lên: '+d.title+(info.macro?' (có macro — không bao giờ được chạy)':'')); return d;
+  }catch(e){ prog(-1,''); toast(e.message||String(e),1); $('wrUm').textContent='❌ '+(e.message||e); return null; }
+  finally{ b.disabled=false; }
+}
+const inpRep=document.createElement('input'); inpRep.type='file'; inpRep.accept='.doc,.docx,.docm,.dotx,.dotm'; inpRep.hidden=true; document.body.appendChild(inpRep);
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('[data-wr]'); if(!b) return; const a=b.dataset.wr, it=b.closest('.wr-item'), d=it&&S.docs.find(x=>x.id===it.dataset.id);
+  if(a==='upload'){ const f=$('wrFile').files[0]; if(!f){ toast('Hãy chọn file Word.',1); return; }
+    const r=await upload({file:f,prev:$('wrPrev').files[0]||null,title:$('wrTitle').value.trim(),desc:$('wrDesc').value.trim(),cat:$('wrCat').value.trim(),pub:$('wrPub').checked});
+    if(r){ ['wrFile','wrPrev','wrTitle','wrDesc'].forEach(i=>$(i).value=''); renderList(); } return; }
+  if(!d) return;
+  if(a==='view') openViewer(d); else if(a==='zoom') openViewer(d,{zoom:1.5}); else if(a==='print') openViewer(d,{print:true});
+  else if(a==='dl') download(d,'f'); else if(a==='dlp') download(d,'p');
+  else if(isAdm()){
+    const save=async m=>{ try{ await saveIndex(); renderList(); toast(m); }catch(x){ toast('Lưu thất bại: '+(x.code||x.message),1); await loadIndex(); renderList(); } };
+    if(a==='edit'){ const t=prompt('Tên tài liệu:',d.title); if(t===null) return; const s=prompt('Mô tả:',d.desc||''); if(s===null) return; const c=prompt('Môn học / bài tập:',d.cat||'Khác'); if(c===null) return; d.title=t.trim()||d.title; d.desc=s.trim(); d.cat=c.trim()||'Khác'; save('Đã cập nhật.'); }
+    else if(a==='pub'){ d.pub=d.pub===false; save(d.pub?'Đã công khai.':'Đã chuyển thành bản nháp.'); }
+    else if(a==='up'||a==='dn'){ const i=S.docs.indexOf(d), j=i+(a==='up'?-1:1); if(j<0||j>=S.docs.length) return; [S.docs[i],S.docs[j]]=[S.docs[j],S.docs[i]]; S.docs.forEach((x,k)=>x.order=k+1); save('Đã đổi thứ tự.'); }
+    else if(a==='del'){ if(!confirm('Xoá “'+d.title+'”? Không thể hoàn tác.')) return; try{ S.docs=S.docs.filter(x=>x!==d); await saveIndex(); await delChunks(d,'f',d.n); if(d.pv) await delChunks(d,'p',d.pv.n); cache.clear(); renderList(); toast('Đã xoá.'); }catch(x){ toast('Xoá thất bại: '+(x.code||x.message),1); await loadIndex(); renderList(); } }
+    else if(a==='rep'){ inpRep.value=''; inpRep.onchange=async()=>{ const f=inpRep.files[0]; if(!f) return; const r=await upload({file:f,id:d.id}); if(r){ cache.clear(); renderList(); } }; inpRep.click(); }
+  }
+});
+const sv=window.switchView; window.switchView=function(v,s){ sv(v,s); if(v==='view-words') show(); };
+window.addEventListener('wr-auth',()=>{ if(S.ready) renderList(); });
+window.WR={inspect,upload,getBlob,download,openViewer,state:S,show,sha,clearCache:()=>cache.clear()};
+})();
+</script>
+
 <script type="module">
 /* ============ CẤU HÌNH — điền 2 thứ này ============ */
 const ADMIN_EMAIL = "vn3348177@gmail.com";
@@ -1385,6 +1695,7 @@ if(FIREBASE_CONFIG.apiKey.startsWith("DAN_")){ console.warn("Chưa cấu hình F
 else{
   const app = initializeApp(FIREBASE_CONFIG), auth = getAuth(app), db = getFirestore(app);
   const ref = doc(db,'site','content');
+  window.WordBridge={db,doc,getDoc,setDoc,deleteDoc,serverTimestamp,user:()=>auth.currentUser};   // cầu nối cho module Tài liệu Word
   const $ = id=>document.getElementById(id);
   const bar=$('editBar'), msg=$('editMsg'), bLogin=$('btnLogin'), bEdit=$('btnEdit'), bSave=$('btnSave'), bCancel=$('btnCancel'), bOut=$('btnLogout');
   const VIEW_IDS=[...document.querySelectorAll('.view')].map(v=>v.id);
@@ -1774,7 +2085,7 @@ else{
   onAuthStateChanged(auth,user=>{
     const ok=!!(user && user.emailVerified && user.email && user.email.toLowerCase()===ADMIN_EMAIL.toLowerCase());
     if(user && !ok){ denied='Tài khoản '+user.email+' không có quyền sửa trang.'; signOut(auth); return; }
-    bLogin.style.display=ok?'none':''; bEdit.style.display=bOut.style.display=ok?'':'none';
+    document.body.classList.toggle('wr-admin',ok); window.dispatchEvent(new Event('wr-auth')); bLogin.style.display=ok?'none':''; bEdit.style.display=bOut.style.display=ok?'':'none';
     bSave.style.display=bCancel.style.display='none';
     document.body.classList.remove('edit-mode');
     msg.textContent=ok?('Xin chào, '+user.email):denied; denied='';
